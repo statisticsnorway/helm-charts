@@ -1,0 +1,287 @@
+{{- if eq (required ".Values.type entry required" .Values.type) "deployment"}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "app.name" . }}
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  {{- if .Values.deploymentStrategy }}
+  strategy:
+{{ toYaml .Values.deploymentStrategy | indent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "app.name" . }}
+        release: {{ .Release.Name }}
+      {{- if or (.Values.configs) (and ( or (eq (toString .Values.metrics.enabled) "true") (eq (toString .Values.metrics.enabled) "True")) .Values.metrics.enabled) (.Values.annotations) }}
+      annotations:
+      {{- if .Values.configs }}
+        "checksum/application-config": "{{ include (print $.Template.BasePath "/configmap-application.yaml") . | sha256sum }}"
+      {{- end }}
+      {{- if .Values.backends }}
+        "checksum/nginx-vhost-config": "{{ include (print $.Template.BasePath "/configmap-nginx-vhost.yaml") . | sha256sum }}"
+      {{- end }}
+      {{- if and ( or (eq (toString .Values.metrics.enabled) "true") (eq (toString .Values.metrics.enabled) "True")) .Values.metrics.enabled }}
+{{ include "prometheus.labels" . | indent 8 }}
+      {{- end }}
+      {{- if .Values.annotations }}
+      {{- with .Values.annotations }}
+        {{- range $key, $value := . }}
+        {{ $key }}: "{{ $value }}"
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+    spec:
+      {{- if and ( or (eq (toString .Values.serviceAccount.create) "true") (eq (toString .Values.serviceAccount.create) "True")) .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "app.serviceAccountName" . }}
+      {{- end }}
+      {{- if or (include "app.secretsInjectionEnabled" .) ( .Values.persistence.owner ) }}
+      initContainers:
+      {{- if .Values.persistence.owner }}
+      - name: chowner
+        image: busybox
+        command:
+          - chown
+          - -R
+          - {{ .Values.persistence.owner }}
+          - {{ .Values.persistence.folder }}
+        volumeMounts:
+        - name: custom-data
+          mountPath: {{ .Values.persistence.folder }}
+      {{- end }}
+      {{- if include "app.secretsInjectionEnabled" . }}
+      - name: secrets-injector
+        image: bitnami/minideb:buster
+        volumeMounts:
+        - name: application-secrets
+          mountPath: /secrets/
+          readOnly: true
+        - name: application-config-secrets-volume
+          mountPath: /config/
+        - name: application-config-volume
+          mountPath: /template/
+        command: ["sh", "-c"]
+        args:
+        - echo "Injecting secrets..";
+        {{- $configs := .Values.configs }}
+        {{- range $config := $configs }}
+        {{- if $config.secretsInjection }}
+        {{- $secrets := $config.secretsInjection }}
+        {{- range $secret := $secrets }}
+          if [ ! -s /config/{{ $config.name }} ]; then
+            cp /template/{{ $config.name }} /config/{{ $config.name }} || exit 1;
+          fi;
+          perl -i -p0e '$secret=`cat /secrets/{{ $secret.secretName }}`; s/{{ $secret.placeholder }}/$secret/seg' /config/{{ $config.name }} || exit 1;
+        {{- end }}
+        {{- end }}
+        {{- end }}
+          echo "done"
+        {{- end }}
+        {{- end }}
+      containers:
+        {{- if .Values.sidecars }}
+{{ toYaml .Values.sidecars | trim | indent 8 | replace "'" "" }}
+        {{- end }}
+        {{- if and ( or (eq (toString .Values.cloudsql.enabled) "true") (eq (toString .Values.cloudsql.enabled) "True")) .Values.cloudsql.enabled }}
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:{{ .Values.cloudsql.version }}
+          command:
+          - /cloud_sql_proxy
+          args:
+          - -instances={{ required "A valid .Values.cloudsql.instance entry required!" .Values.cloudsql.instance }}=tcp:5432
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+        {{- end }}
+        {{- if and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend") }}
+        - name: oauth2-proxy
+          image: {{ .Values.oauth2Proxy.image }}:{{ .Values.oauth2Proxy.version }}
+          imagePullPolicy: Always
+          ports:
+          - name: http-oauth2
+            containerPort: {{ .Values.oauth2Proxy.port }}
+          args:
+          - --config=/secrets/oauth2-proxy-client-config.yaml
+          volumeMounts:
+          - name: oauth2-proxy-client-config
+            mountPath: "/secrets/"
+            readOnly: true
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+        {{- end }}
+        {{- if .Values.backends }}
+        - name: nginx-gateway
+          image: {{ .Values.apiGateway.image }}:{{ .Values.apiGateway.version }}
+          imagePullPolicy: Always
+          ports:
+          - name: http-nginx
+            containerPort: {{ .Values.apiGateway.port }}
+          volumeMounts:
+          - name: nginx-vhost-config-volume
+            mountPath: "/opt/bitnami/nginx/conf/server_blocks"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+        {{- end }}
+        - name: {{ template "app.name" . }}-cont
+          image: {{ template "app.imageRepository" . }}:{{ template "app.imageTag" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.image.command }}
+          command:
+          {{-  range .Values.image.command }}
+            - {{ . }}{{ end }}
+          {{- end }}
+          {{- if .Values.image.args }}
+          args:
+          {{-  range .Values.image.args }}
+            - {{ . }}{{ end }}
+          {{- end }}
+          {{- if or (.Values.configs) (.Values.volumeMounts) (and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled) }}
+          volumeMounts:
+          {{- if .Values.volumeMounts }}
+{{ toYaml .Values.volumeMounts | trim | indent 10 }}
+          {{- end }}
+          {{- if .Values.configs }}
+          {{- range .Values.configs }}
+          {{- if .secretsInjection }}
+          - name: application-config-secrets-volume
+            mountPath: {{ .mountPath }}/{{ .name }}
+            subPath: {{ .name }}
+            readOnly: true
+          {{- else }}
+          - name: application-config-volume
+            mountPath: {{ .mountPath }}/{{ .name }}
+            subPath: {{ .name }}
+            readOnly: true
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled }}
+          - name: custom-data
+            mountPath: {{ .Values.persistence.folder }}
+          {{- end }}
+          {{- end }}
+          ports:
+          - name: {{ .Values.port.name | trunc 15 | trimSuffix "-" }}
+            containerPort: {{ .Values.port.containerport }}
+          {{- if .Values.extraPorts }}
+          {{- range .Values.extraPorts }}
+          {{- if .containerport }}
+          - name: {{ .name | trunc 15 | trimSuffix "-" }}
+            containerPort: {{ .containerport }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if and ( or (eq (toString .Values.probes.liveness.enabled) "true") (eq (toString .Values.probes.liveness.enabled) "True")) .Values.probes.liveness.enabled }}
+          livenessProbe:
+{{ toYaml .Values.probes.liveness.livenessProbe | indent 12 }}
+          {{- end }}
+          {{- if and ( or (eq (toString .Values.probes.readiness.enabled) "true") (eq (toString .Values.probes.readiness.enabled) "True")) .Values.probes.readiness.enabled }}
+          readinessProbe:
+{{ toYaml .Values.probes.readiness.readinessProbe | indent 12 }}
+          {{- end }}
+          {{- if and ( or (eq (toString .Values.resources.enabled) "true") (eq (toString .Values.resources.enabled) "True")) .Values.resources.enabled }}
+          resources:
+            limits:
+{{ toYaml .Values.resources.limits | trim | indent 14 }}
+            requests:
+{{ toYaml .Values.resources.requests | trim | indent 14 }}
+          {{- end }}
+          {{- if .Values.environmentVariables }}
+          env:
+          {{- with .Values.environmentVariables }}
+{{ toYaml . | trim | indent 12 }}
+          {{- end }}
+          {{- end }}
+{{- if and ( or (eq (toString .Values.ContainerSecurityContext.enabled) "true") (eq (toString .Values.ContainerSecurityContext.enabled) "True")) .Values.ContainerSecurityContext.enabled }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.ContainerSecurityContext.allowPrivilegeEscalation }}
+            privileged: {{ .Values.ContainerSecurityContext.privileged }}
+            readOnlyRootFilesystem: {{ .Values.ContainerSecurityContext.readOnlyRootFilesystem }}
+            runAsNonRoot: {{ .Values.ContainerSecurityContext.runAsNonRoot }}
+          {{- if .Values.ContainerSecurityContext.runAsUser }}
+            runAsUser: {{ .Values.ContainerSecurityContext.runAsUser }}
+          {{- end }}
+{{- end }}
+          {{- if .Values.lifecycle }}
+          {{- if .Values.lifecycle.postStartCommand }}
+          lifecycle:
+            postStart:
+              exec:
+                command:
+{{ toYaml .Values.lifecycle.postStartCommand | trim | indent 16}}
+          {{- end }}
+          {{- end }}
+      {{- if .Values.hostAliases }}
+      hostAliases:
+{{ toYaml .Values.hostAliases | trim | indent 8 }}
+      {{- end }}
+{{- if or (.Values.volumes) (.Values.configs) (and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled) (.Values.backends) (and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend")) }}
+      volumes:
+{{- if .Values.volumes }}
+{{ toYaml .Values.volumes | trim | indent 8 }}
+{{- end }}
+{{- if and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend") }}
+        - name: "oauth2-proxy-client-config"
+          secret:
+            secretName: "oauth2-proxy-config-{{ template "app.name" . }}"
+{{- end }}
+{{- if include "app.secretsInjectionEnabled" . }}
+        - name: application-secrets
+          secret:
+            secretName: "application-secrets-{{ template "app.name" . }}"
+        - name: application-config-secrets-volume
+          emptyDir: {}
+{{- end }}
+{{- if .Values.configs }}
+        - name: application-config-volume
+          configMap:
+            name: "{{ template "app.name" . }}-application-config"
+{{- end }}
+{{- if and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled }}
+        - name: custom-data
+          persistentVolumeClaim:
+            claimName: {{ template "app.name" . }}-pvc
+{{- end }}
+{{- if .Values.backends }}
+        - name: nginx-vhost-config-volume
+          configMap:
+            name: "{{ template "app.name" . }}-nginx-vhost-config"
+{{- end }}
+{{- end }}
+{{- if and ( or (eq (toString .Values.PodSecurityContext.enabled) "true") (eq (toString .Values.PodSecurityContext.enabled) "True")) .Values.PodSecurityContext.enabled }}
+      securityContext:
+{{- if .Values.PodSecurityContext.runAsUser }}
+        runAsUser: {{ .Values.PodSecurityContext.runAsUser }}
+{{- end }}
+{{- if .Values.PodSecurityContext.fsGroup }}
+        fsGroup: {{ .Values.PodSecurityContext.fsGroup }}
+{{- end }}
+        runAsNonRoot: {{ .Values.PodSecurityContext.runAsNonRoot }}
+{{- end }}
+{{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+{{- end }}
+
+{{- end}}

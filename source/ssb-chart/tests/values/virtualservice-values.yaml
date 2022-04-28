@@ -1,0 +1,18 @@
+name: "unittest-app"
+namespace: "unittest"
+appType: "backend"
+cluster: "test-cluster"
+billingProject: "ssb-unittest"
+image:
+  repository: ssb.no/unittest-app
+  tag: '1.0'
+routes:
+- name: "/be/unittest-app/auth"
+  type: "prefix"
+  serviceport: 8080
+- name: "/oauth2"
+  type: "prefix"
+  serviceport: 8080
+- name: "/auth"
+  type: "prefix"
+  serviceport: 8080

@@ -1,0 +1,95 @@
+{{- if .Values.backends }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "app.name" . }}-nginx-vhost-config
+  labels:
+{{ include "default.labels" . | indent 4 }}
+data:
+  vhost.conf: |-
+    # Upstream API's
+    {{- range .Values.backends }}
+    upstream {{ required "name is a required field" .name }} {
+      server {{ .name }}.{{ required "namespace is a required field" .namespace }};
+    }
+    {{ end }}
+    # Upstream application
+    upstream {{ template "app.name" . }} {
+      server 127.0.0.1:{{ .Values.port.containerport }};
+    }
+
+    # Enable debug logging
+    error_log  "/opt/bitnami/nginx/logs/error.log" debug;
+
+    server {
+      listen 0.0.0.0:{{ .Values.apiGateway.port }};
+      server_name _;
+
+      # Set proxy buffer sizes
+      proxy_buffering on;
+      proxy_buffer_size        128k;
+      proxy_buffers            4 256k;
+      proxy_busy_buffers_size  256k;
+
+      # Set header buffer sizes
+      client_header_buffer_size 32k;
+      large_client_header_buffers 4 32k;
+
+      # API definitions
+      {{- range .Values.backends }}
+      location /be/{{ .name }} {
+        set $upstream {{ .name }};
+        set $service {{ .name }}.{{ .namespace }};
+
+        rewrite ^/be/(.*)$ /_be/$1 last;
+      }
+      {{ end }}
+      # API policy section
+      location /_be {
+        internal;
+
+        # Remove the prefixes
+        rewrite ^/[^/]+/[^/]+/(.*)$ /$1 break;
+
+        # Do not send upstream errors to the client
+        proxy_intercept_errors on;
+
+        # HTTP version (default is 1.0)
+        proxy_http_version 1.1;
+
+        # The original host requested by the client
+        proxy_set_header X-Forwarded-Host $host;
+
+        # Host header must be set to kubernetes "<service_name.namespace>"
+        # to be able to proxy the requests to the kubernetes domain
+        proxy_set_header Host $service;
+
+        # What other headers do we need?
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+
+        # Pass through only cookies with the name "sessionToken".
+        # This is a Forbruk-team spesific setting and the parameters
+        # for "proxy_set_header Cookie" should maybe be made available
+        # as a variable in the Helmrelease in later improvements.
+        proxy_set_header Cookie $cookie_sessionToken;
+
+        # Pass request to upstream
+        proxy_pass http://$upstream;
+      }
+
+      # Nginx health check endpoint
+      location = /nginx-gw-health {
+        access_log off;
+        add_header Content-Type text/plain;
+
+        return 200 "alive\n";
+      }
+
+      # Proxy everything else to the application.
+      location / {
+        proxy_http_version 1.1;
+        proxy_pass http://{{ template "app.name" . }};
+      }
+    }
+{{- end -}}

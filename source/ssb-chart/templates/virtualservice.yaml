@@ -1,0 +1,68 @@
+# If exposed is set to true, "true" or "True"
+{{- if and ( or (eq (toString .Values.exposed) "true") (eq (toString .Values.exposed) "True")) .Values.exposed }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ template "app.name" . }}
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  hosts:
+{{- $appName := include "app.name" . -}}
+{{- $domainName := .Values.domain -}}
+{{- if .Values.subdomains }}
+{{- if not .Values.urlhosts }}
+{{- range .Values.subdomains }}
+  - {{ $appName }}.{{ . }}.{{ $domainName }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if .Values.urlhosts }}
+{{- if not .Values.subdomains }}
+{{- range .Values.urlhosts }}
+  - {{ . }}.{{ $domainName }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if and .Values.urlhosts .Values.subdomains }}
+{{ $urlhosts := .Values.urlhosts }}
+{{- range $subdomain := .Values.subdomains }}
+{{- range $urlhosts }}
+  - {{ . }}.{{ $subdomain }}.{{ $domainName }}
+{{- end }}
+{{- end }}
+{{- end }}
+  - {{ template "app.name" . }}.{{ template "app.cluster" . }}.{{ .Values.domain }}
+  gateways:
+  - istio-system/{{ template "app.cluster" . }}-gateway
+  http:
+{{- if .Values.routes }}
+{{- $appName := include "app.name" . }}
+{{- $releaseNamespace := .Release.Namespace }}
+{{- range .Values.routes }}
+  - match:
+    - uri:
+        {{ .type }}: "{{ .name }}"
+    route:
+    - destination:
+        host: {{ $appName }}.{{ $releaseNamespace }}.svc.cluster.local
+        port:
+          number: {{ .serviceport }}
+{{- end }}
+{{- end }}
+  - match:
+    - uri:
+        prefix: "/metrics"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: {{ template "app.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port.serviceport }}
+  - route:
+    - destination:
+        host: {{ template "app.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port.serviceport }}
+{{- end }}

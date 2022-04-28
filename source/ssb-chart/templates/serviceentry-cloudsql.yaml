@@ -1,0 +1,18 @@
+{{- if and ( or (eq (toString .Values.cloudsql.enabled) "true") (eq (toString .Values.cloudsql.enabled) "True")) .Values.cloudsql.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: "{{ template "app.name" . }}-cloudsql"
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  hosts:
+  - "dummy-{{ required "A valid .Values.cloudsql.ip entry required!" .Values.cloudsql.ip }}.{{ .Values.domain }}"
+  addresses:
+  - {{ .Values.cloudsql.ip }}/32
+  ports:
+  - name: tcp
+    number: 3307
+    protocol: tcp
+  location: MESH_EXTERNAL
+{{- end }}

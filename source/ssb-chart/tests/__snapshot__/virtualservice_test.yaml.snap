@@ -1,0 +1,41 @@
+should generate default routes and extra routes:
+  1: |
+    - match:
+      - uri:
+          prefix: /be/unittest-app/auth
+      route:
+      - destination:
+          host: unittest-app.unittest.svc.cluster.local
+          port:
+            number: 8080
+    - match:
+      - uri:
+          prefix: /oauth2
+      route:
+      - destination:
+          host: unittest-app.unittest.svc.cluster.local
+          port:
+            number: 8080
+    - match:
+      - uri:
+          prefix: /auth
+      route:
+      - destination:
+          host: unittest-app.unittest.svc.cluster.local
+          port:
+            number: 8080
+    - match:
+      - uri:
+          prefix: /metrics
+      rewrite:
+        uri: /
+      route:
+      - destination:
+          host: unittest-app.unittest.svc.cluster.local
+          port:
+            number: 80
+    - route:
+      - destination:
+          host: unittest-app.unittest.svc.cluster.local
+          port:
+            number: 80
