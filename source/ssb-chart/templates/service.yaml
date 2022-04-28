@@ -1,0 +1,26 @@
+{{- if and ( or (eq (toString .Values.service.enabled) "true") (eq (toString .Values.service.enabled) "True")) .Values.service.enabled }}
+{{- if required "If service is enabled, at least on port must be set: Values.port" .Values.port }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "app.name" . }}
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - name: {{ .Values.port.name | trunc 15 | trimSuffix "-" }}
+    port: {{ default (required ".Values.port.containerport is a required field" .Values.port.containerport) .Values.port.serviceport }}
+    targetPort: {{ include "app.targetPort" . }}
+  {{- if .Values.extraPorts }}
+  {{- range .Values.extraPorts }}
+  - name: {{ .name | trunc 15 | trimSuffix "-" }}
+    port: {{ default .containerport .serviceport }}
+    targetPort: {{ default .containerport .targetport }}
+  {{- end }}
+  {{- end }}
+  selector:
+    app: {{ template "app.name" . }}
+    release: {{ .Release.Name }}
+{{- end }}
+{{- end }}

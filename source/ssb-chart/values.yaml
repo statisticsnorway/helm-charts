@@ -1,0 +1,551 @@
+# TODO: Implement separate value map for custom labels/annotations
+
+# type: required
+# Defines Kubernetes deployment type
+# values: deployment
+type: "deployment"
+
+# name: required
+# Defines name of the application (also used for naming other
+# Kubernetes resources)
+name:
+
+# appType: required
+# Defines if the application is a frontend or a backend. This is important as
+# it decides what kind of authentication is put in front. Valid values are
+# 'backend' and 'frontend', and is not currently validated
+appType: ""
+
+# cluster: required
+# Defines what Kubernetes cluster the app will be running in
+cluster:
+
+# exposed: required
+# Expose this app on the Internet. Used by Istio
+exposed: false
+
+# domain: required
+# Defines what domain the app will be running in
+# Default value is ssb.no
+domain: ssb.no
+
+# billingProject: required
+# Defines what billing project to use as label for the objects
+billingProject:
+
+# image: required
+# Defines image used to start a main container 'repository' and 'tag' sub-fields
+# are required pullPolicy: if not set equals to 'Always'
+image:
+  repository:
+  tag:
+  pullPolicy: Always
+
+# replicaCount: required
+# Defines number of pods to scale to
+# Daemonset doesn't respect that since it runs on all nodes of the cluster
+# node affinity mechanism should be used to restrict on which nodes to allow to start daemonset pods
+# Default value equals 1
+replicaCount: 1
+
+# nodeSelector: optional
+#
+# Node selector using key-value labels for selecting the node to schedule
+# workload. Standard nodes are labeled "ssb-node: standard". Other alternatives
+# are: "ssb-node: jupyter", or "{}"
+#
+#   https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+#
+# Examples:
+#
+#   nodeSelector: {} # Schedule anywhere
+#
+#   nodeSelector:
+#     ssb-node: jupyter
+#
+#   nodeSelector:
+#     ssb-node: standard
+#
+nodeSelector: {}
+
+# tolerations: optional
+#
+# Use taints and tolerations to ensure that pods are not scheduled onto
+# inappropriate nodes.
+#
+# Note that changing this value will not have any affect unless a node is
+# configured with the appropriate "taints".
+#
+#  https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+#
+# Example of a "toleration" to restrict which node a spesific POD
+# can be scheduled on:
+#
+#   - key: "ssb-node"
+#     operator: "Equal"
+#     value: "ssb-jupyter"
+#     effect: "NoSchedule"
+tolerations: []
+
+# affinity: optional
+#
+# Node affinity is a set of rules used by the scheduler to determine where a pod
+# can be placed. The rules are defined using custom labels on nodes and label
+# selectors specified in pods. Node affinity allows a pod to specify an affinity
+# (or anti-affinity) towards a group of nodes it can be placed on.
+#
+#   https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+#
+# Example to avoid scheduling to a specific node (alternative to nodeSelector):
+#
+#   affinity:
+#     nodeAffinity:
+#       requiredDuringSchedulingIgnoredDuringExecution:
+#         nodeSelectorTerms:
+#           - matchExpressions:
+#             - key: "ssb-node"
+#               operator: NotIn
+#               values: ["jupyter"]
+#
+# Example to schedule new pods on dedicated node for "jupyter", but allow to
+# schedule on other node if that node is full:
+#
+#   affinity:
+#     nodeAffinity:
+#       preferredDuringSchedulingIgnoredDuringExecution:
+#         nodeSelectorTerms:
+#           - matchExpressions:
+#             - key: "ssb-node"
+#               operator: In
+#               values: ["jupyter"]
+#
+affinity: {}
+
+# port: Required
+# Main application port. Use 'extraPorts' for additional ports. This was
+# separated to simplify the automation for developer usage.
+#
+# containerport: Define port exposed by containers.
+# serviceport:   Define port exposed by service object (normally 80).
+# targetport:    Define target port on the POD to redirect traffic from the
+#                Service. This will usually be the applications container port,
+#                but will be set to the OAuth2 Proxy port (4180) for "frontends"
+#                or set to this port (port.targetport) if defined.
+# name:          For Istio services you must start with protocol name (i.e.
+#                http or tcp). port.name field is automatically truncated to 15 symbols.
+#                It is up to the developer to ensure that the first 15 characters are unique.
+#                This applies to all occurences of "port" and "extraPorts" name parameters.
+port:
+  name: "http-main"
+  containerport: 80
+  serviceport: 80
+  targetport:
+
+# extraPorts: Optional
+# List of extra application ports in case the application needs to expose ports
+# in addition to the normal application port. Usually not needed, unless using
+# things like 'grpc' in addition to 'http'. For these extra ports it usually
+# makes sense to use the same port for 'containerport' and 'targetport' to avoid
+# collision with the normal application port. This should only be used if your
+# application exposes more than one port. If your application exposes more than
+# one port, you should override 'port' to suit your needs (e.g. if you only
+# need 'http' or 'grpc').
+#
+# name:          Mandatory. The name of the port. For applications using Istio,
+#                this name must start with the protocol (i.e. 'grpc'). The
+#                'name' field is automatically truncated to 15 symbols.
+# containerport: Optional. The container port. It is very important that this
+#                does not conflict with 'port.containerport', or any other
+#                'containerport' within 'extraPorts'.
+# serviceport:   Optional. The service port. It is very important that this
+#                does not conflict with 'port.serviceport', or any other
+#                'serviceport' within 'extraPorts'. If not specified,
+#                'containerport' is used.
+# targetPort:    Optional. This is the target port in the POD to redirect
+#                traffic to. If not specified, 'containerport' is used..
+extraPorts: []
+# - name: "grpc-main"
+#   containerport: 1408
+#   serviceport:
+#   targetport:
+
+# environmentVariables: optional
+# Defines a set of environment variables for a main container of an app
+# In case of referring to volumes/secrets/configmaps remember to create those resources first
+environmentVariables:
+#  - name: TEST_ENV_VARIABLE
+#    value: "I_AM_A_VALUE"
+
+# config: optional
+# Defines a set of configs that should be deployed as a ConfigMap. Note that all
+# configs will be created within one ConfigMap called <application_name>-config,
+# but can be mounted to separate locations. It is possible to inject secrets into
+# configuration files using the "secretsInjection" syntax below. Note that the
+# secret must exist with those names in Kubernetes.
+configs: []
+#  - name: application.properties
+#    mountPath: /etc
+#    config: |
+#      key1=value1
+#      key2=value2
+#  - name: config.yaml
+#    mountPath: /config
+#    config: |
+#      key1: value1
+#      key2: value2
+#  - name: config-with-secret.yaml
+#    mountPath: /config
+#    secretsInjection:
+#     - placeholder: "PLACEHOLDER:APP_SECRET"
+#       secretName: "kubernetes-secret-app-name"
+#     - placeholder: "PLACEHOLDER:OTHER_SECRET"
+#       secretName: "kubernetes-secret-other-name"
+#    config: |
+#      key1: value1
+#      key2: PLACEHOLDER:APP_SECRET
+#      key3: value2
+#      key4: PLACEHOLDER:OTHER_SECRET
+
+# volumes: optional
+# Defines volumes available for mounting in pods
+# See usage and formatting: https://kubernetes.io/docs/concepts/storage/volumes/
+volumes: []
+#  - name: test-volume
+#    hostPath:
+#      path: /data
+#  - name: secret-data
+#    secret:
+#      # Secret must already exist
+#      secretName: my-secret-data
+#      items:
+#      - key: username
+#        path: my-group/my-username
+
+# volumeMounts: optional
+# Defines volume mounts for a main container in the pod
+# See https://kubernetes.io/docs/concepts/storage/volumes/#configmap (mounting Configmap as volume)
+volumeMounts: []
+#  - name: test-volume
+#    mountPath: "/media/test-volume"
+#    readOnly: true
+#    # resulting file "username" will be stored under /media/secret-data/my-group/my-username/
+#  - name: secret-data
+#    mountPath: "/media/secret-data"
+#    readOnly: true
+
+# persistence: optional
+# Defines whether app requires persistent volume
+# Once `enabled: true` is defined, corresponding sections under `volumes:` and `volumeMounts` will be
+# automatically added to the deployment template
+# Only one persistent volume is supported at the moment.
+# storageClass: optional, standard (default)  | ssd
+# Defines storage type for underlying drive
+# `accessMode:` required, use chart default if not sure,
+# `size:` required
+# `folder:` required - defines the mountPath parameter of the corresponding volumeMount's propertry
+# `owner:` not required - define owner user and owner group for the mounted volume
+# `createPvc`: not required - Create PVC manifest. Set to "false" to use existing manifest file.
+persistence:
+  enabled: false
+  createPvc: true
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  folder: /data
+
+# sidecars: optional
+# Defines additional containers to run in a pod
+# Bundles container settings into one yaml structure for simplicity
+# Allowed to define several containers here (start new container with '- name:')
+sidecars:
+
+# service: optional
+# Defines whether to create a service object for loadbalancing of pods and sets service type.
+service:
+  enabled: true
+  type: "ClusterIP"
+
+# resource: optional (optional at the moment, but will be changed to required after enabling Kubernetes policies)
+# Defines restrictions on resources requested and consumed by a single pod (total calculated resources = resources*replicaCount )
+# Used format: https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/
+#              https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/
+resources:
+  enabled: true
+  # Original formatting starts here
+  limits:
+#    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# probes: optional
+# Allows setting readiness and liveness probes for containers
+# Used format: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes
+# Don't put quotes on boolean and numerical values
+probes:
+  liveness:
+    enabled: false
+    # Original formatting starts here
+    livenessProbe:
+      httpGet:
+        port: ""
+        path: ""
+      initialDelaySeconds: 60
+      periodSeconds: 30
+  readiness:
+    enabled: false
+    # Original formatting starts here
+    readinessProbe:
+      httpGet:
+        port: ""
+        path: ""
+      initialDelaySeconds: 60
+      periodSeconds: 30
+
+# metrics: optional, if "true" sets prometheus label to a service to enable scraping by prometheus server
+# port: and path: optional, if left blank uses exposed service port and "/" - endpoint
+# scheme: optional, if left blank "http" metric-endpoint is expected (i.e. istio mtls protection disabled)
+# Don't put quotes on boolean and numerical values
+metrics:
+  enabled: false
+  port: 80
+  path: "/metrics"
+  scheme: "https"
+
+# serviceAccount: required, must be set to either false or true
+# name is generated from .Values.name + "-sa"
+# https://github.com/helm/helm/blob/master/docs/chart_best_practices/rbac.md
+serviceAccount:
+  create: true
+
+# networkpolicy: optional
+# If enabled, this will generate a simple "ingress" network policy (i.e.
+# restrict incoming traffic to the application) that only allows traffic to
+# 'port.containerport' (default) or 'port.targetport' (if specified), as well
+# as any 'extraPorts'. This is a simple "ingress" network policy, "egress"
+# traffic is not restricted.
+#
+# overrideDefaultPolicy: optional
+# Create your own NetworkPolicy for the current application
+# Please refer to kubernetes documentation for details (https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+networkpolicy:
+  enabled: true
+  overrideDefaultPolicy: {}
+#    ingress:
+#      # Allow ingress traffic on port 80 from all namespaces / pods of the cluster
+#      - ports:
+#          - port: 80
+#            protocol: TCP
+#        from:
+#          - namespaceSelector: {}
+#
+#    egress:
+#      # Allow egress traffic to the Kubernetes DNS service
+#      - ports:
+#          - port: 53
+#            protocol: UDP
+#          - port: 53
+#            protocol: TCP
+#        to:
+#          - namespaceSelector: {}
+#            podSelector:
+#              matchLabels:
+#                k8s-app: kube-dns
+
+# PodSecurityContext: optional
+# enabled: optional, specify whether to consider PodSecurityContext template fragment in deployment.yaml
+# You can currently set the following three fields of the security context. Please check documentation:
+# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#podsecuritycontext-v1-core
+# runAsNonRoot: optional
+# runAsUser: optional
+# fsGroup: optional
+# Example bellow is the bare minimum security-wise context for regular application pods
+# Once applications are ready, one should set enabled: to true
+PodSecurityContext:
+  enabled: false
+  runAsNonRoot: true
+  runAsUser: {}
+  fsGroup: {}
+
+# ContainerSecurityContext: optional
+# enabled: optional, specify whether to consider ContainerSecurityContext template fragment deployment.yaml
+# You can currently set the following five fields of the container security context. Please check documentation:
+# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#securitycontext-v1-core
+# allowPrivilegeEscalation: optional
+# privileged: optional
+# readOnlyRootFilesystem: optional
+# runAsNonRoot: optional, may be used to redefine equal field in PodSecurityContext
+# runAsUser: optional, may be used to redefine equal field in PodSecurityContext
+# Example bellow is the bare minimum security-wise context for regular application containers
+# Once applications are ready, one should set enabled: to true
+ContainerSecurityContext:
+  enabled: false
+  allowPrivilegeEscalation: false
+  privileged: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: {}
+
+# egress: optional
+# Defines a list of external https resources you need to be able to reach from # your application. Wildcard is supported, but the Helm chart will replace '*' # with 'wildcard' to avoid errors. Used by Istio
+egress: []
+#  - "dataproc.googleapis.com"
+#  - "*.cloudfront.net"
+
+# cloudsql: optional
+# If enabled, you will get a Cloud SQL Proxy sidecar container to your
+# application that can connect to an external instance specified in
+# 'cloudsql.instance'. The connection string will be provided by the platform
+# team. You should normally use the version specified as the default. An extra
+# Istio egress entry is created to allow access to the external instance using
+# the 'cloudsql.ip'
+#
+# NOTE: Do not add default values here. Default values for cloudsql is set in a
+# separate ConfigMap.
+cloudsql:
+  enabled:
+  version:
+  instance:
+  ip:
+
+# oauth2Proxy: optional
+# If appType is set to "frontend" then OAuth2 Proxy sidecar will be added as a
+# sidecar and the "targetPort" will be set to "oauth2Proxy.port". The OAuth2
+# proxy dependens on a Kubernetes secret containing the configuration and client
+# credentials. For now this has to be added by the platform team from the
+# "platform" repository.
+#
+# NOTE: Do not add default values here. Default values for oauth2Proxy is set in
+# a separate ConfigMap.
+oauth2Proxy:
+  enabled:
+  image:
+  version:
+  port:
+
+# backends: optional
+# If used, the 'backends' list  will be used to configure an API gateway to
+# backend services in the service mesh. The proxy will forward the request
+# headers, including authorization header. This will allow requests a service to
+# make authenticated requests against backend services. Note that the backend
+# receiving a request must have the calling service as allowed audience. A
+# backend service is identified by a service name and a namespace.
+#
+# name:      Mandatory. This is the service name of the backend service
+# namespace: Mandatory. This is the namespace of the backend service
+backends: []
+#  - name: "dataset-access"
+#    namespace: "dapla"
+#  - name: "backend-service"
+#    namespace: "backend"
+
+# apiGateway: optional
+# This is only used when the 'backends' list is populated to set up an Nginx
+# sidecar used as a local API Gateway that proxies requests to the backend
+# services (including authorization header).
+#
+# image:   The Docker image to use for the Nginx sidecar
+# version: The Docker image version to use for the Nginx sidecar
+# port:    The container port to use for the Nginx sidecar
+#
+# NOTE: Do not add default values here. Default values for apiGateway is set in
+# a separate ConfigMap.
+apiGateway:
+  image:
+  version:
+  port:
+
+# istioEndUserAuth: optional
+#
+# istioEndUserAuth:
+#   enabled: true | false  (default "true" for backends)
+#
+# Use this to enable or disable JWT authentication.
+#
+# To skip JWT authentication for selected paths use "excludePaths" (optional):
+#
+# istioEndUserAuth:
+#   excludePaths:
+#     - "/public"   # Matches exacly "/public" path
+#     - "/public/*" # Matches everything under the "/public/" path
+#                   # but not the "/public/" path itself
+#
+# IncludePaths have precendence over excludePaths. It only makes sense to use
+# includePaths in combination with one or more excludePaths. To require JWT
+# authentication for selected paths use includePaths (optional):
+#
+# istioEndUserAuth:
+#   includePaths:
+#     - "/auth"   # Matches exactly "/auth" path
+#     - "/auth/*" # Matches everything under "/auth/" path
+#
+# For more information about Istio's "AuthorizationPolicy" see:
+#
+#   https://istio.io/latest/docs/reference/config/security/authorization-policy/
+#
+# The "aud" (audience) claim identifies the recipients that the JWT is intended
+# for. What audience will end up a JWT is defined in the Keycloak client
+# config. By default Istio Policy for end user auth will look for the
+# applications service name in the audience list in the JWT and only accept the
+# token if there is a string match between the audience in the token and the
+# audience listed in the Policy.
+#
+# To override which audience(s) Istio will identify itself as (optional):
+#
+# istioEndUserAuth:
+#   audience:
+#     - custom-audience-1
+#     - custom-audience-2
+#
+# This can be particlar useful if you want a "common" audience for a set of
+# applications in order to avoid the hassle of having to update the keycloak
+# client configuration with new applications.
+#
+# For more information about Istio's "RequestAuthorization" configuration see:
+# https://istio.io/latest/docs/reference/config/security/request_authentication/
+istioEndUserAuth:
+  enabled: true
+
+# Optional: routes
+#
+# Support for adding additional matching rules and routes to the Istio
+# VirtualService object.
+#
+# Route traffic to path specified in the "name" property to the service port
+# specified in the "serviceport" property.
+#
+# For valid values of "name" and "type" see:
+# https://istio.io/docs/reference/config/networking/virtual-service/#StringMatch
+#
+# Note that "serviceport" must be unique and different from the default service
+# port specified in "port.serviceport".
+#
+# routes:
+#   - name: "/auth"
+#     type: "prefix"
+#     serviceport: 8080
+routes: []
+
+# Optional: subdomains
+#
+# This are the subdomains the application can be used on. If no subdomains
+# are given, the application will be available on
+# <name>.<cluster-name>.ssb.no. E.g. my-app.prod-bip-app.ssb.no.
+# The subdomains must be enabled by the Stratus team before they can be
+# used for applications.
+# subdomains:
+#   - subdomain1
+#   - subdomain2
+subdomains: []
+
+# Optional: urlhosts
+#
+# This are the urlhosts the application can be used on. If no urlhosts
+# are given, the application will be available on
+# <name>.<cluster-name>.ssb.no. E.g. my-app.prod-bip-app.ssb.no.
+# The urlhosts must be enabled by the Stratus team before they can be
+# used for applications.
+# urlhosts:
+#   - testurl1
+#   - testurl2
+urlhosts: []

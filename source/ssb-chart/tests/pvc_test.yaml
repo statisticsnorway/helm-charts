@@ -1,0 +1,64 @@
+suite: test pvc
+templates:
+  - pvc.yaml
+tests:
+  
+  - it: should render nothing if not enabled
+    asserts:
+      - hasDocuments:
+          count: 0
+          
+  - it: should render one document if enabled
+    values: 
+      - ./values/default-values.yaml
+    set:
+      persistence.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should be of kind pvc and generated name from app-name
+    values:
+      - ./values/pvc-default-values.yaml
+    set:
+      persistence.enabled: true
+    asserts: 
+      - isKind:
+         of: PersistentVolumeClaim
+      - equal:
+          path: metadata.name
+          value: unittest-app-pvc
+  
+  # Only persistence.enabled: true set
+  - it: should render defaults if nothing is overridden
+    values:
+      - ./values/pvc-default-values.yaml
+    set:
+      persistence.enabled: true
+    asserts:
+      - contains:
+          path: spec.accessModes
+          content: 
+            ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+      - equal:
+          path: spec.storageClassName
+          value: null          
+
+# persistence.enabled: true set and also overriding some settings 
+  - it: should render overridden values when they are specified
+    values:
+      - ./values/pvc-overridden-values.yaml  
+    asserts:
+      - contains:
+          path: spec.accessModes
+          content: 
+            Read
+      - equal:
+          path: spec.resources.requests.storage
+          value: 42Gi
+      - equal:
+          path: spec.storageClassName
+          value: unittest-storageclass

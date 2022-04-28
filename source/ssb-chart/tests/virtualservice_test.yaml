@@ -1,0 +1,155 @@
+suite: test virtualservice
+templates:
+  - virtualservice.yaml
+tests:
+  
+  - it: should render nothing if not exposed
+    asserts:
+      - hasDocuments:
+          count: 0
+          
+  - it: should render one document if exposed
+    values: 
+      - ./values/default-values.yaml    
+    set:
+      exposed: true
+    asserts:
+      - hasDocuments:
+          count: 1
+  
+  - it: should render nothing if exposed is a string other than "true"
+    values: 
+      - ./values/default-values.yaml    
+    set:
+      exposed: "pleaseexposemyservice"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render one document if exposed is a string that equals "true"
+    values: 
+      - ./values/default-values.yaml    
+    set:
+      exposed: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should render one document if exposed is a string that equals "True"
+    values: 
+      - ./values/default-values.yaml    
+    set:
+      exposed: "True"
+    asserts:
+      - hasDocuments:
+          count: 1         
+  
+  - it: should render nothing if exposed is a string that equals "false"
+    set:
+      exposed: "false"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should generate manifest of type VirtualService
+    values:
+      - ./values/virtualservice-values.yaml
+    set:
+      exposed: "true"
+    asserts:
+      - isKind:
+          of: VirtualService
+
+  - it: should generate gateway
+    values:
+      - ./values/virtualservice-values.yaml
+    set:
+      exposed: "true"
+    asserts:
+      - contains:
+          path: spec.gateways
+          content: 
+            istio-system/test-cluster-gateway
+
+  - it: should generate host and subdomains
+    values:
+      - ./values/virtualservice-values.yaml
+    set:
+      exposed: true
+      subdomains:
+      - testdomain1
+      - testdomain2
+    release:
+      namespace: unittest
+    asserts:
+      - equal:
+          path: spec.hosts
+          value: 
+          - unittest-app.testdomain1.ssb.no
+          - unittest-app.testdomain2.ssb.no
+          - unittest-app.test-cluster.ssb.no
+
+  - it: should generate host
+    values:
+      - ./values/virtualservice-values.yaml
+    set:
+      exposed: true
+    release:
+      namespace: unittest
+    asserts:
+      - equal:
+          path: spec.hosts
+          value:
+          - unittest-app.test-cluster.ssb.no
+  
+  - it: should generate urlhost
+    values:
+      - ./values/virtualservice-values.yaml
+    set:
+      exposed: true
+      urlhosts:
+      - testurl1
+      - testurl2
+    release:
+      namespace: unittest
+    asserts:
+      - equal:
+          path: spec.hosts
+          value:
+          - testurl1.ssb.no
+          - testurl2.ssb.no
+          - unittest-app.test-cluster.ssb.no
+
+  - it: should generate urlhosts, subdomains
+    values:
+      - ./values/virtualservice-values.yaml
+    set:
+      exposed: true
+      urlhosts:
+      - testurl1
+      - testurl2
+      subdomains:
+      - testdomain1
+      - testdomain2
+    release:
+      namespace: unittest
+    asserts:
+      - equal:
+          path: spec.hosts
+          value:
+          - testurl1.testdomain1.ssb.no
+          - testurl2.testdomain1.ssb.no
+          - testurl1.testdomain2.ssb.no
+          - testurl2.testdomain2.ssb.no
+          - unittest-app.test-cluster.ssb.no
+
+  - it: should generate default routes and extra routes
+    values:
+      - ./values/virtualservice-values.yaml
+    set:
+      exposed: true
+    release:
+      namespace: unittest
+    asserts:
+      - matchSnapshot:
+          path: spec.http

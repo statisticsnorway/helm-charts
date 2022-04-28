@@ -1,0 +1,85 @@
+suite: test service
+templates:
+  - service.yaml
+tests:
+  
+  - it: should render nothing if not enabled
+    set:
+      service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+          
+  - it: should render one document if enabled
+    values: 
+      - ./values/default-values.yaml
+    set:
+      service.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should include default labels and be of kind Service
+    values:
+      - ./values/service-values.yaml
+    release:
+      namespace: unittest
+      name: unittest
+    asserts:
+      - equal: 
+          path: metadata.labels
+          value:
+            app: unittest-app
+            billing-project: ssb-unittest
+            chart: ssb-chart-1.3.1
+            heritage: Tiller
+            release: unittest
+      - isKind:
+          of: Service  
+  
+  - it: should render ServiceType and selector
+    values:
+      - ./values/service-values.yaml
+    release:
+      namespace: unittest
+      name: unittest
+    asserts:
+      - equal: 
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.selector
+          value:
+            app: unittest-app
+            release: unittest
+
+  - it: should render default ports
+    values:
+      - ./values/service-values.yaml
+    release:
+      namespace: unittest
+      name: unittest
+    asserts:
+      - equal: 
+          path: spec.ports
+          value:
+            - name: http-main
+              port: 80
+              targetPort: 80
+
+  - it: should render custom ports and extraports
+    values:
+      - ./values/service-custom-ports-values.yaml
+    release:
+      namespace: unittest
+      name: unittest
+    asserts:
+      - equal: 
+          path: spec.ports
+          value:
+            - name: http-unittest
+              port: 80
+              targetPort: 8080
+            - name: "http-liveness-r"
+              port: 8090
+              targetPort: 8090
