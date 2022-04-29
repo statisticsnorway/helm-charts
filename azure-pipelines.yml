@@ -1,0 +1,38 @@
+name: $(Build.SourceBranch)-$(date:yyyyMMdd)$(rev:.r)
+
+# Avoid running on push
+trigger:
+  - none
+pr:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - source/ssb-chart/*
+    - azure-pipelines.yml
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: run_helm_unittests
+  displayName: 'Run Helm tests'
+  steps:
+  - checkout: self
+  # Install necessary plugin for helm unittest
+  - script:  helm plugin install https://github.com/quintush/helm-unittest
+    displayName: 'Installing helm unittest'
+
+  # Run the Helm unittests
+  - script: helm unittest source/ssb-chart -o helm_unittest_testresults.xml -t JUnit
+    displayName: 'Running unittests for ssb-chart'
+
+  # Publish testresults for Helm unittest in Junit-format    
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/helm_unittest_testresults.xml'
+      failTaskOnFailedTests: true      
+    displayName: 'Publishing test results'
+    condition: always()
