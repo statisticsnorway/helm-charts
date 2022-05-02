@@ -1,34 +1,22 @@
 apiVersion: v1
 entries:
-  simple-helm-chart:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-04-28T14:36:20.029129+02:00"
-    description: A Helm chart for Kubernetes
-    digest: 5a70d79d55940c6a08d1509298c38bf1eb38de0792f07045635cc0f54d7e5504
-    name: simple-helm-chart
-    type: application
-    urls:
-    - charts/simple-helm-chart-0.1.1.tgz
-    version: 0.1.1
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-04-28T14:36:20.028618+02:00"
-    description: A Helm chart for Kubernetes
-    digest: 429fe9e80eaf8c579c8316319f6a0520873edc05a764296254f74f7f22c7e3e8
-    name: simple-helm-chart
-    type: application
-    urls:
-    - charts/simple-helm-chart-0.1.0.tgz
-    version: 0.1.0
   ssb-chart:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2022-04-28T14:36:20.030398+02:00"
+    created: "2022-05-02T08:41:38.933023+02:00"
+    description: Generic chart for SSB applications
+    digest: 433af426d60f00cb2ff7942e2a268d504202c1322957d15252ce28ff384e6d1a
+    name: ssb-chart
+    urls:
+    - charts/ssb-chart-2.0.0.tgz
+    version: 2.0.0
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: "2022-05-02T08:41:38.932147+02:00"
     description: Generic chart for SSB applications
     digest: e297125c0f5336864ff2d4173246e6e19c3f31a1b918294ce09dee9f6c86a53a
     name: ssb-chart
     urls:
     - charts/ssb-chart-1.3.1.tgz
     version: 1.3.1
-generated: "2022-04-28T14:36:20.026895+02:00"
+generated: "2022-05-02T08:41:38.931143+02:00"

@@ -2,6 +2,10 @@
 
 This is a repository for Helm charts.
 
+## Charts in this repository
+
+* SSB Chart (See source/ssb-chart)
+
 ## Files in repo
 
 ```shell
