@@ -1,3 +1,21 @@
+# ssb-chart v2.0.0
+
+Moved ssb-chart to this Helm chart repository.
+
+This helm chart can now be referenced with a repository URL:
+```YAML
+spec:
+  chart:
+    repository: "https://raw.githubusercontent.com/statisticsnorway/helm-charts/main/"
+    name: "ssb-chart"
+    version: 2.0.0
+  releaseName: __your-app-name__
+```
+
+# ssb-chart v1.3.1
+
+Support for passing a named HTTP cookie in the Nginx proxy.
+
 # ssb-chart v1.3.0
 
 SSB-Chart is a generic Helm Chart template to use as basis for applications to be deployed on the SSB Platform.
@@ -28,14 +46,14 @@ Use this template as basis for Flux deployment, and update the values in the Kub
 
 ## Installing the Chart
 
-To use the SSB-chart, define the chart in the Flux release file (Change __your-app-name__ to a unique name for your application, and select chart version; the highest available version number is recomended, i.e. `helm/charts/ssb-cart/v1.3.0`)
+To use the SSB-chart, define the chart in the Flux release file (Change __your-app-name__ to a unique name for your application, and select chart version; the highest available version number is recomended, i.e. `2.0.0`)
 
 ```YAML
 spec:
   chart:
-    git: "ssh://git@github.com/statisticsnorway/platform-dev"
-    ref: "master"
-    path: "helm/charts/ssb-chart/__chart-version__"
+    repository: "https://raw.githubusercontent.com/statisticsnorway/helm-charts/main/"
+    name: "ssb-chart"
+    version: 2.0.0
   releaseName: __your-app-name__
 ```
 
@@ -161,14 +179,13 @@ To avoid accidentally creating a resource one should check that the string is se
 
 ## Unit testing the Helm Chart
 
-To be able to confidently change or refactor the `ssb-chart` templates, unit tests for the templates exists in the folder `helm/charts/ssb-chart/<version>/tests`.
+To be able to confidently change or refactor the `ssb-chart` templates, unit tests for the templates exists in the folder `source/ssb-chart/tests`.
 The tests are run with the Helm plugin [airflow-helm-unittest](https://github.com/apache/airflow-helm-unittest), see [install guide](https://github.com/apache/airflow-helm-unittest#install) for installation.
 
 To run the tests:
 
 ```bash
-cd helm/charts/
-helm unittest ssb-chart/<version>
+helm unittest source/ssb-chart
 ```
 
 ### Values
@@ -178,7 +195,7 @@ There are two ways of specifying values that should override the default values 
 * Using the `set` tag directly in the test
 * Specifying a `values` file
 
-Examples on both can be found in the [documentation](https://github.com/apache/airflow-helm-unittest/blob/development/DOCUMENT.md#test-job). The values files for the tests in `ssb-chart` can be found in the directory `helm/charts/ssb-chart/<version>/tests/values`.
+Examples on both can be found in the [documentation](https://github.com/apache/airflow-helm-unittest/blob/development/DOCUMENT.md#test-job). The values files for the tests in `ssb-chart` can be found in the directory `source/ssb-chart/tests/values`.
 
 ### Release values
 
@@ -191,14 +208,13 @@ There are a number of ways to assert that the actual values generated are as to 
 One "special" kind of assertion is the `matchSnapshot` which saves the value for the path in a snapshot file in the `__snapshot__` directory. On the subsequent runs of the test, the value for the path will be compared to the saved snapshot. If there are changes in the template that makes the value for the path different, run the tests with the `-u` parameter to update the snapshot:
 
 ```bash
-cd helm/charts/
-helm unittest ssb-chart/<version> -u
+helm unittest source/ssb-chart/ -u
 ```
 
 ### Tips, tricks and gotcha's writing unit tests
 
 * Rembember it's all `yaml`, so indentation really(!) matters on all levels. As an example, if the error `invalid memory address or nil pointer dereference` is raised there is probably an indentation error in the test
-* The file containing the test must reside in the folder `helm/charts/ssb-chart/<version>/tests/`
+* The file containing the test must reside in the folder `source/ssb-chart/tests/`
 * The file containing the test must be suffixed `_test.yaml`, or else it will not be run
 * If it is hard to calculate what actually is generated, the `matchSnapshot` assertion can be used to create a temporary snapshot file to view the output
 
