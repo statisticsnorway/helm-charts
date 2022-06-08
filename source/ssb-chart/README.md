@@ -1,3 +1,13 @@
+# ssb-chart v2.1.0
+
+Support for setting the "-enable-iam-login" argument for
+the cloudsql-proxy.
+
+This setting enables Postgresql database auth using the Workload Identity SA for the application. 
+Note that the Sqluser must be created with "type: CLOUD_IAM_SERVICE_ACCOUNT" and the username 
+must be set to the Workload Identity SA without the .gserviceaccount.com suffix. Requires 
+cloudsql-proxy >= 1.20.
+
 # ssb-chart v2.0.0
 
 Moved ssb-chart to this Helm chart repository.
