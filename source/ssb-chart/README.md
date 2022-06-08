@@ -146,6 +146,7 @@ Parameter | Description | Default
 `deploymentStrategy` | [Documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) | `rollingUpdate`
 `egress` | A list of HTTPS services you need to reach outside of the service mesh | `[]`
 `cloudsql` | Dictionary to control whether or not to set up a Cloud SQL Proxy sidecar that can connect to an external database | See values.yaml
+`cloudsql.enableIamLogin` | Use WI SA for Postgres database user auth. Sqluser must be created with "type: CLOUD_IAM_SERVICE_ACCOUNT" and username is WI SA email without the .gserviceaccount.com suffix | `false`
 `backends` | List of backend services that an application should be able to talk to (using an Nginx API Gateway) | `[]`
 `apiGateway` | Configuration dictionary for the Nginx API Gateway (only used if `backends` is populated) | See below
 `apiGateway.image` | The Docker image to use for the Nginx API Gateway sidecar | `bitnami/nginx`

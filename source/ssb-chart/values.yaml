@@ -400,13 +400,13 @@ egress: []
 # Istio egress entry is created to allow access to the external instance using
 # the 'cloudsql.ip'
 #
-# NOTE: Do not add default values here. Default values for cloudsql is set in a
-# separate ConfigMap.
+# Default cloudsql version is read from a ConfigMap.
 cloudsql:
-  enabled:
+  enabled: false
   version:
   instance:
   ip:
+  enableIamLogin: false
 
 # oauth2Proxy: optional
 # If appType is set to "frontend" then OAuth2 Proxy sidecar will be added as a

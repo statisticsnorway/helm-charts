@@ -1,0 +1,77 @@
+suite: test deployment with cloudsql
+templates:
+  - deployment.yaml
+tests:
+
+  - it: should render one manifest of type Deployment
+    values:
+      - ./values/cloudsql-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+
+  - it: should set enable_iam_login flag
+    values:
+      - ./values/cloudsql-values.yaml
+    set:
+      name: "myapp"
+      cloudsql:
+        enabled: true
+        version: v2
+        instance: myinstance
+        ip: 127.0.0.1
+        enableIamLogin: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value:
+           cloudsql-proxy
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+           - /cloud_sql_proxy
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - -instances=myinstance=tcp:5432
+            - -enable_iam_login
+
+  - it: should not set enable_iam_login flag
+    values:
+      - ./values/cloudsql-values.yaml
+    set:
+      name: "myapp"
+      cloudsql:
+        enabled: true
+        version: v2
+        instance: myinstance
+        ip: 127.0.0.1
+        enableIamLogin: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value:
+            cloudsql-proxy
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - /cloud_sql_proxy
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - -instances=myinstance=tcp:5432
+
+  - it: should not render cloudsql configuration
+    values:
+      - ./values/cloudsql-values.yaml
+    set:
+      name: "myapp"
+      cloudsql:
+        enabled: false
+    asserts:
+      - notEqual:
+          path: spec.template.spec.containers[0].name
+          value:
+            cloudsql-proxy

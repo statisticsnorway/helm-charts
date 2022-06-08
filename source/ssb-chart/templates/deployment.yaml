@@ -97,6 +97,9 @@ spec:
           - /cloud_sql_proxy
           args:
           - -instances={{ required "A valid .Values.cloudsql.instance entry required!" .Values.cloudsql.instance }}=tcp:5432
+          {{ if .Values.cloudsql.enableIamLogin }}
+          - -enable_iam_login
+          {{- end }}
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
