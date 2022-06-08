@@ -34,13 +34,17 @@ tests:
           path: metadata.name
           value: unittest-app-request-auth
       - equal:
-          path: metadata.labels
-          value: 
-            app: unittest-app
-            billing-project: ssb-unittest
-            chart: ssb-chart-2.1.0
-            heritage: Tiller
-            release: unittest-app-release
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
 
   - it: second document should be of kind AuthorizationPolicy, have correct name and include default labels
     values:
@@ -56,13 +60,17 @@ tests:
           path: metadata.name
           value: unittest-app-default-auth-policy
       - equal:
-          path: metadata.labels
-          value: 
-            app: unittest-app
-            billing-project: ssb-unittest
-            chart: ssb-chart-2.1.0
-            heritage: Tiller
-            release: unittest-app-release
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
   
   - it: RequestAuthentication should have match labels on app-name, have Keycloak as the issuer, forwardOriginaltoken and audience should only be the unittest-app (default)
     values:

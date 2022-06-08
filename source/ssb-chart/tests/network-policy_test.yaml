@@ -28,14 +28,18 @@ tests:
       name: unittest-app-release
       namespace: unittesting
     asserts:
-      - equal: 
-          path: metadata.labels
-          value:
-            app: unittest-app
-            billing-project: ssb-unittest
-            chart: ssb-chart-2.1.0
-            heritage: Tiller
-            release: unittest-app-release
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
       - isKind:
           of: NetworkPolicy    
   
