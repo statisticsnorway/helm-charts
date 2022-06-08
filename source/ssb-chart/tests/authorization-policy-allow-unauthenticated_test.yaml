@@ -32,13 +32,17 @@ tests:
     documentIndex: 2
     asserts:
       - equal:
-          path: metadata.labels
-          value: 
-            app: unittest-app
-            billing-project: ssb-unittest
-            chart: ssb-chart-2.1.0
-            heritage: Tiller
-            release: unittest-app-release
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
       - equal:
           path: metadata.name
           value: unittest-app-allow-auth-policy

@@ -26,13 +26,17 @@ tests:
        - ./values/configmap-nginx-vhost-values.yaml
     asserts:
       - equal:
-          path: metadata.labels
-          value:
-            app: unittest-app
-            billing-project: ssb-unittest
-            chart: ssb-chart-2.1.0
-            heritage: Tiller
-            release: RELEASE-NAME
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: RELEASE-NAME
       - isKind:
          of: ConfigMap
       - equal:
