@@ -31,7 +31,7 @@ tests:
           value:
             app: unittest-app
             billing-project: ssb-unittest
-            chart: ssb-chart-2.0.0
+            chart: ssb-chart-2.1.0
             heritage: Tiller
             release: unittest
       - isKind:
