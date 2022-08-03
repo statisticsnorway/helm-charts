@@ -1,0 +1,40 @@
+suite: test workload identity IAM config
+templates:
+  - wi-gcp-iampolicy.yaml
+tests:
+  
+  - it: should render nothing if not enabled
+    values: 
+      - ./values/default-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+          
+  - it: should render one document if enabled
+    values: 
+      - ./values/workload-identity-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should be of kind IAMPolicy with a name generated from app-name and reference the wi sa
+    values:
+      - ./values/workload-identity-values.yaml
+    asserts:
+      - isKind:
+          of: IAMPolicy
+      - equal:
+          path: metadata.name
+          value: unittest-app-wi-iampolicy
+      - equal:
+          path: spec.resourceRef.kind
+          value: IAMServiceAccount
+      - equal:
+          path: spec.resourceRef.name
+          value: unittest-app-wi-sa
+      - equal:
+          path: spec.bindings[0].role
+          value: roles/iam.workloadIdentityUser
+      - equal: 
+          path: spec.bindings[0].members[0]
+          value: serviceAccount:cluster-project.svc.id.goog[unittest/unittest-app-sa]

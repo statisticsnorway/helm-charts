@@ -1,4 +1,32 @@
-# ssb-chart v2.1.0
+# SSB-chart
+
+SSB-chart is a generic Helm chart template to use as basis for applications to be deployed on the SSB cloud platform.
+
+## Introduction
+
+Use this template as basis for Flux deployment, and update the values in the HelmRelease manifest.
+
+## Chart version changelog
+
+### v2.2.0
+
+Support for creating Workload Identity resources by providing appropriate values for both the new properties `workloadIdentity.clusterProject` and `workloadIdentity.identityProject`.
+
+Example:
+
+```yaml
+workloadIdentity:
+  clusterProject: "staging-bip"
+  identityProject: "ssb-team-stratus-staging"
+```
+
+This results in the configuration needed for Google Workload Identity:
+
+- An IAMServiceAccount manifest ([template](./templates/wi-gcp-sa.yaml)) which Config Connector will use to create the GCP service account in the `identityProject`
+- An IAMPolicy manifest ([template](./templates/wi-gcp-iampolicy.yaml)) which Config Connector will use to create the Workload Identity policy for the new GCP service account
+- The Kubernetes service account ([template](./templates/serviceaccount.yaml)) representing the application is annotated with the new GCP service account's ID.
+
+### v2.1.0
 
 Support for setting the "-enable-iam-login" argument for
 the cloudsql-proxy.
@@ -8,11 +36,12 @@ Note that the Sqluser must be created with "type: CLOUD_IAM_SERVICE_ACCOUNT" and
 must be set to the Workload Identity SA without the .gserviceaccount.com suffix. Requires 
 cloudsql-proxy >= 1.20.
 
-# ssb-chart v2.0.0
+### v2.0.0
 
 Moved ssb-chart to this Helm chart repository.
 
 This helm chart can now be referenced with a repository URL:
+
 ```YAML
 spec:
   chart:
@@ -22,21 +51,9 @@ spec:
   releaseName: __your-app-name__
 ```
 
-# ssb-chart v1.3.1
+### v1.3.1
 
 Support for passing a named HTTP cookie in the Nginx proxy.
-
-# ssb-chart v1.3.0
-
-SSB-Chart is a generic Helm Chart template to use as basis for applications to be deployed on the SSB Platform.
-
-**This version of the chart is adapted to changes in Istio v1.10 - if unsure what version to use, ask team Stratus**
-
-## Introduction
-
-Use this template as basis for Flux deployment, and update the values in the Kubernetes manifest file
-
-## Chart version changelog
 
 ### v1.3.0
 
@@ -132,6 +149,8 @@ Parameter | Description | Default
 `serviceAccount.create` | Specifies whether a ServiceAccount should be created | `true`
 `serviceAccount.name` | Override default name for the ServiceAccount | `<app.name>-sa`
 `serviceAccount.annotations` | Set annotations on ServiceAccount | `{}`
+`workloadIdentity.clusterProject` | The ID of the project containing the cluster where the application runs, typically `staging-bip` or `prod-bip` (Workload Identity is created if both this and `workloadIdentity.identityProject` are set) |
+`workloadIdentity.identityProject` | The ID of the project where Config Connector creates resources, typically `ssb-team-<teamname>-staging` or `ssb-team-<teamname>` (Workload Identity is created if both this and `workloadIdentity.clusterProject` are set) |
 `networkpolicy.enabled` | Define whether simple ingress NetworkPolicy will be generated | `true`
 `networkpolicy.overrideDefaultPolicy` | Allows manual definition of a NetworkPolicy. **NB! Use with caution !** | `empty`
 `PodSecurityContext.enabled`| Specify whether to consider PodSecurityContext template fragment in deployment.yaml| `false`|

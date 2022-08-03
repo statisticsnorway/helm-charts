@@ -1,0 +1,15 @@
+suite: test workload identity SA config
+templates:
+  - serviceaccount.yaml
+tests:
+
+  - it: should have annotation for workload identity
+    values:
+      - ./values/workload-identity-values.yaml
+    asserts:
+      - isKind:
+          of: ServiceAccount
+      - contains:
+          path: metadata.annotations
+          content:
+            iam.gke.io/gcp-service-account: unittest-app-wi-sa@ccproj.iam.gserviceaccount.com

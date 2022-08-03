@@ -1,0 +1,12 @@
+{{- if .Values.workloadIdentity }}
+# This is the Workload Identity GCP service account.
+# IAM is handled separately
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: {{ template "app.name" . }}-wi-sa
+  namespace: {{ required "namespace is a required field for workload identity config" .Values.namespace }}
+spec:
+  displayName: "Workload identity service account for {{ .Values.namespace }}/{{ template "app.name" . }} in
+  {{ template "app.cluster" . }} cluster"
+{{- end }}

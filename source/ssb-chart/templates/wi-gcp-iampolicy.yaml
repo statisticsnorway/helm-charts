@@ -1,0 +1,23 @@
+{{- if .Values.workloadIdentity }}
+# This connects the Workload Identity GCP service account with the 
+# Kubernetes service account
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicy
+metadata:
+  name: {{ template "app.name" . }}-wi-iampolicy
+  namespace: {{ required "namespace is a required field for workload identity config" .Values.namespace }}
+spec:
+  resourceRef:
+    apiVersion: iam.cnrm.cloud.google.com/v1beta1
+    kind: IAMServiceAccount
+    # Matches SA created in 'wi-gcp-sa.yaml'
+    name: {{ template "app.name" . }}-wi-sa
+    namespace: {{ .Values.namespace }}
+  bindings:
+    - role: roles/iam.workloadIdentityUser
+      members:
+        # The first part after serviceAccount: is the project-id of the GCP project 
+        # where the application runs. This is typically `staging-bip` or `prod-bip`. 
+        # The Kubernetes SA is the default naming convention from the SSB Helm chart.
+        - serviceAccount:{{ required "clusterProject is a required field for workload identity config" .Values.workloadIdentity.clusterProject }}.svc.id.goog[{{ .Values.namespace }}/{{ template "app.name" . }}-sa]
+{{- end }}

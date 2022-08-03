@@ -1,0 +1,28 @@
+suite: test workload identity SA config
+templates:
+  - wi-gcp-sa.yaml
+tests:
+  
+  - it: should render nothing if not enabled
+    values: 
+      - ./values/default-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+          
+  - it: should render one document if enabled
+    values: 
+      - ./values/workload-identity-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should be of kind IAMServiceAccount with a name generated from app-name
+    values:
+      - ./values/workload-identity-values.yaml
+    asserts:
+      - isKind:
+          of: IAMServiceAccount
+      - equal:
+          path: metadata.name
+          value: unittest-app-wi-sa
