@@ -1,3 +1,26 @@
+# ssb-chart v2.2.0
+
+Support for not running cloudsql-proxy and revert the change introduced in v2.1.0
+
+Example:
+```YAML
+cloudsql:
+  enabled: true
+  useSqlProxy: false
+```
+Setting the `useSqlProxy` option to `false` will skip the addition of the cloudsql-proxy, but will keep the creation 
+of the `ServiceEntry` making it possible to connect to the Cloud SQL database. The value defaults to `true` if not 
+set, for backward compatibility.
+
+If the developers opt to use IamAuthentication to the Cloud SQL database the cloudsql-proxy is not needed.
+The reason for using IamAuthentication is to simplify setup by using IAM instead of username and password.
+
+Docs on using IamAuthentication via the connectors from Google directly in-process:
+https://cloud.google.com/sql/docs/postgres/iam-logins#python
+
+Also, reverted the change introduced in v2.1.0 as it seems the use case for this setting in the cloudsql-proxy could
+is intended for connecting from your local machine (a database tool for instance)
+
 # ssb-chart v2.1.0
 
 Support for setting the "-enable-iam-login" argument for

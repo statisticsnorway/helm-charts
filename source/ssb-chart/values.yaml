@@ -406,7 +406,7 @@ cloudsql:
   version:
   instance:
   ip:
-  enableIamLogin: false
+  useSqlProxy: true
 
 # oauth2Proxy: optional
 # If appType is set to "frontend" then OAuth2 Proxy sidecar will be added as a
