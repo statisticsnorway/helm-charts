@@ -91,7 +91,8 @@ spec:
 {{ toYaml .Values.sidecars | trim | indent 8 | replace "'" "" }}
         {{- end }}
         # If CloudSQL enabled is true/True AND useSqlProxy is true/True then create a cloudsql-proxy sidecar
-        {{- if and ( and ( or (eq (toString .Values.cloudsql.enabled) "true") (eq (toString .Values.cloudsql.enabled) "True")) .Values.cloudsql.enabled ( or (eq (toString .Values.cloudsql.useSqlProxy) "true") (eq (toString .Values.cloudsql.useSqlProxy) "True")))  }}
+       {{- if and ( or (eq (toString .Values.cloudsql.enabled) "true") (eq (toString .Values.cloudsql.enabled) "True")) .Values.cloudsql.enabled }}
+       {{- if and ( or (eq (toString .Values.cloudsql.useSqlProxy) "true") (eq (toString .Values.cloudsql.useSqlProxy) "True")) .Values.cloudsql.useSqlProxy }}
         - name: cloudsql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:{{ .Values.cloudsql.version }}
           command:
