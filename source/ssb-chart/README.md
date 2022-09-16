@@ -1,6 +1,11 @@
 # ssb-chart v2.2.0
 
-Support for not running cloudsql-proxy and revert the change introduced in v2.1.0
+Support for using Cloud SQL connectors instead of the CloudSql proxy.
+
+Cloud SQL connectors support IamAuthentication which gives improved security over cloudSql proxy.
+If you're using Go, Java, or Python, consider using the corresponding Cloud SQL connector which does everything the 
+proxy does:
+https://github.com/GoogleCloudPlatform/cloud-sql-proxy/blob/main/README.md
 
 Example:
 ```YAML

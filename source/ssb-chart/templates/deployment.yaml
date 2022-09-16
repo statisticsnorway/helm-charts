@@ -104,6 +104,7 @@ spec:
             runAsUser: 1000
             allowPrivilegeEscalation: false
         {{- end }}
+        {{- end }}
         {{- if and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend") }}
         - name: oauth2-proxy
           image: {{ .Values.oauth2Proxy.image }}:{{ .Values.oauth2Proxy.version }}
