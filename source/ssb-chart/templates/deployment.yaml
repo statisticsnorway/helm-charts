@@ -90,20 +90,20 @@ spec:
         {{- if .Values.sidecars }}
 {{ toYaml .Values.sidecars | trim | indent 8 | replace "'" "" }}
         {{- end }}
-        {{- if and ( or (eq (toString .Values.cloudsql.enabled) "true") (eq (toString .Values.cloudsql.enabled) "True")) .Values.cloudsql.enabled }}
+        # If CloudSQL enabled is true/True AND useSqlProxy is true/True then create a cloudsql-proxy sidecar
+       {{- if and ( or (eq (toString .Values.cloudsql.enabled) "true") (eq (toString .Values.cloudsql.enabled) "True")) .Values.cloudsql.enabled }}
+       {{- if and ( or (eq (toString .Values.cloudsql.useSqlProxy) "true") (eq (toString .Values.cloudsql.useSqlProxy) "True")) .Values.cloudsql.useSqlProxy }}
         - name: cloudsql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:{{ .Values.cloudsql.version }}
           command:
           - /cloud_sql_proxy
           args:
           - -instances={{ required "A valid .Values.cloudsql.instance entry required!" .Values.cloudsql.instance }}=tcp:5432
-          {{ if .Values.cloudsql.enableIamLogin }}
-          - -enable_iam_login
-          {{- end }}
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
             allowPrivilegeEscalation: false
+        {{- end }}
         {{- end }}
         {{- if and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend") }}
         - name: oauth2-proxy

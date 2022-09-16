@@ -399,14 +399,15 @@ egress: []
 # team. You should normally use the version specified as the default. An extra
 # Istio egress entry is created to allow access to the external instance using
 # the 'cloudsql.ip'
-#
+# useSqlProxy: set to false if using Google connectors directly to omit the creation of cloudsql-proxy sidecar
+
 # Default cloudsql version is read from a ConfigMap.
 cloudsql:
   enabled: false
   version:
   instance:
   ip:
-  enableIamLogin: false
+  useSqlProxy: true
 
 # oauth2Proxy: optional
 # If appType is set to "frontend" then OAuth2 Proxy sidecar will be added as a
