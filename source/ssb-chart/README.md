@@ -1,3 +1,15 @@
+# ssb-chart v2.3.1
+
+Update release notes.
+
+# ssb-chart v2.3.0
+
+A ServiceEntry should only take effect in the namespace where it is defined.
+
+This fixes an issue that a ServiceEntry from one namespace can interfere with the traffic of another namespace.
+
+The "exportTo" configuration with a value of "." defines an export to the same namespace that the service is declared in.
+
 # ssb-chart v2.2.0
 
 Support for using Cloud SQL connectors instead of the CloudSql proxy.

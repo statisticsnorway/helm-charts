@@ -19,9 +19,14 @@ This is a repository for Helm charts.
 ## Updating Helm charts
 
 1. Update the chart under the source directory
-2. Increment the version string in the Charts.yaml file
-3. Run the `./bin/build.sh` script
-4. Commit the changes and create PR
+1. Add release notes to the helm charts README.md file 
+1. Increment the version string in the Charts.yaml file
+1. Run the `./bin/build.sh` script
+1. Commit the changes to a branch
+1. You can test from the branch in a HelmRelease by changing the repository path
+
+   E.g: `repository: https://raw.githubusercontent.com/statisticsnorway/helm-charts/<branch>/`
+1. Create PR
 
 In order to use a new version of a Helm chart, the version tag of the
 HelmRelease has to be changed as well.
