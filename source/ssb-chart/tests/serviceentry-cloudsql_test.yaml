@@ -1,0 +1,49 @@
+suite: test serviceentry for cloudsql
+templates:
+  - serviceentry-cloudsql.yaml
+tests:
+
+  - it: should render one document for cloudsql egress
+    values:
+      - ./values/default-values.yaml
+    set:
+      cloudsql:
+        enabled: true
+        instance: "ssb-team-stratus:europe-north1:auth-unittest-sqlinstance-stratus"
+        ip: "10.0.0.1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ServiceEntry
+
+  - it: should render valid serviceentry
+    values:
+      - ./values/default-values.yaml
+    set:
+      cloudsql:
+        enabled: true
+        instance: "ssb-team-stratus:europe-north1:auth-unittest-sqlinstance-stratus"
+        ip: "10.0.0.1"
+    asserts:
+      - equal:
+          path: spec.hosts
+          value:
+          - dummy-10.0.0.1.ssb.no
+      - equal:
+          path: spec.addresses
+          value:
+            - 10.0.0.1/32
+      - equal:
+          path: spec.exportTo
+          value:
+          - "."
+      - equal:
+          path: spec.ports
+          value:
+            - name: tcp
+              number: 3307
+              protocol: tcp
+      - equal:
+          path: spec.location
+          value: MESH_EXTERNAL

@@ -10,6 +10,8 @@ metadata:
 spec:
   hosts:
   - "{{ . }}"
+  exportTo:
+  - "."
   ports:
   - number: 443
     name: https

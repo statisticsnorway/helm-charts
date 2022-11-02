@@ -10,6 +10,8 @@ spec:
   - "dummy-{{ required "A valid .Values.cloudsql.ip entry required!" .Values.cloudsql.ip }}.{{ .Values.domain }}"
   addresses:
   - {{ .Values.cloudsql.ip }}/32
+  exportTo:
+  - "."
   ports:
   - name: tcp
     number: 3307
