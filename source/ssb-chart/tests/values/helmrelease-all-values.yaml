@@ -1,0 +1,226 @@
+name: "unittest-app"
+namespace: "unittest"
+cluster: "test-cluster"
+billingProject: "ssb-unittest"
+
+image:
+  repository: ssb.no/unittest-app
+  tag: '1.0'
+  pullPolicy: Never
+
+exposed: true
+
+replicaCount: 2
+
+nodeSelector:
+  ssb-node: some-node-label
+
+tolerations:
+  - key: "ssb-node"
+    operator: "Equal"
+    value: "some-node-label"
+    effect: "NoSchedule"
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: "ssb-node"
+              operator: NotIn
+              values: ["some-other-node-label"]
+
+port:
+  name: "http-unittest-app"
+  containerport: 8080
+  serviceport: 80
+
+extraPorts:
+  - name: "grpc-unittest-app"
+    containerport: 9090
+    serviceport: 9090
+
+environmentVariables:
+  - name: MY_VAR
+    value: "SOME VALUE"
+
+configs:
+  - name: application.properties
+    mountPath: /etc
+    config: |
+      key1=value1
+      key2=value2
+  - name: config.yaml
+    mountPath: /config
+    config: |
+      key3: value3
+      key4: value4
+  - name: secret.conf
+    mountPath: /etc/secrets.conf
+    secretsInjection:
+      - placeholder: "PLACEHOLDER:MYSECRET"
+        secretName: "mysecret"
+    config: |
+      some.secret: PLACEHOLDER:MYSECRET
+      some.key: value
+
+volumes:
+  - name: secret-volume
+    secret:
+      secretName: secret-name
+      items:
+        - key: credentials
+          path: subpath/credentials
+  - name: cache-volume
+    emptyDir: {}
+  - name: config-volume
+    configMap:
+      name: configmap-name
+      items:
+        - key: myconfig.cfg
+          path: myconfig.cfg
+
+volumeMounts:
+  - name: secret-volume
+    mountPath: /path/to/secrets
+    readOnly: true
+  - name: cache-volume
+    mountPath: /cache
+  - name: config-volume
+    mountPath: /etc/config
+    readOnly: true
+
+persistence:
+  enabled: true
+  createPvc: true
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  folder: /data
+
+sidecars:
+  - name: my-sidecar
+    image: sidecar:1.0.0
+    command:
+      - /runme
+    args:
+      - -some-arg value
+
+service:
+  enabled: true
+  type: "ClusterIP"
+
+resources:
+  enabled: true
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+probes:
+  liveness:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        port: 8080
+        path: "/alive"
+      initialDelaySeconds: 60
+      periodSeconds: 30
+  readiness:
+    enabled: true
+    readinessProbe:
+      httpGet:
+        port: 8080
+        path: "/ready"
+      initialDelaySeconds: 60
+      periodSeconds: 30
+
+metrics:
+  enabled: true
+  port: 8080
+  path: "/metrics"
+  scheme: "https"
+
+serviceAccount:
+  create: true
+
+networkpolicy:
+  enabled: true
+  overrideDefaultPolicy:
+    ingress:
+      - ports:
+          - port: 8080
+            protocol: TCP
+        from:
+          - namespaceSelector: {}
+
+    egress:
+      - ports:
+          - port: 53
+            protocol: UDP
+          - port: 53
+            protocol: TCP
+        to:
+          - namespaceSelector: {}
+            podSelector:
+              matchLabels:
+                k8s-app: kube-dns
+
+PodSecurityContext:
+  enabled: true
+  runAsNonRoot: true
+
+ContainerSecurityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+egress:
+  - "pypi.org"
+
+cloudsql:
+  enabled: true
+  instance: "test-dev-7978:europe-north1:test-sqlinstance"
+  ip: "10.0.0.3"
+  version: 1.2.3
+  port: 1234 # Not used by chart
+
+oauth2Proxy: # Frontend only
+  enabled: true
+  image: "proxy-image-name"
+  version: 3.4.5
+  port: 4567
+
+backends:
+  - name: "test-api-host"
+    namespace: "ns1"
+  - name: "other-api-host"
+    namespace: "ns2"
+
+apiGateway:
+  image: "gw-image-name"
+  version: 6.7.8
+  port: 8888
+
+routes:
+  - name: "/some/path"
+    type: "prefix"
+    serviceport: 9090
+
+subdomains:
+  - test.domain.com
+
+urlhosts:
+  - myaliasname
+
+istioEndUserAuth: # Backend only
+  enabled: true
+  excludePaths:
+    - "/public"
+    - "/public/*"
+  includePaths:
+    - "/oauth"
+    - "/oauth/*"
