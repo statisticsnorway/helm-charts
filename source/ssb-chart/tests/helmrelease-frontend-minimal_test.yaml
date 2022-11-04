@@ -1,0 +1,70 @@
+suite: test helmrelease for frontend with with minimal config
+
+tests:
+  - it: should render Deployment
+    templates:
+      - deployment.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "frontend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+      - matchSnapshot: {}
+
+  - it: should render NetworkPolicy
+    templates:
+      - network-policy.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "frontend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: NetworkPolicy
+      - matchSnapshot: {}
+
+  - it: should render ServiceAccount
+    templates:
+      - serviceaccount.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "frontend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ServiceAccount
+      - matchSnapshot: {}
+
+  - it: should render Service
+    templates:
+      - service.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "frontend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Service
+      - matchSnapshot: {}

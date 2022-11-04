@@ -1,0 +1,123 @@
+suite: test helmrelease for backend with minimal config
+
+tests:
+  - it: should render Deployment
+    templates:
+      - deployment.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+      - matchSnapshot: {}
+
+  - it: should render NetworkPolicy
+    templates:
+      - network-policy.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: NetworkPolicy
+      - matchSnapshot: {}
+
+  - it: should render ServiceAccount
+    templates:
+      - serviceaccount.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ServiceAccount
+      - matchSnapshot: {}
+
+  - it: should render Service
+    templates:
+      - service.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Service
+      - matchSnapshot: {}
+
+  - it: should render RequestAuthentication
+    templates:
+      - istio-authentication.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    documentIndex: 0
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: RequestAuthentication
+      - matchSnapshot: {}
+
+  - it: should render AuthorizationPolicy (require JWT)
+    templates:
+      - istio-authentication.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    documentIndex: 1
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: AuthorizationPolicy
+      - matchSnapshot: {}
+
+  - it: should render AuthorizationPolicy
+    templates:
+      - authorization-policy.yaml
+    values:
+      - ./values/helmrelease-minimal.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: AuthorizationPolicy
+      - matchSnapshot: {}
