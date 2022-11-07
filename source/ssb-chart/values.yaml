@@ -179,9 +179,7 @@ environmentVariables:
 # config: optional
 # Defines a set of configs that should be deployed as a ConfigMap. Note that all
 # configs will be created within one ConfigMap called <application_name>-config,
-# but can be mounted to separate locations. It is possible to inject secrets into
-# configuration files using the "secretsInjection" syntax below. Note that the
-# secret must exist with those names in Kubernetes.
+# but can be mounted to separate locations.
 configs: []
 #  - name: application.properties
 #    mountPath: /etc
@@ -193,18 +191,6 @@ configs: []
 #    config: |
 #      key1: value1
 #      key2: value2
-#  - name: config-with-secret.yaml
-#    mountPath: /config
-#    secretsInjection:
-#     - placeholder: "PLACEHOLDER:APP_SECRET"
-#       secretName: "kubernetes-secret-app-name"
-#     - placeholder: "PLACEHOLDER:OTHER_SECRET"
-#       secretName: "kubernetes-secret-other-name"
-#    config: |
-#      key1: value1
-#      key2: PLACEHOLDER:APP_SECRET
-#      key3: value2
-#      key4: PLACEHOLDER:OTHER_SECRET
 
 # volumes: optional
 # Defines volumes available for mounting in pods

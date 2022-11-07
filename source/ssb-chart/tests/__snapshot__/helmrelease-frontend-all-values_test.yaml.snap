@@ -8,9 +8,6 @@ should render ConfigMap for application config:
       config.yaml: |
         key3: value3
         key4: value4
-      secret.conf: |
-        some.secret: PLACEHOLDER:MYSECRET
-        some.key: value
     kind: ConfigMap
     metadata:
       labels:
@@ -82,7 +79,7 @@ should render Deployment:
       template:
         metadata:
           annotations:
-            checksum/application-config: 2d4bee57e22677284cd6fc1b9ba8d080267941a67c6fa6056f9d044b1147d99d
+            checksum/application-config: eba1203ef90c08e73878491d941caff9bbc8f35a66d2632a4afa634f70f958d3
             checksum/nginx-vhost-config: 2d87b11ea876af84a7e82a17bbb2b1065088506ccd6408a7fd8ff2dd29ad10e4
             prometheus.io/path: /metrics
             prometheus.io/port: "8080"
@@ -199,31 +196,8 @@ should render Deployment:
               name: application-config-volume
               readOnly: true
               subPath: config.yaml
-            - mountPath: /etc/secrets.conf/secret.conf
-              name: application-config-secrets-volume
-              readOnly: true
-              subPath: secret.conf
             - mountPath: /data
               name: custom-data
-          initContainers:
-          - args:
-            - echo "Injecting secrets.."; if [ ! -s /config/secret.conf ]; then cp /template/secret.conf
-              /config/secret.conf || exit 1; fi; perl -i -p0e '$secret=`cat /secrets/mysecret`;
-              s/PLACEHOLDER:MYSECRET/$secret/seg' /config/secret.conf || exit 1; echo
-              "done"
-            command:
-            - sh
-            - -c
-            image: bitnami/minideb:buster
-            name: secrets-injector
-            volumeMounts:
-            - mountPath: /secrets/
-              name: application-secrets
-              readOnly: true
-            - mountPath: /config/
-              name: application-config-secrets-volume
-            - mountPath: /template/
-              name: application-config-volume
           nodeSelector:
             ssb-node: some-node-label
           securityContext:
@@ -252,11 +226,6 @@ should render Deployment:
           - name: oauth2-proxy-client-config
             secret:
               secretName: oauth2-proxy-config-unittest-app
-          - name: application-secrets
-            secret:
-              secretName: application-secrets-unittest-app
-          - emptyDir: {}
-            name: application-config-secrets-volume
           - configMap:
               name: unittest-app-application-config
             name: application-config-volume

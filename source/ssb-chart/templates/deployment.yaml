@@ -43,9 +43,8 @@ spec:
       {{- if and ( or (eq (toString .Values.serviceAccount.create) "true") (eq (toString .Values.serviceAccount.create) "True")) .Values.serviceAccount.create }}
       serviceAccountName: {{ include "app.serviceAccountName" . }}
       {{- end }}
-      {{- if or (include "app.secretsInjectionEnabled" .) ( .Values.persistence.owner ) }}
-      initContainers:
       {{- if .Values.persistence.owner }}
+      initContainers:
       - name: chowner
         image: busybox
         command:
@@ -57,35 +56,6 @@ spec:
         - name: custom-data
           mountPath: {{ .Values.persistence.folder }}
       {{- end }}
-      {{- if include "app.secretsInjectionEnabled" . }}
-      - name: secrets-injector
-        image: bitnami/minideb:buster
-        volumeMounts:
-        - name: application-secrets
-          mountPath: /secrets/
-          readOnly: true
-        - name: application-config-secrets-volume
-          mountPath: /config/
-        - name: application-config-volume
-          mountPath: /template/
-        command: ["sh", "-c"]
-        args:
-        - echo "Injecting secrets..";
-        {{- $configs := .Values.configs }}
-        {{- range $config := $configs }}
-        {{- if $config.secretsInjection }}
-        {{- $secrets := $config.secretsInjection }}
-        {{- range $secret := $secrets }}
-          if [ ! -s /config/{{ $config.name }} ]; then
-            cp /template/{{ $config.name }} /config/{{ $config.name }} || exit 1;
-          fi;
-          perl -i -p0e '$secret=`cat /secrets/{{ $secret.secretName }}`; s/{{ $secret.placeholder }}/$secret/seg' /config/{{ $config.name }} || exit 1;
-        {{- end }}
-        {{- end }}
-        {{- end }}
-          echo "done"
-        {{- end }}
-        {{- end }}
       containers:
         {{- if .Values.sidecars }}
 {{ toYaml .Values.sidecars | trim | indent 8 | replace "'" "" }}
@@ -158,17 +128,10 @@ spec:
           {{- end }}
           {{- if .Values.configs }}
           {{- range .Values.configs }}
-          {{- if .secretsInjection }}
-          - name: application-config-secrets-volume
-            mountPath: {{ .mountPath }}/{{ .name }}
-            subPath: {{ .name }}
-            readOnly: true
-          {{- else }}
           - name: application-config-volume
             mountPath: {{ .mountPath }}/{{ .name }}
             subPath: {{ .name }}
             readOnly: true
-          {{- end }}
           {{- end }}
           {{- end }}
           {{- if and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled }}
@@ -240,13 +203,6 @@ spec:
         - name: "oauth2-proxy-client-config"
           secret:
             secretName: "oauth2-proxy-config-{{ template "app.name" . }}"
-{{- end }}
-{{- if include "app.secretsInjectionEnabled" . }}
-        - name: application-secrets
-          secret:
-            secretName: "application-secrets-{{ template "app.name" . }}"
-        - name: application-config-secrets-volume
-          emptyDir: {}
 {{- end }}
 {{- if .Values.configs }}
         - name: application-config-volume

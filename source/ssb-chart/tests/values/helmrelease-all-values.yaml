@@ -55,14 +55,6 @@ configs:
     config: |
       key3: value3
       key4: value4
-  - name: secret.conf
-    mountPath: /etc/secrets.conf
-    secretsInjection:
-      - placeholder: "PLACEHOLDER:MYSECRET"
-        secretName: "mysecret"
-    config: |
-      some.secret: PLACEHOLDER:MYSECRET
-      some.key: value
 
 volumes:
   - name: secret-volume
