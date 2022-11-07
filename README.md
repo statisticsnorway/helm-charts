@@ -21,6 +21,8 @@ This is a repository for Helm charts.
 1. Update the chart under the source directory
 1. Add release notes to the helm charts README.md file 
 1. Increment the version string in the Charts.yaml file
+1. Run unit tests `helm unittest source/ssb-chart`
+1. Validate the changes to the test snapshots and rerun above command with "-u" switch
 1. Run the `./bin/build.sh` script
 1. Commit the changes to a branch
 1. You can test from the branch in a HelmRelease by changing the repository path
