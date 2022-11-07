@@ -1,0 +1,407 @@
+should render ConfigMap for application config:
+  1: |
+    apiVersion: v1
+    data:
+      application.properties: |
+        key1=value1
+        key2=value2
+      config.yaml: |
+        key3: value3
+        key4: value4
+    kind: ConfigMap
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-application-config
+should render ConfigMap for nginx config:
+  1: |
+    apiVersion: v1
+    data:
+      vhost.conf: "# Upstream API's\nupstream test-api-host {\n  server test-api-host.ns1;\n}\n\nupstream
+        other-api-host {\n  server other-api-host.ns2;\n}\n\n# Upstream application\nupstream
+        unittest-app {\n  server 127.0.0.1:8080;\n}\n\n# Enable debug logging\nerror_log
+        \ \"/opt/bitnami/nginx/logs/error.log\" debug;\n\nserver {\n  listen 0.0.0.0:8888;\n
+        \ server_name _;\n\n  # Set proxy buffer sizes\n  proxy_buffering on;\n  proxy_buffer_size
+        \       128k;\n  proxy_buffers            4 256k;\n  proxy_busy_buffers_size  256k;\n\n
+        \ # Set header buffer sizes\n  client_header_buffer_size 32k;\n  large_client_header_buffers
+        4 32k;\n\n  # API definitions\n  location /be/test-api-host {\n    set $upstream
+        test-api-host;\n    set $service test-api-host.ns1;\n\n    rewrite ^/be/(.*)$
+        /_be/$1 last;\n  }\n  \n  location /be/other-api-host {\n    set $upstream other-api-host;\n
+        \   set $service other-api-host.ns2;\n\n    rewrite ^/be/(.*)$ /_be/$1 last;\n
+        \ }\n  \n  # API policy section\n  location /_be {\n    internal;\n\n    # Remove
+        the prefixes\n    rewrite ^/[^/]+/[^/]+/(.*)$ /$1 break;\n\n    # Do not send
+        upstream errors to the client\n    proxy_intercept_errors on;\n\n    # HTTP version
+        (default is 1.0)\n    proxy_http_version 1.1;\n\n    # The original host requested
+        by the client\n    proxy_set_header X-Forwarded-Host $host;\n\n    # Host header
+        must be set to kubernetes \"<service_name.namespace>\"\n    # to be able to proxy
+        the requests to the kubernetes domain\n    proxy_set_header Host $service;\n\n
+        \   # What other headers do we need?\n    proxy_set_header X-Real-IP $remote_addr;\n
+        \   proxy_set_header X-Scheme $scheme;\n\n    # Pass through only cookies with
+        the name \"sessionToken\".\n    # This is a Forbruk-team spesific setting and
+        the parameters\n    # for \"proxy_set_header Cookie\" should maybe be made available\n
+        \   # as a variable in the Helmrelease in later improvements.\n    proxy_set_header
+        Cookie $cookie_sessionToken;\n\n    # Pass request to upstream\n    proxy_pass
+        http://$upstream;\n  }\n\n  # Nginx health check endpoint\n  location = /nginx-gw-health
+        {\n    access_log off;\n    add_header Content-Type text/plain;\n\n    return
+        200 \"alive\\n\";\n  }\n\n  # Proxy everything else to the application.\n  location
+        / {\n    proxy_http_version 1.1;\n    proxy_pass http://unittest-app;\n  }\n}"
+    kind: ConfigMap
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-nginx-vhost-config
+should render Deployment:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: unittest-app
+          release: unittest-app
+      template:
+        metadata:
+          annotations:
+            checksum/application-config: 080f15b580bd0fa11f257c220510a9d325b1b28d75d6f74c037e4eaeffcafc05
+            checksum/nginx-vhost-config: 84c9cd76c0a249e53a0e38ab36b1f17e6c626872aae42667c8f3fc98696c79c5
+            prometheus.io/path: /metrics
+            prometheus.io/port: "8080"
+            prometheus.io/scheme: https
+            prometheus.io/scrape: "true"
+          labels:
+            app: unittest-app
+            release: unittest-app
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: ssb-node
+                    operator: NotIn
+                    values:
+                    - some-other-node-label
+          containers:
+          - args:
+            - -some-arg value
+            command:
+            - /runme
+            image: sidecar:1.0.0
+            name: my-sidecar
+          - args:
+            - -instances=test-dev-7978:europe-north1:test-sqlinstance=tcp:5432
+            command:
+            - /cloud_sql_proxy
+            image: gcr.io/cloudsql-docker/gce-proxy:1.2.3
+            name: cloudsql-proxy
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+          - args:
+            - --config=/secrets/oauth2-proxy-client-config.yaml
+            image: proxy-image-name:3.4.5
+            imagePullPolicy: Always
+            name: oauth2-proxy
+            ports:
+            - containerPort: 4567
+              name: http-oauth2
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+            volumeMounts:
+            - mountPath: /secrets/
+              name: oauth2-proxy-client-config
+              readOnly: true
+          - image: gw-image-name:6.7.8
+            imagePullPolicy: Always
+            name: nginx-gateway
+            ports:
+            - containerPort: 8888
+              name: http-nginx
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+            volumeMounts:
+            - mountPath: /opt/bitnami/nginx/conf/server_blocks
+              name: nginx-vhost-config-volume
+          - env:
+            - name: MY_VAR
+              value: SOME VALUE
+            image: ssb.no/unittest-app:1.0
+            imagePullPolicy: Never
+            livenessProbe:
+              httpGet:
+                path: /alive
+                port: 8080
+              initialDelaySeconds: 60
+              periodSeconds: 30
+            name: unittest-app-cont
+            ports:
+            - containerPort: 8080
+              name: http-unittest-a
+            - containerPort: 9090
+              name: grpc-unittest-a
+            readinessProbe:
+              httpGet:
+                path: /ready
+                port: 8080
+              initialDelaySeconds: 60
+              periodSeconds: 30
+            resources:
+              limits:
+                cpu: 100m
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+            volumeMounts:
+            - mountPath: /path/to/secrets
+              name: secret-volume
+              readOnly: true
+            - mountPath: /cache
+              name: cache-volume
+            - mountPath: /etc/config
+              name: config-volume
+              readOnly: true
+            - mountPath: /etc/application.properties
+              name: application-config-volume
+              readOnly: true
+              subPath: application.properties
+            - mountPath: /config/config.yaml
+              name: application-config-volume
+              readOnly: true
+              subPath: config.yaml
+            - mountPath: /data
+              name: custom-data
+          nodeSelector:
+            ssb-node: some-node-label
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: unittest-app-sa
+          tolerations:
+          - effect: NoSchedule
+            key: ssb-node
+            operator: Equal
+            value: some-node-label
+          volumes:
+          - name: secret-volume
+            secret:
+              items:
+              - key: credentials
+                path: subpath/credentials
+              secretName: secret-name
+          - emptyDir: {}
+            name: cache-volume
+          - configMap:
+              items:
+              - key: myconfig.cfg
+                path: myconfig.cfg
+              name: configmap-name
+            name: config-volume
+          - name: oauth2-proxy-client-config
+            secret:
+              secretName: oauth2-proxy-config-unittest-app
+          - configMap:
+              name: unittest-app-application-config
+            name: application-config-volume
+          - name: custom-data
+            persistentVolumeClaim:
+              claimName: unittest-app-pvc
+          - configMap:
+              name: unittest-app-nginx-vhost-config
+            name: nginx-vhost-config-volume
+should render NetworkPolicy:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: np-unittest-app
+    spec:
+      egress:
+      - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+        to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ingress:
+      - from:
+        - namespaceSelector: {}
+        ports:
+        - port: 8080
+          protocol: TCP
+      podSelector:
+        matchLabels:
+          app: unittest-app
+should render PVC:
+  1: |
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: unittest-app-pvc
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+should render Service:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app
+    spec:
+      ports:
+      - name: http-unittest-a
+        port: 80
+        targetPort: 4567
+      - name: grpc-unittest-a
+        port: 9090
+        targetPort: 9090
+      selector:
+        app: unittest-app
+        release: unittest-app
+      type: ClusterIP
+should render ServiceAccount:
+  1: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-sa
+should render ServiceEntry for cloudsql:
+  1: |
+    apiVersion: networking.istio.io/v1alpha3
+    kind: ServiceEntry
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-cloudsql
+    spec:
+      addresses:
+      - 10.0.0.3/32
+      exportTo:
+      - .
+      hosts:
+      - dummy-10.0.0.3.ssb.no
+      location: MESH_EXTERNAL
+      ports:
+      - name: tcp
+        number: 3307
+        protocol: tcp
+should render ServiceEntry for https:
+  1: |
+    apiVersion: networking.istio.io/v1alpha3
+    kind: ServiceEntry
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-pypi.org
+    spec:
+      exportTo:
+      - .
+      hosts:
+      - pypi.org
+      location: MESH_EXTERNAL
+      ports:
+      - name: https
+        number: 443
+        protocol: HTTPS
+      resolution: DNS
+should render VirtualService:
+  1: |
+    apiVersion: networking.istio.io/v1alpha3
+    kind: VirtualService
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app
+    spec:
+      gateways:
+      - istio-system/test-cluster-gateway
+      hosts:
+      - myaliasname.test.domain.com.ssb.no
+      - unittest-app.test-cluster.ssb.no
+      http:
+      - match:
+        - uri:
+            prefix: /some/path
+        route:
+        - destination:
+            host: unittest-app.unittest.svc.cluster.local
+            port:
+              number: 9090
+      - match:
+        - uri:
+            prefix: /metrics
+        rewrite:
+          uri: /
+        route:
+        - destination:
+            host: unittest-app.unittest.svc.cluster.local
+            port:
+              number: 80
+      - route:
+        - destination:
+            host: unittest-app.unittest.svc.cluster.local
+            port:
+              number: 80

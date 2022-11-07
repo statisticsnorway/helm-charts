@@ -87,15 +87,3 @@ The "targetPort" is set in this priority
   {{ .Values.port.containerport }}
 {{- end }}
 {{- end -}}
-
-{{/*
-Set boolean "app.secretsInjectionEnabled" to true if any
-configs need secrets injection.
-*/}}
-{{- define "app.secretsInjectionEnabled" -}}
-{{- range .Values.configs }}
-{{- if .secretsInjection }}
-{{- true }}
-{{- end }}
-{{- end }}
-{{- end -}}

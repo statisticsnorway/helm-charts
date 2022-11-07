@@ -1,0 +1,225 @@
+suite: test helmrelease for backend with all values
+
+tests:
+  - it: should render Deployment
+    templates:
+      - deployment.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+      - matchSnapshot: {}
+
+  - it: should render PVC
+    templates:
+      - pvc.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PersistentVolumeClaim
+      - matchSnapshot: {}
+
+  - it: should render ConfigMap
+    templates:
+      - configmap-application.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ConfigMap
+      - matchSnapshot: {}
+
+  - it: should render ConfigMap for nginx config
+    templates:
+      - configmap-nginx-vhost.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ConfigMap
+      - matchSnapshot: {}
+
+  - it: should render NetworkPolicy
+    templates:
+      - network-policy.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: NetworkPolicy
+      - matchSnapshot: {}
+
+  - it: should render ServiceAccount
+    templates:
+      - serviceaccount.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ServiceAccount
+      - matchSnapshot: {}
+
+  - it: should render ServiceEntry for cloudsql
+    templates:
+      - serviceentry-cloudsql.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ServiceEntry
+      - matchSnapshot: {}
+
+  - it: should render ServiceEntry for https
+    templates:
+      - serviceentry-https.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ServiceEntry
+      - matchSnapshot: {}
+
+  - it: should render VirtualService
+    templates:
+      - virtualservice.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VirtualService
+      - matchSnapshot: {}
+
+  - it: should render Service
+    templates:
+      - service.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Service
+      - matchSnapshot: {}
+
+  - it: should render RequestAuthentication
+    templates:
+      - istio-authentication.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    documentIndex: 0
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: RequestAuthentication
+      - matchSnapshot: {}
+
+  - it: should render AuthorizationPolicy (require JWT)
+    templates:
+      - istio-authentication.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    documentIndex: 1
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: AuthorizationPolicy
+      - matchSnapshot: {}
+
+  - it: should render AuthorizationPolicy
+    templates:
+      - authorization-policy.yaml
+    values:
+      - ./values/helmrelease-all-values.yaml
+    set:
+      appType: "backend"
+    release:
+      name: unittest-app
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 4
+      - isKind:
+          of: AuthorizationPolicy
+      - matchSnapshot: {}

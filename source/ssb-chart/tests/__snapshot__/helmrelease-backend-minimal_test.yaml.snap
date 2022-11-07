@@ -1,0 +1,190 @@
+should render AuthorizationPolicy:
+  1: |
+    apiVersion: security.istio.io/v1beta1
+    kind: AuthorizationPolicy
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-allow-metrics-auth-policy
+    spec:
+      action: ALLOW
+      rules:
+      - to:
+        - operation:
+            paths:
+            - /metrics
+      selector:
+        matchLabels:
+          app: unittest-app
+  2: |
+    apiVersion: security.istio.io/v1beta1
+    kind: AuthorizationPolicy
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-allow-health-auth-policy
+    spec:
+      action: ALLOW
+      rules:
+      - to:
+        - operation:
+            paths:
+            - /healthz/ready
+      selector:
+        matchLabels:
+          app: unittest-app
+should render AuthorizationPolicy (require JWT):
+  1: |
+    apiVersion: security.istio.io/v1beta1
+    kind: AuthorizationPolicy
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-default-auth-policy
+    spec:
+      action: ALLOW
+      rules:
+      - from:
+        - source:
+            requestPrincipals:
+            - '*'
+      selector:
+        matchLabels:
+          app: unittest-app
+should render Deployment:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: unittest-app
+          release: unittest-app
+      template:
+        metadata:
+          labels:
+            app: unittest-app
+            release: unittest-app
+        spec:
+          containers:
+          - image: ssb.no/unittest-app:1.0
+            imagePullPolicy: Always
+            name: unittest-app-cont
+            ports:
+            - containerPort: 80
+              name: http-main
+            resources:
+              limits:
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+          serviceAccountName: unittest-app-sa
+should render NetworkPolicy:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: np-unittest-app
+    spec:
+      ingress:
+      - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+          podSelector:
+            matchLabels:
+              app: prometheus
+              component: server
+        ports:
+        - port: 15090
+          protocol: TCP
+      - from:
+        - namespaceSelector: {}
+        ports:
+        - port: 80
+          protocol: TCP
+      podSelector:
+        matchLabels:
+          app: unittest-app
+should render RequestAuthentication:
+  1: |
+    apiVersion: security.istio.io/v1beta1
+    kind: RequestAuthentication
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-request-auth
+    spec:
+      jwtRules:
+      - audiences:
+        - unittest-app
+        forwardOriginalToken: true
+        issuer: https://keycloak.test-cluster.ssb.no/auth/realms/ssb
+      selector:
+        matchLabels:
+          app: unittest-app
+should render Service:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app
+    spec:
+      ports:
+      - name: http-main
+        port: 80
+        targetPort: 80
+      selector:
+        app: unittest-app
+        release: unittest-app
+      type: ClusterIP
+should render ServiceAccount:
+  1: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app: unittest-app
+        billing-project: ssb-unittest
+        chart: ssb-chart-2.3.2
+        heritage: Tiller
+        release: unittest-app
+      name: unittest-app-sa
