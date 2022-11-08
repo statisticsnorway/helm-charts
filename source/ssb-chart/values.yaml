@@ -8,7 +8,7 @@ type: "deployment"
 # name: required
 # Defines name of the application (also used for naming other
 # Kubernetes resources)
-name:
+name: "myapp"
 
 # appType: required
 # Defines if the application is a frontend or a backend. This is important as
@@ -31,14 +31,14 @@ domain: ssb.no
 
 # billingProject: required
 # Defines what billing project to use as label for the objects
-billingProject:
+billingProject: "default"
 
 # image: required
 # Defines image used to start a main container 'repository' and 'tag' sub-fields
 # are required pullPolicy: if not set equals to 'Always'
 image:
-  repository:
-  tag:
+  repository: gcr.io/distroless/static
+  tag: "latest"
   pullPolicy: Always
 
 # replicaCount: required
