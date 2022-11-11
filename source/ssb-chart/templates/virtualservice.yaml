@@ -52,7 +52,11 @@ spec:
 {{- end }}
   - match:
     - uri:
+{{- if and .Values.metics .Values.metrics.path }}
+	prefix: "{{ .Values.metrics.path }}"
+{{- else }}
         prefix: "/metrics"
+{{- end }}
     rewrite:
       uri: "/"
     route:
