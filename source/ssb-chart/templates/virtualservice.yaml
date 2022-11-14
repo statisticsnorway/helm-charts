@@ -50,9 +50,14 @@ spec:
           number: {{ .serviceport }}
 {{- end }}
 {{- end }}
+{{- if and ( or (eq (toString .Values.metrics.enabled) "true") (eq (toString .Values.metrics.enabled) "True")) .Values.metrics.enabled }}
   - match:
     - uri:
+{{- if .Values.metrics.path }}
+        prefix: "{{ .Values.metrics.path }}"
+{{- else }}
         prefix: "/metrics"
+{{- end }}
     rewrite:
       uri: "/"
     route:
@@ -60,6 +65,7 @@ spec:
         host: {{ template "app.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
         port:
           number: {{ .Values.port.serviceport }}
+{{- end }}
   - route:
     - destination:
         host: {{ template "app.name" . }}.{{ .Release.Namespace }}.svc.cluster.local

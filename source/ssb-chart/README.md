@@ -1,3 +1,16 @@
+# ssb-chart v2.3.3
+
+Updates in this release:
+
+* Fixes the issue where a custom path to metrics is not honored in all templates
+
+# ssb-chart v2.3.2
+
+Updates in this release:
+
+* Removed the secrets injector.
+* Added golden file tests.
+
 # ssb-chart v2.3.1
 
 Update release notes.

@@ -16,3 +16,5 @@ routes:
 - name: "/auth"
   type: "prefix"
   serviceport: 8080
+metrics:
+  enabled: true
