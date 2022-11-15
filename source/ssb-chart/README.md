@@ -1,291 +1,1181 @@
-# ssb-chart v2.3.3
+# ssb-chart
 
-Updates in this release:
+![Version: 2.3.3](https://img.shields.io/badge/Version-2.3.3-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
-* Fixes the issue where a custom path to metrics is not honored in all templates
+Generic chart for SSB applications
 
-# ssb-chart v2.3.2
+## Values
 
-Updates in this release:
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td id="ContainerSecurityContext"><a href="./values.yaml#L245">ContainerSecurityContext</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+enabled: false
+allowPrivilegeEscalation: false
+privileged: false
+readOnlyRootFilesystem: false
+runAsNonRoot: true
+runAsUser: {}
 
-* Removed the secrets injector.
-* Added golden file tests.
+</pre>
+</div>
+			</td>
+			<td>Container SecurityContext for main application. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#securitycontext-v1-core. Optional.</td>
+		</tr>
+		<tr>
+			<td id="PodSecurityContext"><a href="./values.yaml#L235">PodSecurityContext</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+enabled: false
+runAsNonRoot: true
+runAsUser: {}
+fsGroup: {}
 
-# ssb-chart v2.3.1
+</pre>
+</div>
+			</td>
+			<td>PodSecurityContext. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#podsecuritycontext-v1-core. Optional.</td>
+		</tr>
+		<tr>
+			<td id="affinity"><a href="./values.yaml#L66">affinity</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+{}
+</pre>
+</div>
+			</td>
+			<td>Node affinity is a set of rules used by the scheduler to determine where a pod can be placed. The rules are defined using custom labels on nodes and label selectors specified in pods. Node affinity allows a pod to specify an affinity (or anti-affinity) towards a group of nodes it can be placed on. See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="apiGateway"><a href="./values.yaml#L301">apiGateway</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+image:
+version:
+port:
 
-Update release notes.
+</pre>
+</div>
+			</td>
+			<td>This is used together with the 'backends' config to specify which container image and port should be used for the backend-for-frontend (API gateway). NOTE: Do not add default values here. Default values for apiGateway is set in a shared config. Optional.</td>
+		</tr>
+		<tr>
+			<td id="appType"><a href="./values.yaml#L12">appType</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+""
+</pre>
+</div>
+			</td>
+			<td>Application type: `"backend"` or `"frontend"`. Notet that this setting will impact how authentication is configured. Required.</td>
+		</tr>
+		<tr>
+			<td id="backends"><a href="./values.yaml#L294">backends</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>The 'backends' list is used to configure a backend-for-frontend (API gateway) to enable authenticated requests to other applications/API's. The proxy will forward request headers, including the authorization header. This will allow the app to make authenticated requests to the applications listed. Note that the application receiving the request must have the calling app in it's allowed audience list. A "backend" application is identified by a service name and a namespace. Required fields: "name" and "namespace". See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="billingProject"><a href="./values.yaml#L28">billingProject</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"default"
+</pre>
+</div>
+			</td>
+			<td>What billing project to use as label for the objects. Required.</td>
+		</tr>
+		<tr>
+			<td id="cloudsql--enabled"><a href="./values.yaml#L267">cloudsql.enabled</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+false
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="cloudsql--instance"><a href="./values.yaml#L270">cloudsql.instance</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>Required.</td>
+		</tr>
+		<tr>
+			<td id="cloudsql--ip"><a href="./values.yaml#L272">cloudsql.ip</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>Required.</td>
+		</tr>
+		<tr>
+			<td id="cloudsql--useSqlProxy"><a href="./values.yaml#L274">cloudsql.useSqlProxy</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+true
+</pre>
+</div>
+			</td>
+			<td>Optional. Set to false if using Google connectors directly to omit adding a cloudsql-proxy.</td>
+		</tr>
+		<tr>
+			<td id="cloudsql--version"><a href="./values.yaml#L268">cloudsql.version</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="cluster"><a href="./values.yaml#L16">cluster</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>Which Kubernetes cluster the app will be deployd to. Required.</td>
+		</tr>
+		<tr>
+			<td id="configs"><a href="./values.yaml#L111">configs</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>Defines a set of configs that should be deployed as a ConfigMap. Note that all configs will be created within one ConfigMap called <application_name>-config, but can be mounted to separate locations. See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="domain"><a href="./values.yaml#L24">domain</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"ssb.no"
+</pre>
+</div>
+			</td>
+			<td>Which domain the app will belong to. Optional.</td>
+		</tr>
+		<tr>
+			<td id="egress"><a href="./values.yaml#L258">egress</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>Defines a list of external https resources you need to be able to reach from your application. Wildcard is supported, but the Helm chart will replace '*' with 'wildcard' to avoid errors. See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="environmentVariables"><a href="./values.yaml#L104">environmentVariables</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>Defines a set of environment variables for a main container of an app. In case of referring to volumes/secrets/configmaps remember to create those resources first See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="exposed"><a href="./values.yaml#L20">exposed</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+false
+</pre>
+</div>
+			</td>
+			<td>Set to `true´ to expose application publicly through the ingress gateway. Optional.</td>
+		</tr>
+		<tr>
+			<td id="extraPorts"><a href="./values.yaml#L98">extraPorts</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>List of extra application ports in case the application needs to expose ports in addition to the normal application port. Usually not needed, unless using things like 'grpc' in addition to 'http'. For these extra ports it usually makes sense to use the same port for 'containerport' and 'targetport' to avoid collision with the normal application port. This should only be used if your application exposes more than one port. If your application exposes more than one port, you should override 'port' to suit your needs (e.g. if you only need 'http' or 'grpc'). See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="image"><a href="./values.yaml#L34">image</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+{
+  "pullPolicy": "Always",
+  "repository": "",
+  "tag": ""
+}
+</pre>
+</div>
+			</td>
+			<td>Application image. Required.</td>
+		</tr>
+		<tr>
+			<td id="image--pullPolicy"><a href="./values.yaml#L42">image.pullPolicy</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"Always"
+</pre>
+</div>
+			</td>
+			<td>Image pullPolicy. Optional.</td>
+		</tr>
+		<tr>
+			<td id="image--repository"><a href="./values.yaml#L37">image.repository</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="">
+""
+</pre>
+</div>
+			</td>
+			<td>Image repository. Required.</td>
+		</tr>
+		<tr>
+			<td id="image--tag"><a href="./values.yaml#L40">image.tag</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="">
+""
+</pre>
+</div>
+			</td>
+			<td>Image tag. Required.</td>
+		</tr>
+		<tr>
+			<td id="istioEndUserAuth"><a href="./values.yaml#L313">istioEndUserAuth</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+{
+  "enabled": true
+}
+</pre>
+</div>
+			</td>
+			<td>Application authentication with Istio policies. Skip authentication for selected paths with "excludePaths". Require authentication for selected paths with "includePaths". Note that "includePaths" have precedence over "excludePaths". Customize which apps that can authenticate to get access using "audience". See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="istioEndUserAuth--enabled"><a href="./values.yaml#L316">istioEndUserAuth.enabled</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+true
+</pre>
+</div>
+			</td>
+			<td>Enable or disable authentication. Istio end-user auth is enabled by default for "AppType: backend".</td>
+		</tr>
+		<tr>
+			<td id="metrics"><a href="./values.yaml#L207">metrics</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+enabled: false
+port: 80
+path: "/metrics"
+scheme: "https"
 
-# ssb-chart v2.3.0
+</pre>
+</div>
+			</td>
+			<td>If "enabled: true", sets prometheus label to a service to enable scraping by prometheus server. Don't put quotes on boolean and numerical values. Optional.</td>
+		</tr>
+		<tr>
+			<td id="name"><a href="./values.yaml#L7">name</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"myapp"
+</pre>
+</div>
+			</td>
+			<td>Name of the application (also used for naming other Kubernetes resources). Required.</td>
+		</tr>
+		<tr>
+			<td id="networkpolicy"><a href="./values.yaml#L226">networkpolicy</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+enabled: true
+# -- Optionally create your own NetworkPolicy for the current application.
+overrideDefaultPolicy: {}
 
-A ServiceEntry should only take effect in the namespace where it is defined.
+</pre>
+</div>
+			</td>
+			<td>Generates a simple "ingress" network policy (i.e. restrict incoming traffic to the application), that only allows traffic to 'port.containerport' (default) or 'port.targetport' (if specified), as well as any 'extraPorts'. This is a simple "ingress" network policy, "egress" traffic is not restricted here. See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="networkpolicy--overrideDefaultPolicy"><a href="./values.yaml#L229">networkpolicy.overrideDefaultPolicy</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+{}
+</pre>
+</div>
+			</td>
+			<td>Optionally create your own NetworkPolicy for the current application.</td>
+		</tr>
+		<tr>
+			<td id="nodeSelector"><a href="./values.yaml#L52">nodeSelector</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+{}
+</pre>
+</div>
+			</td>
+			<td>Node selector for selecting where the to schedule the workload. Standard nodes are labeled "ssb-node: standard". Jupyter nodes are labeled "ssb-node: jupyter". See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="oauth2Proxy--enabled"><a href="./values.yaml#L282">oauth2Proxy.enabled</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="oauth2Proxy--image"><a href="./values.yaml#L283">oauth2Proxy.image</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="oauth2Proxy--port"><a href="./values.yaml#L285">oauth2Proxy.port</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="oauth2Proxy--version"><a href="./values.yaml#L284">oauth2Proxy.version</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="persistence"><a href="./values.yaml#L128">persistence</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+# -- Enable persistent volume.
+# Optional.
+enabled: false
+# -- Supported storage classes: "standard", "ssd"
+# @default -- "standard"
+# Optional.
+storageClass:
+# -- Create PVC. Set to "false" to use existing manifest file.
+# Optional.
+createPvc: true
+# -- Set access mode: "ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod".
+# Required if "createPvc: true".
+accessMode: ReadWriteOnce
+# -- PVC disk size.
+# Required if "createPvc: true".
+size: 1Gi
+# -- Mount path.
+# Required.
+folder: /data
+# Define owner user and owner group for the mounted volume.
+# Optional.
+owner:
 
-This fixes an issue that a ServiceEntry from one namespace can interfere with the traffic of another namespace.
+</pre>
+</div>
+			</td>
+			<td>Persistence defines whether app requires persistent volume. Once `enabled: true` is defined, corresponding sections under `volumes:` and `volumeMounts` will be automatically added to the deployment template. Only one persistent volume is supported at the moment. Optional.</td>
+		</tr>
+		<tr>
+			<td id="persistence--accessMode"><a href="./values.yaml#L141">persistence.accessMode</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"ReadWriteOnce"
+</pre>
+</div>
+			</td>
+			<td>Set access mode: "ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod". Required if "createPvc: true".</td>
+		</tr>
+		<tr>
+			<td id="persistence--createPvc"><a href="./values.yaml#L138">persistence.createPvc</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+true
+</pre>
+</div>
+			</td>
+			<td>Create PVC. Set to "false" to use existing manifest file. Optional.</td>
+		</tr>
+		<tr>
+			<td id="persistence--enabled"><a href="./values.yaml#L131">persistence.enabled</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+false
+</pre>
+</div>
+			</td>
+			<td>Enable persistent volume. Optional.</td>
+		</tr>
+		<tr>
+			<td id="persistence--folder"><a href="./values.yaml#L147">persistence.folder</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"/data"
+</pre>
+</div>
+			</td>
+			<td>Mount path. Required.</td>
+		</tr>
+		<tr>
+			<td id="persistence--size"><a href="./values.yaml#L144">persistence.size</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"1Gi"
+</pre>
+</div>
+			</td>
+			<td>PVC disk size. Required if "createPvc: true".</td>
+		</tr>
+		<tr>
+			<td id="persistence--storageClass"><a href="./values.yaml#L135">persistence.storageClass</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="">
+"standard"
+</pre>
+</div>
+			</td>
+			<td>Supported storage classes: "standard", "ssd" Optional.</td>
+		</tr>
+		<tr>
+			<td id="port"><a href="./values.yaml#L72">port</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+# -- name must start with protocol name (i.e.http or tcp). The name field is
+# automatically truncated to 15 symbols.
+# Optional.
+name: "http-main"
+# -- Port exposed by container.
+# Optional.
+containerport: 80
+# -- Port exposed by service object.
+# Optional.
+serviceport: 80
+# -- The target port on the POD to redirect traffic from the Service. This will usually be the
+# applications container port.
+# Optional.
+targetport:
 
-The "exportTo" configuration with a value of "." defines an export to the same namespace that the service is declared in.
+</pre>
+</div>
+			</td>
+			<td>Main application port. Use 'extraPorts' for additional ports. This was separated to simplify the automation for developer usage. Optional.</td>
+		</tr>
+		<tr>
+			<td id="port--containerport"><a href="./values.yaml#L79">port.containerport</a></td>
+			<td>
+int
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+80
+</pre>
+</div>
+			</td>
+			<td>Port exposed by container. Optional.</td>
+		</tr>
+		<tr>
+			<td id="port--name"><a href="./values.yaml#L76">port.name</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"http-main"
+</pre>
+</div>
+			</td>
+			<td>name must start with protocol name (i.e.http or tcp). The name field is automatically truncated to 15 symbols. Optional.</td>
+		</tr>
+		<tr>
+			<td id="port--serviceport"><a href="./values.yaml#L82">port.serviceport</a></td>
+			<td>
+int
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+80
+</pre>
+</div>
+			</td>
+			<td>Port exposed by service object. Optional.</td>
+		</tr>
+		<tr>
+			<td id="port--targetport"><a href="./values.yaml#L86">port.targetport</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>The target port on the POD to redirect traffic from the Service. This will usually be the applications container port. Optional.</td>
+		</tr>
+		<tr>
+			<td id="probes"><a href="./values.yaml#L183">probes</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+liveness:
+    enabled: false
+    # Original formatting starts here
+    livenessProbe:
+        httpGet:
+            port: ""
+            path: ""
+        initialDelaySeconds: 60
+        periodSeconds: 30
+readiness:
+    enabled: false
+    # Original formatting starts here
+    readinessProbe:
+        httpGet:
+            port: ""
+            path: ""
+        initialDelaySeconds: 60
+        periodSeconds: 30
 
-# ssb-chart v2.2.0
+</pre>
+</div>
+			</td>
+			<td>Readiness and liveness probes for containers. Used format: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes. Don't put quotes on boolean and numerical values.</td>
+		</tr>
+		<tr>
+			<td id="replicaCount"><a href="./values.yaml#L46">replicaCount</a></td>
+			<td>
+int
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+1
+</pre>
+</div>
+			</td>
+			<td>Number of pods to scale to (not HPA). Optional.</td>
+		</tr>
+		<tr>
+			<td id="resources"><a href="./values.yaml#L170">resources</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+enabled: true
+limits:
+    #cpu: 100m
+    memory: 128Mi
+requests:
+    cpu: 100m
+    memory: 128Mi
 
-Support for using Cloud SQL connectors instead of the CloudSql proxy.
+</pre>
+</div>
+			</td>
+			<td>Defines restrictions on resources requested and consumed by a single pod. Total calculated resources = resources*replicaCount. Ref:  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/ Optional.</td>
+		</tr>
+		<tr>
+			<td id="routes"><a href="./values.yaml#L324">routes</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>Support for adding additional matching rules and routes to the Istio VirtualService object. Route traffic to a path specified in `name` to the service port specified `serviceport`. Note that "serviceport" must be unique and different from the default service port specified in "port.serviceport". See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="service"><a href="./values.yaml#L159">service</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+{
+  "enabled": true,
+  "type": "ClusterIP"
+}
+</pre>
+</div>
+			</td>
+			<td>Defines whether to create a service object for loadbalancing of pods and sets service type. Optional.</td>
+		</tr>
+		<tr>
+			<td id="serviceAccount"><a href="./values.yaml#L217">serviceAccount</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+{
+  "create": true
+}
+</pre>
+</div>
+			</td>
+			<td>Kubernetes service account. SA name is generated from the application name with a "-sa" suffix. Ref. https://github.com/helm/helm/blob/master/docs/chart_best_practices/rbac.md. Optional.</td>
+		</tr>
+		<tr>
+			<td id="sidecars"><a href="./values.yaml#L155">sidecars</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>Defines additional containers to run in a pod. Bundles container settings into one yaml structure for simplicity. Follows the Kubernetes container spec. Optional.</td>
+		</tr>
+		<tr>
+			<td id="subdomains"><a href="./values.yaml#L330">subdomains</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>Alternative subdomains for the application. The default subdomain is `<cluster-name>`. Note that subdomains must be added to DNS for this to work. See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="tolerations"><a href="./values.yaml#L58">tolerations</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>Tolerations allow the scheduler to schedule pods on nodes with matching taints. The following taints exists for jupyter nodepools: `ssb-node=jupyter` See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="type"><a href="./values.yaml#L3">type</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"deployment"
+</pre>
+</div>
+			</td>
+			<td>Kubernetes deployment type. Optional.</td>
+		</tr>
+		<tr>
+			<td id="urlhosts"><a href="./values.yaml#L336">urlhosts</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>Alternative hostnames for the application. The default hostname is `<application name>`. Note that urlhosts must be added to DNS for this to work. See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="volumeMounts"><a href="./values.yaml#L121">volumeMounts</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>Defines volume mounts for the application. See examples section below for more details. Optional.</td>
+		</tr>
+		<tr>
+			<td id="volumes"><a href="./values.yaml#L116">volumes</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td>Defines volumes available for mounting in pods. See examples section below for more details. Optional.</td>
+		</tr>
+	</tbody>
+</table>
 
-Cloud SQL connectors support IamAuthentication which gives improved security over cloudSql proxy.
-If you're using Go, Java, or Python, consider using the corresponding Cloud SQL connector which does everything the 
-proxy does:
-https://github.com/GoogleCloudPlatform/cloud-sql-proxy/blob/main/README.md
+## Example values
 
-Example:
-```YAML
-cloudsql:
+### nodeSelector
+
+Standard nodes are labeled "ssb-node: standard". Jupyter nodes are labeled "ssb-node: jupyter".
+
+```yaml
+nodeSelector:
+  ssb-node: "jupyter"
+```
+See [nodeSelector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
+for more information.
+
+### tolerations
+
+Example of "toleration" to ensure POD is scheduled on a jupyter nodepool:
+```yaml
+tolerations:
+  effect: "NoSchedule"
+  key: "ssb-node"
+  operator: "Equal"
+  value: "ssb-jupyter"
+```
+See [taints and toleration](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+for more information.
+
+### affinity
+
+Alternative to nodeSelector.
+
+Example: Avoid scheduling to a specific node:
+```yaml
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: "ssb-node"
+            operator: NotIn
+            values: ["jupyter"]
+```
+Example: Schedule new pods on dedicated node for "jupyter":
+```yaml
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: "ssb-node"
+            operator: In
+            values: ["jupyter"]
+```
+See [affinity and anti-affinity](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+for more information.
+
+### extraPorts
+
+```yaml
+extraPorts:
+    # Name of port must start with the protocol (i.e. 'grpc').
+    # The value is automatically truncated to 15 symbols.
+    # Required.
+  - name: "grpc-main"
+    # Container port. Must not be the same as application containerport or any
+    # other defined containerport.
+    # Optional.
+    containerport: 1408
+    # Service port. Must not be the same as application serviceport or any
+    # other defined serviceport.
+    # Optional.
+    serviceport:
+    # Target port in the POD to redirect traffic to. If not specified this will
+    # default to containerport.
+    # Optional.
+    targetport:
+```
+
+### environmentVariables:
+
+```yaml
+environmentVariables:
+  - name: TEST_ENV_VARIABLE
+    value: "I_AM_A_VALUE"
+```
+
+### configs
+
+```yaml
+configs:
+  - name: application.properties
+    mountPath: /etc
+    config: |
+      key1=value1
+      key2=value2
+  - name: config.yaml
+    mountPath: /config
+    config: |
+      key1: value1
+      key2: value2
+```
+
+### volumes
+
+```yaml
+volumes:
+  - name: test-volume
+    hostPath:
+      path: /data
+  - name: secret-data
+    secret:
+      # Secret must already exist
+      secretName: my-secret-data
+      items:
+      - key: username
+        path: my-group/my-username
+```
+See [usage and formatting](https://kubernetes.io/docs/concepts/storage/volumes/) for more details.
+
+### volumeMounts
+
+```yaml
+volumeMounts:
+  - name: test-volume
+    mountPath: "/media/test-volume"
+    readOnly: true
+    # resulting file "username" will be stored under /media/secret-data/my-group/my-username/
+  - name: secret-data
+    mountPath: "/media/secret-data"
+    readOnly: true
+```
+
+See [mounting configmap as volume](https://kubernetes.io/docs/concepts/storage/volumes/#configmap)
+for more details.
+
+### networkpolicy
+
+Example using overrideDefaultPolicy:
+```yaml
+networkpolicy:
   enabled: true
-  useSqlProxy: false
-```
-Setting the `useSqlProxy` option to `false` will skip the addition of the cloudsql-proxy, but will keep the creation 
-of the `ServiceEntry` making it possible to connect to the Cloud SQL database. The value defaults to `true` if not 
-set, for backward compatibility.
+  overrideDefaultPolicy:
+    ingress:
+      # Allow ingress traffic on port 80 from all namespaces / pods of the cluster
+      - ports:
+          - port: 80
+            protocol: TCP
+        from:
+          - namespaceSelector: {}
 
-If the developers opt to use IamAuthentication to the Cloud SQL database the cloudsql-proxy is not needed.
-The reason for using IamAuthentication is to simplify setup by using IAM instead of username and password.
-
-Docs on using IamAuthentication via the connectors from Google directly in-process:
-https://cloud.google.com/sql/docs/postgres/iam-logins#python
-
-Also, reverted the change introduced in v2.1.0 as it seems the use case for this setting in the cloudsql-proxy could
-is intended for connecting from your local machine (a database tool for instance)
-
-# ssb-chart v2.1.0
-
-Support for setting the "-enable-iam-login" argument for
-the cloudsql-proxy.
-
-This setting enables Postgresql database auth using the Workload Identity SA for the application. 
-Note that the Sqluser must be created with "type: CLOUD_IAM_SERVICE_ACCOUNT" and the username 
-must be set to the Workload Identity SA without the .gserviceaccount.com suffix. Requires 
-cloudsql-proxy >= 1.20.
-
-# ssb-chart v2.0.0
-
-Moved ssb-chart to this Helm chart repository.
-
-This helm chart can now be referenced with a repository URL:
-```YAML
-spec:
-  chart:
-    repository: "https://raw.githubusercontent.com/statisticsnorway/helm-charts/main/"
-    name: "ssb-chart"
-    version: 2.0.0
-  releaseName: __your-app-name__
+    egress:
+      # Allow egress traffic to the Kubernetes DNS service
+      - ports:
+          - port: 53
+            protocol: UDP
+          - port: 53
+            protocol: TCP
+        to:
+          - namespaceSelector: {}
+            podSelector:
+              matchLabels:
+                k8s-app: kube-dns
 ```
 
-# ssb-chart v1.3.1
+Please refer to the [kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+for details.
 
-Support for passing a named HTTP cookie in the Nginx proxy.
+### egress
 
-# ssb-chart v1.3.0
-
-SSB-Chart is a generic Helm Chart template to use as basis for applications to be deployed on the SSB Platform.
-
-**This version of the chart is adapted to changes in Istio v1.10 - if unsure what version to use, ask team Stratus**
-
-## Introduction
-
-Use this template as basis for Flux deployment, and update the values in the Kubernetes manifest file
-
-## Chart version changelog
-
-### v1.3.0
-
-- All bolean variables tested to work both as string and non-string values.
-
-### v1.2.0
-
-- Added support for custom application names/urlhosts. Follow [this link](https://github.com/statisticsnorway/ssb-developer-guide/blob/master/docs/deploy/gitops/helm-operator.md) for more information.
-
-### v1.1.0
-
-- Added support for custom subdomain name. Follow [this link](https://github.com/statisticsnorway/ssb-developer-guide/blob/master/docs/deploy/gitops/helm-operator.md) for more information.
-
-### v1.0.0
-
-- Initial release of ssb-chart
-
-## Installing the Chart
-
-To use the SSB-chart, define the chart in the Flux release file (Change __your-app-name__ to a unique name for your application, and select chart version; the highest available version number is recomended, i.e. `2.0.0`)
-
-```YAML
-spec:
-  chart:
-    repository: "https://raw.githubusercontent.com/statisticsnorway/helm-charts/main/"
-    name: "ssb-chart"
-    version: 2.0.0
-  releaseName: __your-app-name__
+```yaml
+egress:
+  - "dataproc.googleapis.com"
+  - "*.cloudfront.net"
 ```
 
-The [configuration](#configuration) section lists the parameters that can be configured during installation.
+### backends
 
-> **Tip**: List all releases using `helm list --all-namespaces`
-
-## Uninstalling the Chart
-
-To uninstall/delete the `my-release` deployment:
-
-```console
-$ helm delete my-release
+```yaml
+backends:
+  - name: "dataset-access"
+    namespace: "dapla"
+  - name: "backend-service"
+    namespace: "backend"
 ```
 
-The command removes all the Kubernetes components associated with the chart and deletes the release.
+### istioEndUserAuth
 
-## Configuration
-
-The following table lists the configurable parameters of the ssb-chart and their default values.
-
-Parameter | Description | Default
---- | --- | ---
-`type`| Kubernetes deployment type |`deployment`
-`name`| Name of the application (also used for naming other Kubernetes resources) |
-`appType`| The type of application. Important as it decides the authentication. `backend` and `frontend` are the only valid options for now |
-`cluster`| Name of the Kubernetes cluster |
-`exposed`| Boolean to control whether or not to expose the application to the Internet (requires Istio service mesh) | `false`
-`domain`| Domain to use for exposed services (this depends on where the Kubernetes cluster is running) | `ssb.no`
-`billingProject` | What SSB project should resources be billed to |
-`image.repository` | URL to the repository for the image | `_REPOSITORY_`
-`image.tag` | Image tag | `_TAG_`
-`ìmage.pullPolicy`| Update image automatically? | `Always`
-`replicaCount`| Number of replicas to run |`1`
-`port.name`| The name of the service port |`http-main`
-`port.serviceport`| The service port of the service |`80`
-`port.containerport`| The container port of the service |`80`
-`port.targetport`| The target port of the service |
-`extraPorts`| List of additional application ports (see `values.yaml` for example) | `[]`
-`environmentVariables` | Environment variables for the app |
-`configs` | Configs available to mount from `ConfigMap` | `[]`
-`volumes` | Volumes available for mounting in the pods | `[]`
-`volumesMounts` | Volume mounts for the main container in the pod | `[]`
-`sidecars`| Defines additional containers to run in a pod |
-`service.enabled`| Create a service object for loadbalancing of pods | `true`
-`service.type`| Service type: ClusterIP or NodePort | `ClusterIP`
-`resources.enabled` | Enable restrictions on resources requested and consumed by a single container | `true`
-`resources.limits.cpu` | Restrict CPU resources limits for a single pod | `100m`
-`resources.limits.memory` | Restrict memory resources limits for a single pod | `128Mi`
-`resources.requests.cpu` | Specify CPU resources requested when starting a pod | `100m`
-`resources.requests.memory` | Specify memory resources requested when starting a pod | `128Mi`
-`probes.liveness.enabled` | Set liveness probe for container | `false`
-`probes.liveness.livenessProbe.httpGet.port:` | Liveness probe port |
-`probes.liveness.livenessProbe.httpGet.path:` | Liveness probe path |
-`probes.liveness.livenessProbe.initialDelaySeconds:` | Liveness probe initial delay after creation | 60
-`probes.liveness.livenessProbe.periodSeconds:` | Liveness probe period in seconds | 30
-`probes.readiness.enabled` | Set readiness probe for container | `false`
-`probes.readiness.livenessProbe.httpGet.port:` | Readiness probe port |
-`probes.readiness.livenessProbe.httpGet.path:` | Readiness probe path |
-`probes.readiness.livenessProbe.initialDelaySeconds:` | Readiness probe initial delay after creation | 60
-`probes.readiness.livenessProbe.periodSeconds:` | Readiness probe period in seconds | 30
-`metrics.enabled`| Enable metrics endpoint | `true`
-`metrics.port`| Metrics endpoint port| `8081`
-`metrics.path`| Metrics endpoint path| `/prometheus`
-`metrics.scheme`| Metrics endpoint scheme | `https`
-`serviceAccount.create` | Specifies whether a ServiceAccount should be created | `true`
-`serviceAccount.name` | Override default name for the ServiceAccount | `<app.name>-sa`
-`serviceAccount.annotations` | Set annotations on ServiceAccount | `{}`
-`networkpolicy.enabled` | Define whether simple ingress NetworkPolicy will be generated | `true`
-`networkpolicy.overrideDefaultPolicy` | Allows manual definition of a NetworkPolicy. **NB! Use with caution !** | `empty`
-`PodSecurityContext.enabled`| Specify whether to consider PodSecurityContext template fragment in deployment.yaml| `false`|
-`PodSecurityContext.runAsNonRoot`| [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#podsecuritycontext-v1-core)| `true`|
-`PodSecurityContext.runAsUser`| [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#podsecuritycontext-v1-core) | `{}`, depends on container image and available users there|
-`PodSecurityContext.fsGroup`| [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#podsecuritycontext-v1-core) | `{}`|
-`ContainerSecurityContext.enabled`| Specify whether to consider ContainerSecurityContext template fragment deployment.yaml | `false`|
-`ContainerSecurityContext.allowPrivilegeEscalation`| [Documentation](#links) | `false`|
-`ContainerSecurityContext.privileged`| [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#securitycontext-v1-core) | `false`|
-`ContainerSecurityContext.readOnlyRootFilesystem`| [Documentation](#links) | `false`|
-`ContainerSecurityContext.runAsNonRoot`| [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#securitycontext-v1-core) | `true`|
-`ContainerSecurityContext.runAsUser`| [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#securitycontext-v1-core) | `{}`|
-`annotations` | [Documentation](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) | `{}`
-`lifecycle.postStartCommand` | [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/#define-poststart-and-prestop-handlers) | `{}`
-`hostAliases` | [Documentation](https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases) | `{}`
-`persistence.enabled` | Define whether to add a persistent volume and mount it under defined folder | `false`
-`persistence.createPvc` | Define whether to generate and provision PersistentVolumeClaim using Helm. Set to false and provide PVC in a separate manifest to persist the data even if the HelmRelease is deleted | `true`
-`persistence.size` | Define size of persistent volume | `1Gi` |
-`persistence.folder` | Define mount folder | /data |
-`persistence.accessMode` | [Documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) | `ReadWriteOnce`
-`persistence.owner` | Define user and group owner of the mounted volume in `chown` command format, for example: "1000:1000" | Not defined
-`deploymentStrategy` | [Documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) | `rollingUpdate`
-`egress` | A list of HTTPS services you need to reach outside of the service mesh | `[]`
-`cloudsql` | Dictionary to control whether or not to set up a Cloud SQL Proxy sidecar that can connect to an external database | See values.yaml
-`cloudsql.enableIamLogin` | Use WI SA for Postgres database user auth. Sqluser must be created with "type: CLOUD_IAM_SERVICE_ACCOUNT" and username is WI SA email without the .gserviceaccount.com suffix. Requires cloudsql-proxy >= 1.20 | `false`
-`backends` | List of backend services that an application should be able to talk to (using an Nginx API Gateway) | `[]`
-`apiGateway` | Configuration dictionary for the Nginx API Gateway (only used if `backends` is populated) | See below
-`apiGateway.image` | The Docker image to use for the Nginx API Gateway sidecar | `bitnami/nginx`
-`apiGateway.version` | The Docker image version to use for the Nginx API Gateway sidecar | `1.16`
-`apiGateway.port` | The container port to use for the Nginx API Gateway sidecar | `1.16`
-`nodeSelector` | [Documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) | nodeSelector.ssb-node=standard
-`affinity` | [Documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) | {}
-`tolerations` | [Documentation](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)| []
-`istioEndUserAuth` | Configuration for overriding default [Policy for Istio end user auth](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) | See below
-`istioEndUserAuth.enabled` | Enabled by default for "backend" applications | `true`
-`istioEndUserAuth.includePaths` | Only require authentication for selected paths | `[]`
-`istioEndUserAuth.excludePaths` | Do not require authentication for selected paths | `[]`
-`istioEndUserAuth.audience` | Override default audience that must match "aud" claim in token | `<application name>`
-`subdomains` | A optional list of subdomains where the application will be available (subdomains must be created in forehand by team Stratus) | `[]`
-`urlhosts` | A optional list of hostnames to which the service will answer. If used in combination with subdomains, the names will be created in each subdomain. If used alone, the names will be created in 'ssb.no' in production environment, and in 'staging.ssb.no' in staging environment. | `[]`
-
-## A note about boolean values and conditionals
-
-There is a gotcha if one expects a boolean in a if-statement, but a string is provided:
-
-```bash
-{{- if .Values.exposed }}
-````
-
-This will evaluate to true whenever `exposed` exists (isn't Go nil) and isn't zero, literal false, or an empty string. If "false" is provided the expression will actually evaluate to true!
-To avoid accidentally creating a resource one should check that the string is set AND that the toString-method on the value equals "true":
-
-```bash
-{{- if and (eq (toString .Values.exposed) "true") .Values.exposed }}
+Skip authentication for selected paths:
+```yaml
+istioEndUserAuth:
+  excludePaths:
+    - "/public"   # Matches exactly "/public" path
+    - "/public/*" # Matches everything under the "/public/" path
+                  # but not the "/public/" path itself
+```
+Require authentication for selected paths use includePaths:
+```yaml
+istioEndUserAuth:
+  includePaths:
+    - "/auth"   # Matches exactly "/auth" path
+    - "/auth/*" # Matches everything under "/auth/" path
+```
+Customize apps that can authenticate to get access:
+```yaml
+istioEndUserAuth:
+  audience:
+    - custom-audience-1
+    - custom-audience-2
 ```
 
-## Unit testing the Helm Chart
+Please refer to the Istio documentation for more details:
+- https://istio.io/latest/docs/reference/config/security/authorization-policy/
+- https://istio.io/latest/docs/reference/config/security/request_authentication/
 
-To be able to confidently change or refactor the `ssb-chart` templates, unit tests for the templates exists in the folder `source/ssb-chart/tests`.
-The tests are run with the Helm plugin [airflow-helm-unittest](https://github.com/apache/airflow-helm-unittest), see [install guide](https://github.com/apache/airflow-helm-unittest#install) for installation.
+### routes
 
-To run the tests:
-
-```bash
-helm unittest source/ssb-chart
+```yaml
+routes:
+  - name: "/auth"
+    type: "prefix"
+    serviceport: 8080
 ```
 
-### Values
+Please refer to the
+[Kubernetes documentation](https://istio.io/docs/reference/config/networking/virtual-service/#StringMatch)
+for valid values of "name" and "type".
 
-There are two ways of specifying values that should override the default values in the chart:
+### subdomains
 
-* Using the `set` tag directly in the test
-* Specifying a `values` file
-
-Examples on both can be found in the [documentation](https://github.com/apache/airflow-helm-unittest/blob/development/DOCUMENT.md#test-job). The values files for the tests in `ssb-chart` can be found in the directory `source/ssb-chart/tests/values`.
-
-### Release values
-
-The values for the `release` itself are placed in the `release` tag in each test. See the [documentaion](https://github.com/apache/airflow-helm-unittest/blob/development/DOCUMENT.md#test-job)
-
-### Asserting results
-
-There are a number of ways to assert that the actual values generated are as to be expected. Please refer to the docs on [assertion types](https://github.com/apache/airflow-helm-unittest/blob/development/DOCUMENT.md#assertion-types) to see all possibilities.
-
-One "special" kind of assertion is the `matchSnapshot` which saves the value for the path in a snapshot file in the `__snapshot__` directory. On the subsequent runs of the test, the value for the path will be compared to the saved snapshot. If there are changes in the template that makes the value for the path different, run the tests with the `-u` parameter to update the snapshot:
-
-```bash
-helm unittest source/ssb-chart/ -u
+```yaml
+subdomains:
+  - subdomain1
+  - subdomain2
 ```
 
-### Tips, tricks and gotcha's writing unit tests
+### urlhosts
 
-* Rembember it's all `yaml`, so indentation really(!) matters on all levels. As an example, if the error `invalid memory address or nil pointer dereference` is raised there is probably an indentation error in the test
-* The file containing the test must reside in the folder `source/ssb-chart/tests/`
-* The file containing the test must be suffixed `_test.yaml`, or else it will not be run
-* If it is hard to calculate what actually is generated, the `matchSnapshot` assertion can be used to create a temporary snapshot file to view the output
+```yaml
+urlhosts:
+  - testurl1
+  - testurl2
+```
 
-## CI for the chart
-
-There is a [pipeline](https://dev.azure.com/statisticsnorway/Stratus/_build?definitionId=175&_a=summary) in the Team Stratus' project on Azure Pipelines, which run the unit tests described above. It also runs the test defined for the `manifestvalidator.sh` script.
-
-The unit test job installs the [Helm unittest](https://github.com/quintush/helm-unittest) plugin and runs the unittests defined in the `tests` directory. The job to test the `manifestvalidator.sh` script installs Kind and YQ, and creates a `Kind` Kubernetes cluster. It also installs all namespaces and CRDs on the cluster. This job is quite like the pipeline for validating new/changed `HelmRelease` manifests. See the CI-paragraph in the [testing](https://github.com/statisticsnorway/ssb-developer-guide/blob/master/docs/deploy/testing.md) documentation. These two jobbs run i parallell.
-
-Both jobs publish test results as a JUnit xml file which means the test runs can be viewed in the `Tests` tab on the run in Azure Pipelines.
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

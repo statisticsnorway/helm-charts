@@ -18,12 +18,13 @@ This is a repository for Helm charts.
 
 ## Updating Helm charts
 
-1. Update the chart under the source directory
-1. Add release notes to the helm charts README.md file 
-1. Increment the version string in the Charts.yaml file
+1. Update the Helm chart in the `source/` directory
+1. Add release notes to the helm charts `CHANGELOG.md` file
+1. Increment the version string in the `Charts.yaml` file
+1. Update the `Values` descriptions using the "[helm-docs](https://github.com/norwoodj/helm-docs)" command
 1. Run unit tests `helm unittest source/ssb-chart`
-1. Validate the changes to the test snapshots and rerun above command with "-u" switch
-1. Run the `./bin/build.sh` script
+1. Validate the changes to the test snapshots and rerun unit tests with `-u` to update
+1. Run the `./bin/build.sh` script to package the new release
 1. Commit the changes to a branch
 1. You can test from the branch in a HelmRelease by changing the repository path
 
@@ -67,7 +68,7 @@ spec:
     # Use the ssb-chart from the helm-charts repo.
     repository: "https://raw.githubusercontent.com/statisticsnorway/helm-charts/main/"
     name: "ssb-chart"
-    version: 1.3.1
+    version: 2.3.4
   releaseName: "myapp"
   helmVersion: v3
   valuesFrom:

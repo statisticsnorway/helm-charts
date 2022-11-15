@@ -1,0 +1,321 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{- define "chart.valuetypes.email" }}
+{{- end }}
+{{ template "chart.valuetypes.email" . }}
+
+{{ define "chart.valueDefaultColumnRender" }}
+{{- $defaultValue := (default .Default .AutoDefault)  -}}
+{{- $notationType := .NotationType }}
+{{- if (and (hasPrefix "`" $defaultValue) (hasSuffix "`" $defaultValue) ) -}}
+{{- $defaultValue = (toPrettyJson (fromJson (trimAll "`" (default .Default .AutoDefault) ) ) ) -}}
+{{- $notationType = "json" }}
+{{- end -}}
+{{- if (eq $notationType "tpl" ) }}
+<pre lang="{{ $notationType }}">
+{{ .Key }}: |
+{{- $defaultValue | nindent 2 }}
+</pre>
+{{- else if (eq $notationType "email") }}
+<a href="mailto:{{ $defaultValue }}" style="color: green;">"{{ $defaultValue }}"</a>
+{{- else }}
+<pre lang="{{ $notationType }}">
+{{ $defaultValue }}
+</pre>
+{{- end }}
+{{ end }}
+
+{{ define "chart.typeColumnRender" }}
+{{- if (eq .Type "string/email") }}
+<a href="#stringemail" title="{{- template "chart.valuetypes.email" -}}">{{.Type}}</a>
+{{- else if (eq .Type "k8s/storage/persistent-volume/access-modes" )}}
+<a target="_blank" 
+   href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes"
+   >{{- .Type }}</a>
+{{- else }}
+{{ .Type }}
+{{- end }}
+{{ end }}
+
+{{ define "chart.valuesTableHtml" }}
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+	{{- range .Values }}
+		<tr>
+			<td id="{{ .Key | replace "." "--" }}"><a href="./values.yaml#L{{ .LineNumber }}">{{ .Key }}</a></td>
+			<td>{{- template "chart.typeColumnRender" . -}}</td>
+			<td>
+				<div style="max-width: 400px;">{{ template "chart.valueDefaultColumnRender" . }}</div>
+			</td>
+			<td>{{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }}</td>
+		</tr>
+	{{- end }}
+	</tbody>
+</table>
+{{ end }}
+
+{{ template "chart.valuesSectionHtml" . }}
+
+## Example values
+
+### nodeSelector
+
+Standard nodes are labeled "ssb-node: standard". Jupyter nodes are labeled "ssb-node: jupyter".
+
+```yaml
+nodeSelector:
+  ssb-node: "jupyter"
+```
+See [nodeSelector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
+for more information.
+
+### tolerations
+
+Example of "toleration" to ensure POD is scheduled on a jupyter nodepool:
+```yaml
+tolerations:
+  effect: "NoSchedule"
+  key: "ssb-node"
+  operator: "Equal"
+  value: "ssb-jupyter"
+```
+See [taints and toleration](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+for more information.
+
+### affinity
+
+Alternative to nodeSelector.
+
+Example: Avoid scheduling to a specific node:
+```yaml
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: "ssb-node"
+            operator: NotIn
+            values: ["jupyter"]
+```
+Example: Schedule new pods on dedicated node for "jupyter":
+```yaml
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: "ssb-node"
+            operator: In
+            values: ["jupyter"]
+```
+See [affinity and anti-affinity](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+for more information.
+
+### extraPorts
+
+```yaml
+extraPorts:
+    # Name of port must start with the protocol (i.e. 'grpc').
+    # The value is automatically truncated to 15 symbols.
+    # Required.
+  - name: "grpc-main"
+    # Container port. Must not be the same as application containerport or any
+    # other defined containerport.
+    # Optional.
+    containerport: 1408
+    # Service port. Must not be the same as application serviceport or any
+    # other defined serviceport.
+    # Optional.
+    serviceport:
+    # Target port in the POD to redirect traffic to. If not specified this will
+    # default to containerport.
+    # Optional.
+    targetport:
+```
+
+### environmentVariables:
+
+```yaml
+environmentVariables:
+  - name: TEST_ENV_VARIABLE
+    value: "I_AM_A_VALUE"
+```
+
+### configs
+
+```yaml
+configs:
+  - name: application.properties
+    mountPath: /etc
+    config: |
+      key1=value1
+      key2=value2
+  - name: config.yaml
+    mountPath: /config
+    config: |
+      key1: value1
+      key2: value2
+```
+
+### volumes
+
+```yaml
+volumes:
+  - name: test-volume
+    hostPath:
+      path: /data
+  - name: secret-data
+    secret:
+      # Secret must already exist
+      secretName: my-secret-data
+      items:
+      - key: username
+        path: my-group/my-username
+```
+See [usage and formatting](https://kubernetes.io/docs/concepts/storage/volumes/) for more details.
+
+### volumeMounts
+
+```yaml
+volumeMounts:
+  - name: test-volume
+    mountPath: "/media/test-volume"
+    readOnly: true
+    # resulting file "username" will be stored under /media/secret-data/my-group/my-username/
+  - name: secret-data
+    mountPath: "/media/secret-data"
+    readOnly: true
+```
+
+See [mounting configmap as volume](https://kubernetes.io/docs/concepts/storage/volumes/#configmap)
+for more details.
+
+### networkpolicy
+
+Example using overrideDefaultPolicy:
+```yaml
+networkpolicy:
+  enabled: true
+  overrideDefaultPolicy:
+    ingress:
+      # Allow ingress traffic on port 80 from all namespaces / pods of the cluster
+      - ports:
+          - port: 80
+            protocol: TCP
+        from:
+          - namespaceSelector: {}
+
+    egress:
+      # Allow egress traffic to the Kubernetes DNS service
+      - ports:
+          - port: 53
+            protocol: UDP
+          - port: 53
+            protocol: TCP
+        to:
+          - namespaceSelector: {}
+            podSelector:
+              matchLabels:
+                k8s-app: kube-dns
+```
+
+Please refer to the [kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+for details.
+
+### egress
+
+```yaml
+egress:
+  - "dataproc.googleapis.com"
+  - "*.cloudfront.net"
+```
+
+### backends
+
+```yaml
+backends:
+  - name: "dataset-access"
+    namespace: "dapla"
+  - name: "backend-service"
+    namespace: "backend"
+```
+
+### istioEndUserAuth
+
+Skip authentication for selected paths:
+```yaml
+istioEndUserAuth:
+  excludePaths:
+    - "/public"   # Matches exactly "/public" path
+    - "/public/*" # Matches everything under the "/public/" path
+                  # but not the "/public/" path itself
+```
+Require authentication for selected paths use includePaths:
+```yaml
+istioEndUserAuth:
+  includePaths:
+    - "/auth"   # Matches exactly "/auth" path
+    - "/auth/*" # Matches everything under "/auth/" path
+```
+Customize apps that can authenticate to get access:
+```yaml
+istioEndUserAuth:
+  audience:
+    - custom-audience-1
+    - custom-audience-2
+```
+
+Please refer to the Istio documentation for more details:
+- https://istio.io/latest/docs/reference/config/security/authorization-policy/
+- https://istio.io/latest/docs/reference/config/security/request_authentication/
+
+### routes
+
+```yaml
+routes:
+  - name: "/auth"
+    type: "prefix"
+    serviceport: 8080
+```
+
+Please refer to the
+[Kubernetes documentation](https://istio.io/docs/reference/config/networking/virtual-service/#StringMatch)
+for valid values of "name" and "type".
+
+### subdomains
+
+```yaml
+subdomains:
+  - subdomain1
+  - subdomain2
+```
+
+### urlhosts
+
+```yaml
+urlhosts:
+  - testurl1
+  - testurl2
+```
+
+{{ template "helm-docs.versionFooter" . }}
