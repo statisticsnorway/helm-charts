@@ -154,8 +154,9 @@ persistence:
 # Optional.
 sidecars:
 
-# -- Defines whether to create a service object for loadbalancing of pods and sets service type.
+# -- (object) Defines whether to create a service object for loadbalancing of pods and sets service type.
 # Optional.
+# @notationType -- yaml
 service:
   enabled: true
   type: "ClusterIP"
@@ -210,10 +211,11 @@ metrics:
   path: "/metrics"
   scheme: "https"
 
-# -- Kubernetes service account.
+# -- (object) Kubernetes service account.
 # SA name is generated from the application name with a "-sa" suffix.
 # Ref. https://github.com/helm/helm/blob/master/docs/chart_best_practices/rbac.md.
 # Optional.
+# @notationType -- yaml
 serviceAccount:
   create: true
 
@@ -303,13 +305,14 @@ apiGateway:
   version:
   port:
 
-# -- Application authentication with Istio policies.
+# -- (object) Application authentication with Istio policies.
 # Skip authentication for selected paths with "excludePaths".
 # Require authentication for selected paths with "includePaths".
 # Note that "includePaths" have precedence over "excludePaths".
 # Customize which apps that can authenticate to get access using "audience".
 # See examples section below for more details.
 # Optional.
+# @notationType -- yaml
 istioEndUserAuth:
   # -- Enable or disable authentication.
   # Istio end-user auth is enabled by default for "AppType: backend".

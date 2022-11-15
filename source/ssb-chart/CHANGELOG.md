@@ -6,11 +6,15 @@ Updates in this release:
 
 * Major documentation update
 
+---
+
 ## v2.3.3
 
 Updates in this release:
 
 * Fixes an issue where a custom path to metrics is not honored in all templates
+
+---
 
 ## v2.3.2
 
