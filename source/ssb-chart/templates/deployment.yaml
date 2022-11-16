@@ -55,6 +55,9 @@ spec:
         volumeMounts:
         - name: custom-data
           mountPath: {{ .Values.persistence.folder }}
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
       {{- end }}
       containers:
         {{- if .Values.sidecars }}
@@ -70,9 +73,7 @@ spec:
           args:
           - -instances={{ required "A valid .Values.cloudsql.instance entry required!" .Values.cloudsql.instance }}=tcp:5432
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
-            allowPrivilegeEscalation: false
+{{ include "global.ContainerSecurityContext" . | indent 12 }}
         {{- end }}
         {{- end }}
         {{- if and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend") }}
@@ -89,9 +90,7 @@ spec:
             mountPath: "/secrets/"
             readOnly: true
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
-            allowPrivilegeEscalation: false
+{{ include "global.ContainerSecurityContext" . | indent 12 }}
         {{- end }}
         {{- if .Values.backends }}
         - name: nginx-gateway
@@ -104,9 +103,14 @@ spec:
           - name: nginx-vhost-config-volume
             mountPath: "/opt/bitnami/nginx/conf/server_blocks"
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
             allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
         {{- end }}
         - name: {{ template "app.name" . }}-cont
           image: {{ template "app.imageRepository" . }}:{{ template "app.imageTag" . }}
@@ -171,16 +175,26 @@ spec:
 {{ toYaml . | trim | indent 12 }}
           {{- end }}
           {{- end }}
-{{- if and ( or (eq (toString .Values.ContainerSecurityContext.enabled) "true") (eq (toString .Values.ContainerSecurityContext.enabled) "True")) .Values.ContainerSecurityContext.enabled }}
           securityContext:
             allowPrivilegeEscalation: {{ .Values.ContainerSecurityContext.allowPrivilegeEscalation }}
             privileged: {{ .Values.ContainerSecurityContext.privileged }}
             readOnlyRootFilesystem: {{ .Values.ContainerSecurityContext.readOnlyRootFilesystem }}
             runAsNonRoot: {{ .Values.ContainerSecurityContext.runAsNonRoot }}
-          {{- if .Values.ContainerSecurityContext.runAsUser }}
             runAsUser: {{ .Values.ContainerSecurityContext.runAsUser }}
-          {{- end }}
-{{- end }}
+            runAsGroup: {{ .Values.ContainerSecurityContext.runAsGroup }}
+            {{- if .Values.ContainerSecurityContext.capabilities }}
+            capabilities:
+              {{- if .Values.ContainerSecurityContext.capabilities.add }}
+              add: {{ .Values.ContainerSecurityContext.capabilities.add }}
+              {{- end }}
+              {{- if .Values.ContainerSecurityContext.capabilities.drop }}
+              drop: {{ .Values.ContainerSecurityContext.capabilities.drop }}
+              {{- end }}
+            {{- end }}
+            {{- if .Values.ContainerSecurityContext.seccompProfile }}
+            seccompProfile:
+              type: {{ .Values.ContainerSecurityContext.seccompProfile.type }}
+            {{- end }}
           {{- if .Values.lifecycle }}
           {{- if .Values.lifecycle.postStartCommand }}
           lifecycle:
@@ -220,15 +234,22 @@ spec:
             name: "{{ template "app.name" . }}-nginx-vhost-config"
 {{- end }}
 {{- end }}
-{{- if and ( or (eq (toString .Values.PodSecurityContext.enabled) "true") (eq (toString .Values.PodSecurityContext.enabled) "True")) .Values.PodSecurityContext.enabled }}
       securityContext:
+{{- if .Values.PodSecurityContext.runAsNonRoot }}
+        runAsNonRoot: {{ .Values.PodSecurityContext.runAsNonRoot }}
+{{- end }}
 {{- if .Values.PodSecurityContext.runAsUser }}
         runAsUser: {{ .Values.PodSecurityContext.runAsUser }}
+{{- end }}
+{{- if .Values.PodSecurityContext.runAsGroup }}
+        runAsGroup: {{ .Values.PodSecurityContext.runAsGroup }}
 {{- end }}
 {{- if .Values.PodSecurityContext.fsGroup }}
         fsGroup: {{ .Values.PodSecurityContext.fsGroup }}
 {{- end }}
-        runAsNonRoot: {{ .Values.PodSecurityContext.runAsNonRoot }}
+{{- if .Values.ContainerSecurityContext.seccompProfile }}
+        seccompProfile:
+          type: {{ .Values.ContainerSecurityContext.seccompProfile.type }}
 {{- end }}
 {{- with .Values.nodeSelector }}
       nodeSelector:

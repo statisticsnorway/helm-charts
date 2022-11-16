@@ -145,7 +145,9 @@ persistence:
   # -- Mount path.
   # Required.
   folder: /data
-  # Define owner user and owner group for the mounted volume.
+  # -- Define owner user and owner group for the mounted volume.
+  # NOTE: Only use this option if setting the `PodSecurityContext.fsGroup` to the containers
+  # process UID (runAsUser) does NOT work.
   # Optional.
   owner:
 
@@ -231,26 +233,59 @@ networkpolicy:
   overrideDefaultPolicy: {}
 
 # -- (object) PodSecurityContext.
-# Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#podsecuritycontext-v1-core.
+# Default security context for pods. If set in both SecurityContext and PodSecurityContext,
+# the value specified in SecurityContext takes precedence.
+# Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podsecuritycontext-v1-core.
 # Optional.
 # @notationType -- yaml
 PodSecurityContext:
-  enabled: false
-  runAsNonRoot: true
-  runAsUser: {}
-  fsGroup: {}
+  # -- Containers in pod must run as a non-root user (e.g. not run as UID 0).
+  runAsNonRoot:
+  # -- The UID to run the entrypoint of the container process.
+  # Defaults to the user specified in the image metadata if unspecified.
+  runAsUser:
+  # -- The GID to run the entrypoint of the container process. Uses runtime default if unset.
+  runAsGroup:
+  # -- All processes in the pod will be part of this supplementary group.
+  # Supported volume mounts will be owned by this group.
+  fsGroup:
+  # -- (object) Limit the range of system calls allowed.
+  # @notationType -- yaml
+  seccompProfile:
+    # -- RuntimeDefault: As defined by the container runtime.
+    type: RuntimeDefault
 
 # -- (object) Container SecurityContext for main application.
-# Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#securitycontext-v1-core.
+# Default restricted security context for the application.
+# If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
 # Optional.
+# Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#securitycontext-v1-core
 # @notationType -- yaml
 ContainerSecurityContext:
-  enabled: false
+  # -- If processes should be allowed to gain more privileges than its parent process.
   allowPrivilegeEscalation: false
+  # -- If processes in container can run privileged. This is equivalent to running as root on the host.
   privileged: false
-  readOnlyRootFilesystem: false
+  # -- If container should have a read-only root filesystem.
+  readOnlyRootFilesystem: true
+  # -- Container must run as a non-root user (e.g. not run as UID 0).
   runAsNonRoot: true
-  runAsUser: {}
+  # -- The UID to run the entrypoint of the container process.
+  # Defaults to the user specified in the image metadata if unspecified.
+  runAsUser: 1000
+  # -- The GID to run the entrypoint of the container process. Uses runtime default if unset.
+  runAsGroup: 1000
+  # -- (object) The capabilities to add/drop when running containers.
+  # Defaults to the default set of capabilities granted by the container runtime
+  # @notationType -- yaml
+  capabilities:
+    drop: ["ALL"]
+    add: []
+  # -- (object) Limit the range of system calls allowed.
+  # @notationType -- yaml
+  seccompProfile:
+    # -- RuntimeDefault: As defined by the container runtime.
+    type: RuntimeDefault
 
 # -- Defines a list of external https resources you need to be able to reach from
 # your application. Wildcard is supported, but the Helm chart will replace '*'

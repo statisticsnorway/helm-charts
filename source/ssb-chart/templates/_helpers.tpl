@@ -87,3 +87,19 @@ The "targetPort" is set in this priority
   {{ .Values.port.containerport }}
 {{- end }}
 {{- end -}}
+{{/*
+A restricted container security context for use in the deployment template.
+See ".Values.ContainerSecurityContext" for main app security context.
+*/}}
+{{- define "global.ContainerSecurityContext" -}}
+allowPrivilegeEscalation: false
+privileged: false
+readOnlyRootFilesystem: true
+runAsNonRoot: true
+runAsUser: 1000
+runAsGroup: 1000
+capabilities:
+  drop: ["ALL"]
+seccompProfile:
+  type: RuntimeDefault
+{{- end -}}

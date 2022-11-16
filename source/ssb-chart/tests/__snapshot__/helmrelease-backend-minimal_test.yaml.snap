@@ -6,7 +6,7 @@ should render AuthorizationPolicy:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-allow-metrics-auth-policy
@@ -27,7 +27,7 @@ should render AuthorizationPolicy:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-allow-health-auth-policy
@@ -49,7 +49,7 @@ should render AuthorizationPolicy (require JWT):
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-default-auth-policy
@@ -71,7 +71,7 @@ should render Deployment:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app
@@ -100,6 +100,21 @@ should render Deployment:
               requests:
                 cpu: 100m
                 memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsGroup: 1000
+              runAsNonRoot: true
+              runAsUser: 1000
+              seccompProfile:
+                type: RuntimeDefault
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
           serviceAccountName: unittest-app-sa
 should render NetworkPolicy:
   1: |
@@ -109,7 +124,7 @@ should render NetworkPolicy:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: np-unittest-app
@@ -142,7 +157,7 @@ should render RequestAuthentication:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-request-auth
@@ -163,7 +178,7 @@ should render Service:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app
@@ -184,7 +199,7 @@ should render ServiceAccount:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-sa

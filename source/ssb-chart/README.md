@@ -1,6 +1,6 @@
 # ssb-chart
 
-![Version: 2.3.4](https://img.shields.io/badge/Version-2.3.4-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 3.0.0](https://img.shields.io/badge/Version-3.0.0-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Generic chart for SSB applications
 
@@ -15,42 +15,287 @@ Generic chart for SSB applications
 	</thead>
 	<tbody>
 		<tr>
-			<td id="ContainerSecurityContext"><a href="./values.yaml#L247">ContainerSecurityContext</a></td>
+			<td id="ContainerSecurityContext"><a href="./values.yaml#L264">ContainerSecurityContext</a></td>
 			<td>
 object
 </td>
 			<td>
 				<div style="max-width: 400px;">
 <pre lang="yaml">
-enabled: false
+# -- If processes should be allowed to gain more privileges than its parent process.
 allowPrivilegeEscalation: false
+# -- If processes in container can run privileged. This is equivalent to running as root on the host.
 privileged: false
-readOnlyRootFilesystem: false
+# -- If container should have a read-only root filesystem.
+readOnlyRootFilesystem: true
+# -- Container must run as a non-root user (e.g. not run as UID 0).
 runAsNonRoot: true
-runAsUser: {}
+# -- The UID to run the entrypoint of the container process.
+# Defaults to the user specified in the image metadata if unspecified.
+runAsUser: 1000
+# -- The GID to run the entrypoint of the container process. Uses runtime default if unset.
+runAsGroup: 1000
+# -- (object) The capabilities to add/drop when running containers.
+# Defaults to the default set of capabilities granted by the container runtime
+# @notationType -- yaml
+capabilities:
+    drop: ["ALL"]
+    add: []
+# -- (object) Limit the range of system calls allowed.
+# @notationType -- yaml
+seccompProfile:
+    # -- RuntimeDefault: As defined by the container runtime.
+    type: RuntimeDefault
 
 </pre>
 </div>
 			</td>
-			<td>Container SecurityContext for main application. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#securitycontext-v1-core. Optional.</td>
+			<td>Container SecurityContext for main application. Default restricted security context for the application. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Optional. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#securitycontext-v1-core</td>
 		</tr>
 		<tr>
-			<td id="PodSecurityContext"><a href="./values.yaml#L237">PodSecurityContext</a></td>
+			<td id="ContainerSecurityContext--allowPrivilegeEscalation"><a href="./values.yaml#L266">ContainerSecurityContext.allowPrivilegeEscalation</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+false
+</pre>
+</div>
+			</td>
+			<td>If processes should be allowed to gain more privileges than its parent process.</td>
+		</tr>
+		<tr>
+			<td id="ContainerSecurityContext--capabilities"><a href="./values.yaml#L281">ContainerSecurityContext.capabilities</a></td>
 			<td>
 object
 </td>
 			<td>
 				<div style="max-width: 400px;">
 <pre lang="yaml">
-enabled: false
-runAsNonRoot: true
-runAsUser: {}
-fsGroup: {}
+drop: ["ALL"]
+add: []
 
 </pre>
 </div>
 			</td>
-			<td>PodSecurityContext. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#podsecuritycontext-v1-core. Optional.</td>
+			<td>The capabilities to add/drop when running containers. Defaults to the default set of capabilities granted by the container runtime</td>
+		</tr>
+		<tr>
+			<td id="ContainerSecurityContext--privileged"><a href="./values.yaml#L268">ContainerSecurityContext.privileged</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+false
+</pre>
+</div>
+			</td>
+			<td>If processes in container can run privileged. This is equivalent to running as root on the host.</td>
+		</tr>
+		<tr>
+			<td id="ContainerSecurityContext--readOnlyRootFilesystem"><a href="./values.yaml#L270">ContainerSecurityContext.readOnlyRootFilesystem</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+true
+</pre>
+</div>
+			</td>
+			<td>If container should have a read-only root filesystem.</td>
+		</tr>
+		<tr>
+			<td id="ContainerSecurityContext--runAsGroup"><a href="./values.yaml#L277">ContainerSecurityContext.runAsGroup</a></td>
+			<td>
+int
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+1000
+</pre>
+</div>
+			</td>
+			<td>The GID to run the entrypoint of the container process. Uses runtime default if unset.</td>
+		</tr>
+		<tr>
+			<td id="ContainerSecurityContext--runAsNonRoot"><a href="./values.yaml#L272">ContainerSecurityContext.runAsNonRoot</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+true
+</pre>
+</div>
+			</td>
+			<td>Container must run as a non-root user (e.g. not run as UID 0).</td>
+		</tr>
+		<tr>
+			<td id="ContainerSecurityContext--runAsUser"><a href="./values.yaml#L275">ContainerSecurityContext.runAsUser</a></td>
+			<td>
+int
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+1000
+</pre>
+</div>
+			</td>
+			<td>The UID to run the entrypoint of the container process. Defaults to the user specified in the image metadata if unspecified.</td>
+		</tr>
+		<tr>
+			<td id="ContainerSecurityContext--seccompProfile"><a href="./values.yaml#L286">ContainerSecurityContext.seccompProfile</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+# -- RuntimeDefault: As defined by the container runtime.
+type: RuntimeDefault
+
+</pre>
+</div>
+			</td>
+			<td>Limit the range of system calls allowed.</td>
+		</tr>
+		<tr>
+			<td id="ContainerSecurityContext--seccompProfile--type"><a href="./values.yaml#L288">ContainerSecurityContext.seccompProfile.type</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"RuntimeDefault"
+</pre>
+</div>
+			</td>
+			<td>RuntimeDefault: As defined by the container runtime.</td>
+		</tr>
+		<tr>
+			<td id="PodSecurityContext"><a href="./values.yaml#L241">PodSecurityContext</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+# -- Containers in pod must run as a non-root user (e.g. not run as UID 0).
+runAsNonRoot:
+# -- The UID to run the entrypoint of the container process.
+# Defaults to the user specified in the image metadata if unspecified.
+runAsUser:
+# -- The GID to run the entrypoint of the container process. Uses runtime default if unset.
+runAsGroup:
+# -- All processes in the pod will be part of this supplementary group.
+# Supported volume mounts will be owned by this group.
+fsGroup:
+# -- (object) Limit the range of system calls allowed.
+# @notationType -- yaml
+seccompProfile:
+    # -- RuntimeDefault: As defined by the container runtime.
+    type: RuntimeDefault
+
+</pre>
+</div>
+			</td>
+			<td>PodSecurityContext. Default security context for pods. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podsecuritycontext-v1-core. Optional.</td>
+		</tr>
+		<tr>
+			<td id="PodSecurityContext--fsGroup"><a href="./values.yaml#L251">PodSecurityContext.fsGroup</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>All processes in the pod will be part of this supplementary group. Supported volume mounts will be owned by this group.</td>
+		</tr>
+		<tr>
+			<td id="PodSecurityContext--runAsGroup"><a href="./values.yaml#L248">PodSecurityContext.runAsGroup</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>The GID to run the entrypoint of the container process. Uses runtime default if unset.</td>
+		</tr>
+		<tr>
+			<td id="PodSecurityContext--runAsNonRoot"><a href="./values.yaml#L243">PodSecurityContext.runAsNonRoot</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>Containers in pod must run as a non-root user (e.g. not run as UID 0).</td>
+		</tr>
+		<tr>
+			<td id="PodSecurityContext--runAsUser"><a href="./values.yaml#L246">PodSecurityContext.runAsUser</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>The UID to run the entrypoint of the container process. Defaults to the user specified in the image metadata if unspecified.</td>
+		</tr>
+		<tr>
+			<td id="PodSecurityContext--seccompProfile"><a href="./values.yaml#L254">PodSecurityContext.seccompProfile</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+# -- RuntimeDefault: As defined by the container runtime.
+type: RuntimeDefault
+
+</pre>
+</div>
+			</td>
+			<td>Limit the range of system calls allowed.</td>
+		</tr>
+		<tr>
+			<td id="PodSecurityContext--seccompProfile--type"><a href="./values.yaml#L256">PodSecurityContext.seccompProfile.type</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+"RuntimeDefault"
+</pre>
+</div>
+			</td>
+			<td>RuntimeDefault: As defined by the container runtime.</td>
 		</tr>
 		<tr>
 			<td id="affinity"><a href="./values.yaml#L66">affinity</a></td>
@@ -67,7 +312,7 @@ object
 			<td>Node affinity is a set of rules used by the scheduler to determine where a pod can be placed. The rules are defined using custom labels on nodes and label selectors specified in pods. Node affinity allows a pod to specify an affinity (or anti-affinity) towards a group of nodes it can be placed on. See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="apiGateway"><a href="./values.yaml#L303">apiGateway</a></td>
+			<td id="apiGateway"><a href="./values.yaml#L338">apiGateway</a></td>
 			<td>
 object
 </td>
@@ -98,7 +343,7 @@ string
 			<td>Application type: `"backend"` or `"frontend"`. Notet that this setting will impact how authentication is configured. Required.</td>
 		</tr>
 		<tr>
-			<td id="backends"><a href="./values.yaml#L296">backends</a></td>
+			<td id="backends"><a href="./values.yaml#L331">backends</a></td>
 			<td>
 list
 </td>
@@ -126,7 +371,7 @@ string
 			<td>What billing project to use as label for the objects. Required.</td>
 		</tr>
 		<tr>
-			<td id="cloudsql--enabled"><a href="./values.yaml#L269">cloudsql.enabled</a></td>
+			<td id="cloudsql--enabled"><a href="./values.yaml#L304">cloudsql.enabled</a></td>
 			<td>
 bool
 </td>
@@ -140,7 +385,7 @@ false
 			<td></td>
 		</tr>
 		<tr>
-			<td id="cloudsql--instance"><a href="./values.yaml#L272">cloudsql.instance</a></td>
+			<td id="cloudsql--instance"><a href="./values.yaml#L307">cloudsql.instance</a></td>
 			<td>
 string
 </td>
@@ -154,7 +399,7 @@ null
 			<td>Required.</td>
 		</tr>
 		<tr>
-			<td id="cloudsql--ip"><a href="./values.yaml#L274">cloudsql.ip</a></td>
+			<td id="cloudsql--ip"><a href="./values.yaml#L309">cloudsql.ip</a></td>
 			<td>
 string
 </td>
@@ -168,7 +413,7 @@ null
 			<td>Required.</td>
 		</tr>
 		<tr>
-			<td id="cloudsql--useSqlProxy"><a href="./values.yaml#L276">cloudsql.useSqlProxy</a></td>
+			<td id="cloudsql--useSqlProxy"><a href="./values.yaml#L311">cloudsql.useSqlProxy</a></td>
 			<td>
 bool
 </td>
@@ -182,7 +427,7 @@ true
 			<td>Optional. Set to false if using Google connectors directly to omit adding a cloudsql-proxy.</td>
 		</tr>
 		<tr>
-			<td id="cloudsql--version"><a href="./values.yaml#L270">cloudsql.version</a></td>
+			<td id="cloudsql--version"><a href="./values.yaml#L305">cloudsql.version</a></td>
 			<td>
 string
 </td>
@@ -238,7 +483,7 @@ string
 			<td>Which domain the app will belong to. Optional.</td>
 		</tr>
 		<tr>
-			<td id="egress"><a href="./values.yaml#L260">egress</a></td>
+			<td id="egress"><a href="./values.yaml#L295">egress</a></td>
 			<td>
 list
 </td>
@@ -354,7 +599,7 @@ string
 			<td>Image tag. Required.</td>
 		</tr>
 		<tr>
-			<td id="istioEndUserAuth"><a href="./values.yaml#L316">istioEndUserAuth</a></td>
+			<td id="istioEndUserAuth"><a href="./values.yaml#L351">istioEndUserAuth</a></td>
 			<td>
 object
 </td>
@@ -371,7 +616,7 @@ enabled: true
 			<td>Application authentication with Istio policies. Skip authentication for selected paths with "excludePaths". Require authentication for selected paths with "includePaths". Note that "includePaths" have precedence over "excludePaths". Customize which apps that can authenticate to get access using "audience". See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="istioEndUserAuth--enabled"><a href="./values.yaml#L319">istioEndUserAuth.enabled</a></td>
+			<td id="istioEndUserAuth--enabled"><a href="./values.yaml#L354">istioEndUserAuth.enabled</a></td>
 			<td>
 bool
 </td>
@@ -385,7 +630,7 @@ true
 			<td>Enable or disable authentication. Istio end-user auth is enabled by default for "AppType: backend".</td>
 		</tr>
 		<tr>
-			<td id="metrics"><a href="./values.yaml#L208">metrics</a></td>
+			<td id="metrics"><a href="./values.yaml#L210">metrics</a></td>
 			<td>
 object
 </td>
@@ -417,7 +662,7 @@ string
 			<td>Name of the application (also used for naming other Kubernetes resources). Required.</td>
 		</tr>
 		<tr>
-			<td id="networkpolicy"><a href="./values.yaml#L228">networkpolicy</a></td>
+			<td id="networkpolicy"><a href="./values.yaml#L230">networkpolicy</a></td>
 			<td>
 object
 </td>
@@ -434,7 +679,7 @@ overrideDefaultPolicy: {}
 			<td>Generates a simple "ingress" network policy (i.e. restrict incoming traffic to the application), that only allows traffic to 'port.containerport' (default) or 'port.targetport' (if specified), as well as any 'extraPorts'. This is a simple "ingress" network policy, "egress" traffic is not restricted here. See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="networkpolicy--overrideDefaultPolicy"><a href="./values.yaml#L231">networkpolicy.overrideDefaultPolicy</a></td>
+			<td id="networkpolicy--overrideDefaultPolicy"><a href="./values.yaml#L233">networkpolicy.overrideDefaultPolicy</a></td>
 			<td>
 object
 </td>
@@ -462,7 +707,7 @@ object
 			<td>Node selector for selecting where the to schedule the workload. Standard nodes are labeled "ssb-node: standard". Jupyter nodes are labeled "ssb-node: jupyter". See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="oauth2Proxy--enabled"><a href="./values.yaml#L284">oauth2Proxy.enabled</a></td>
+			<td id="oauth2Proxy--enabled"><a href="./values.yaml#L319">oauth2Proxy.enabled</a></td>
 			<td>
 string
 </td>
@@ -476,7 +721,7 @@ null
 			<td></td>
 		</tr>
 		<tr>
-			<td id="oauth2Proxy--image"><a href="./values.yaml#L285">oauth2Proxy.image</a></td>
+			<td id="oauth2Proxy--image"><a href="./values.yaml#L320">oauth2Proxy.image</a></td>
 			<td>
 string
 </td>
@@ -490,7 +735,7 @@ null
 			<td></td>
 		</tr>
 		<tr>
-			<td id="oauth2Proxy--port"><a href="./values.yaml#L287">oauth2Proxy.port</a></td>
+			<td id="oauth2Proxy--port"><a href="./values.yaml#L322">oauth2Proxy.port</a></td>
 			<td>
 string
 </td>
@@ -504,7 +749,7 @@ null
 			<td></td>
 		</tr>
 		<tr>
-			<td id="oauth2Proxy--version"><a href="./values.yaml#L286">oauth2Proxy.version</a></td>
+			<td id="oauth2Proxy--version"><a href="./values.yaml#L321">oauth2Proxy.version</a></td>
 			<td>
 string
 </td>
@@ -544,7 +789,9 @@ size: 1Gi
 # -- Mount path.
 # Required.
 folder: /data
-# Define owner user and owner group for the mounted volume.
+# -- Define owner user and owner group for the mounted volume.
+# NOTE: Only use this option if setting the `PodSecurityContext.fsGroup` to the containers
+# process UID (runAsUser) does NOT work.
 # Optional.
 owner:
 
@@ -608,6 +855,20 @@ string
 </div>
 			</td>
 			<td>Mount path. Required.</td>
+		</tr>
+		<tr>
+			<td id="persistence--owner"><a href="./values.yaml#L152">persistence.owner</a></td>
+			<td>
+string
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+null
+</pre>
+</div>
+			</td>
+			<td>Define owner user and owner group for the mounted volume. NOTE: Only use this option if setting the `PodSecurityContext.fsGroup` to the containers process UID (runAsUser) does NOT work. Optional.</td>
 		</tr>
 		<tr>
 			<td id="persistence--size"><a href="./values.yaml#L144">persistence.size</a></td>
@@ -722,7 +983,7 @@ null
 			<td>The target port on the POD to redirect traffic from the Service. This will usually be the applications container port. Optional.</td>
 		</tr>
 		<tr>
-			<td id="probes"><a href="./values.yaml#L184">probes</a></td>
+			<td id="probes"><a href="./values.yaml#L186">probes</a></td>
 			<td>
 object
 </td>
@@ -768,7 +1029,7 @@ int
 			<td>Number of pods to scale to (not HPA). Optional.</td>
 		</tr>
 		<tr>
-			<td id="resources"><a href="./values.yaml#L171">resources</a></td>
+			<td id="resources"><a href="./values.yaml#L173">resources</a></td>
 			<td>
 object
 </td>
@@ -789,7 +1050,7 @@ requests:
 			<td>Defines restrictions on resources requested and consumed by a single pod. Total calculated resources = resources*replicaCount. Ref:  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/ Optional.</td>
 		</tr>
 		<tr>
-			<td id="routes"><a href="./values.yaml#L327">routes</a></td>
+			<td id="routes"><a href="./values.yaml#L362">routes</a></td>
 			<td>
 list
 </td>
@@ -803,7 +1064,7 @@ list
 			<td>Support for adding additional matching rules and routes to the Istio VirtualService object. Route traffic to a path specified in `name` to the service port specified `serviceport`. Note that "serviceport" must be unique and different from the default service port specified in "port.serviceport". See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="service"><a href="./values.yaml#L160">service</a></td>
+			<td id="service"><a href="./values.yaml#L162">service</a></td>
 			<td>
 object
 </td>
@@ -819,7 +1080,7 @@ type: "ClusterIP"
 			<td>Defines whether to create a service object for loadbalancing of pods and sets service type. Optional.</td>
 		</tr>
 		<tr>
-			<td id="serviceAccount"><a href="./values.yaml#L219">serviceAccount</a></td>
+			<td id="serviceAccount"><a href="./values.yaml#L221">serviceAccount</a></td>
 			<td>
 object
 </td>
@@ -834,7 +1095,7 @@ create: true
 			<td>Kubernetes service account. SA name is generated from the application name with a "-sa" suffix. Ref. https://github.com/helm/helm/blob/master/docs/chart_best_practices/rbac.md. Optional.</td>
 		</tr>
 		<tr>
-			<td id="sidecars"><a href="./values.yaml#L155">sidecars</a></td>
+			<td id="sidecars"><a href="./values.yaml#L157">sidecars</a></td>
 			<td>
 string
 </td>
@@ -848,7 +1109,7 @@ null
 			<td>Defines additional containers to run in a pod. Bundles container settings into one yaml structure for simplicity. Follows the Kubernetes container spec. Optional.</td>
 		</tr>
 		<tr>
-			<td id="subdomains"><a href="./values.yaml#L333">subdomains</a></td>
+			<td id="subdomains"><a href="./values.yaml#L368">subdomains</a></td>
 			<td>
 list
 </td>
@@ -890,7 +1151,7 @@ string
 			<td>Kubernetes deployment type. Optional.</td>
 		</tr>
 		<tr>
-			<td id="urlhosts"><a href="./values.yaml#L339">urlhosts</a></td>
+			<td id="urlhosts"><a href="./values.yaml#L374">urlhosts</a></td>
 			<td>
 list
 </td>
@@ -933,6 +1194,82 @@ list
 		</tr>
 	</tbody>
 </table>
+
+## About Pod and Container Security
+
+Pods are the smallest deployable Kubernetes unit and consist of one or more containers.
+Pods are often a an attackers initial execution environment upon exploiting a container.
+For this reason, Pods should be hardened to make exploitation more difficult and to limit
+the impact of a successful compromise.
+
+Preventing root execution by using non-root containers or a rootless container engine limits
+the impact of a container compromise.
+
+When configuring security contexts for pods and containers the aim is to be as strict as possible,
+so that containers do not run as root user (UID 0) and with as few privileges as possible.
+
+```text
+If an application fails with the strict security context provided by this Helm chart,
+the recommendation is to rebuild the application using a root-less container image.
+```
+
+### ContainerSecurityContext
+
+This SecurityContext sets the security context for the main application.
+
+If both the SecurityContext for a container and PodSecurityContext is set, the value specified in the
+SecurityContext for the container takes precedence.
+
+By default, this Helm chart sets a "restricted" security context for the application as shown below.
+This ensures that the container follows the recommended security practice, and runs with as few privileges
+as possible:
+
+```yaml
+ContainerSecurityContext:
+  # If processes should be allowed to gain more privileges than its parent process.
+  allowPrivilegeEscalation: false
+  # If processes in container can run privileged. Setting this to `true` is equivalent
+  # to running as root on the host.
+  privileged: false
+  # If container should have a read-only root filesystem.
+  readOnlyRootFilesystem: true
+  # Container must run as a non-root user (e.g. not run as UID 0).
+  runAsNonRoot: true
+  # The UID to run the entrypoint of the container process.
+  # Defaults to the user specified in the image metadata if unspecified.
+  runAsUser: 1000
+  # The GID to run the entrypoint of the container process. Uses runtime default if unset.
+  runAsGroup: 1000
+  # The capabilities to add/drop when running containers.
+  capabilities:
+    drop: ["ALL"]
+    add: []
+  # Limit the range of system calls allowed.
+  seccompProfile:
+    # RuntimeDefault: As defined by the container runtime.
+    type: RuntimeDefault
+```
+
+Please refer to the
+[Kubernetes Guide for configuring a Security Context for a Pod or Container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+documentation and the
+[SecurityContext specification](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#securitycontext-v1-core)
+for more information.
+
+### PodSecurityContext
+
+A PodSecurityContext sets the default security context for all containers in a pod.
+
+If both the SecurityContext for a container and PodSecurityContext is set, the value specified in the
+SecurityContext for the container takes precedence.
+
+The default PodSecurityPolicy sets the "seccompProfile" type to "RuntimeDefault".
+
+See the "[Values](#values)" section for information about the available configuration options.
+
+Please refer to the Kubernetes
+[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podsecuritycontext-v1-core)
+specification for more information.
 
 ## Example values
 
