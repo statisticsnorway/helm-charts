@@ -13,7 +13,7 @@ should render ConfigMap for application config:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-application-config
@@ -54,7 +54,7 @@ should render ConfigMap for nginx config:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-nginx-vhost-config
@@ -66,7 +66,7 @@ should render Deployment:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app
@@ -79,8 +79,8 @@ should render Deployment:
       template:
         metadata:
           annotations:
-            checksum/application-config: 9b4d41de1061590c46011d1dff6f9614b5f05eaf862ca7f21d167146b4a714b3
-            checksum/nginx-vhost-config: b7f8e26c94824526a410b2a5e70971ea1bf8f1b22e7a12b98b0adb6f5ef0cd73
+            checksum/application-config: 30c9d4094fc9cb2e7aa770ca3e0a5552c7aa1fa107106d1cbb83ca0aefa3e344
+            checksum/nginx-vhost-config: b6e3e0d9a7207390afa341e4a5a23900b33aa99357545d039af4889d531830de
             prometheus.io/path: /metrics/path
             prometheus.io/port: "8080"
             prometheus.io/scheme: https
@@ -105,6 +105,18 @@ should render Deployment:
             - /runme
             image: sidecar:1.0.0
             name: my-sidecar
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsGroup: 1000
+              runAsNonRoot: true
+              runAsUser: 1000
+              seccompProfile:
+                type: RuntimeDefault
           - args:
             - -instances=test-dev-7978:europe-north1:test-sqlinstance=tcp:5432
             command:
@@ -113,8 +125,16 @@ should render Deployment:
             name: cloudsql-proxy
             securityContext:
               allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsGroup: 1000
               runAsNonRoot: true
               runAsUser: 1000
+              seccompProfile:
+                type: RuntimeDefault
           - args:
             - --config=/secrets/oauth2-proxy-client-config.yaml
             image: proxy-image-name:3.4.5
@@ -125,8 +145,16 @@ should render Deployment:
               name: http-oauth2
             securityContext:
               allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsGroup: 1000
               runAsNonRoot: true
               runAsUser: 1000
+              seccompProfile:
+                type: RuntimeDefault
             volumeMounts:
             - mountPath: /secrets/
               name: oauth2-proxy-client-config
@@ -139,8 +167,14 @@ should render Deployment:
               name: http-nginx
             securityContext:
               allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              privileged: false
+              readOnlyRootFilesystem: false
               runAsNonRoot: true
-              runAsUser: 1000
+              seccompProfile:
+                type: RuntimeDefault
             volumeMounts:
             - mountPath: /opt/bitnami/nginx/conf/server_blocks
               name: nginx-vhost-config-volume
@@ -175,10 +209,17 @@ should render Deployment:
                 cpu: 100m
                 memory: 128Mi
             securityContext:
-              allowPrivilegeEscalation: false
-              privileged: false
-              readOnlyRootFilesystem: true
-              runAsNonRoot: true
+              allowPrivilegeEscalation: true
+              capabilities:
+                add:
+                - ALL
+              privileged: true
+              readOnlyRootFilesystem: false
+              runAsGroup: 0
+              runAsNonRoot: false
+              runAsUser: 0
+              seccompProfile:
+                type: Unrestricted
             volumeMounts:
             - mountPath: /path/to/secrets
               name: secret-volume
@@ -201,7 +242,12 @@ should render Deployment:
           nodeSelector:
             ssb-node: some-node-label
           securityContext:
+            fsGroup: 3000
+            runAsGroup: 2000
             runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: Unrestricted
           serviceAccountName: unittest-app-sa
           tolerations:
           - effect: NoSchedule
@@ -243,7 +289,7 @@ should render NetworkPolicy:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: np-unittest-app
@@ -288,7 +334,7 @@ should render Service:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app
@@ -312,7 +358,7 @@ should render ServiceAccount:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-sa
@@ -324,7 +370,7 @@ should render ServiceEntry for cloudsql:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-cloudsql
@@ -348,7 +394,7 @@ should render ServiceEntry for https:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-pypi.org
@@ -371,7 +417,7 @@ should render VirtualService:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-2.3.4
+        chart: ssb-chart-3.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app

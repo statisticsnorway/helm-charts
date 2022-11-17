@@ -76,6 +76,82 @@
 
 {{ template "chart.valuesSectionHtml" . }}
 
+## About Pod and Container Security
+
+Pods are the smallest deployable Kubernetes unit and consist of one or more containers.
+Pods are often a an attackers initial execution environment upon exploiting a container.
+For this reason, Pods should be hardened to make exploitation more difficult and to limit
+the impact of a successful compromise.
+
+Preventing root execution by using non-root containers or a rootless container engine limits
+the impact of a container compromise.
+
+When configuring security contexts for pods and containers the aim is to be as strict as possible,
+so that containers do not run as root user (UID 0) and with as few privileges as possible.
+
+```text
+If an application fails with the strict security context provided by this Helm chart,
+the recommendation is to rebuild the application using a root-less container image.
+```
+
+### ContainerSecurityContext
+
+This SecurityContext sets the security context for the main application.
+
+If both the SecurityContext for a container and PodSecurityContext is set, the value specified in the
+SecurityContext for the container takes precedence.
+
+By default, this Helm chart sets a "restricted" security context for the application as shown below.
+This ensures that the container follows the recommended security practice, and runs with as few privileges
+as possible:
+
+```yaml
+ContainerSecurityContext:
+  # If processes should be allowed to gain more privileges than its parent process.
+  allowPrivilegeEscalation: false
+  # If processes in container can run privileged. Setting this to `true` is equivalent
+  # to running as root on the host.
+  privileged: false
+  # If container should have a read-only root filesystem.
+  readOnlyRootFilesystem: true
+  # Container must run as a non-root user (e.g. not run as UID 0).
+  runAsNonRoot: true
+  # The UID to run the entrypoint of the container process.
+  # Defaults to the user specified in the image metadata if unspecified.
+  runAsUser: 1000
+  # The GID to run the entrypoint of the container process. Uses runtime default if unset.
+  runAsGroup: 1000
+  # The capabilities to add/drop when running containers.
+  capabilities:
+    drop: ["ALL"]
+    add: []
+  # Limit the range of system calls allowed.
+  seccompProfile:
+    # RuntimeDefault: As defined by the container runtime.
+    type: RuntimeDefault
+```
+
+Please refer to the
+[Kubernetes Guide for configuring a Security Context for a Pod or Container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+documentation and the
+[SecurityContext specification](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#securitycontext-v1-core)
+for more information.
+
+### PodSecurityContext
+
+A PodSecurityContext sets the default security context for all containers in a pod.
+
+If both the SecurityContext for a container and PodSecurityContext is set, the value specified in the
+SecurityContext for the container takes precedence.
+
+The default PodSecurityPolicy sets the "seccompProfile" type to "RuntimeDefault".
+
+See the "[Values](#values)" section for information about the available configuration options.
+
+Please refer to the Kubernetes
+[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podsecuritycontext-v1-core)
+specification for more information.
+
 ## Example values
 
 ### nodeSelector

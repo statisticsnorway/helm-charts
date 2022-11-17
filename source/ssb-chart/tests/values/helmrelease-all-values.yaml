@@ -96,6 +96,17 @@ sidecars:
       - /runme
     args:
       - -some-arg value
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      capabilities:
+        drop: [ALL]
+      seccompProfile:
+        type: RuntimeDefault
 
 service:
   enabled: true
@@ -159,16 +170,28 @@ networkpolicy:
               matchLabels:
                 k8s-app: kube-dns
 
+# Test that we can override the default pod security context settings.
 PodSecurityContext:
-  enabled: true
   runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 2000
+  fsGroup: 3000
+  seccompProfile:
+    type: "Profile"
 
+# Test that we can override the default security context settings.
 ContainerSecurityContext:
-  enabled: true
-  allowPrivilegeEscalation: false
-  privileged: false
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
+  allowPrivilegeEscalation: true
+  privileged: true
+  readOnlyRootFilesystem: false
+  runAsNonRoot: false
+  runAsUser: 0
+  runAsGroup: 0
+  capabilities:
+    drop: []
+    add: ["ALL"]
+  seccompProfile:
+    type: Unrestricted
 
 egress:
   - "pypi.org"

@@ -1,5 +1,13 @@
 # Changelog - ssb-chart
 
+## v3.0.0
+
+Updates in this release:
+* Restricted security context for containers
+* Updated default pod securitycontext
+
+---
+
 ## v2.3.4
 
 Updates in this release:
