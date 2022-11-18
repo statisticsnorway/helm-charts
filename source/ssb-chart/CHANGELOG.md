@@ -1,5 +1,12 @@
 # Changelog - ssb-chart
 
+## v3.0.1
+
+Updates in this release:
+* Documentation changes only
+
+---
+
 ## v3.0.0
 
 Updates in this release:

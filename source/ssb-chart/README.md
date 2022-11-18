@@ -1,6 +1,6 @@
 # ssb-chart
 
-![Version: 3.0.0](https://img.shields.io/badge/Version-3.0.0-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 3.0.1](https://img.shields.io/badge/Version-3.0.1-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Generic chart for SSB applications
 
@@ -1211,6 +1211,8 @@ so that containers do not run as root user (UID 0) and with as few privileges as
 ```text
 If an application fails with the strict security context provided by this Helm chart,
 the recommendation is to rebuild the application using a root-less container image.
+
+For read/write access to a temporary folder use a "emptyDir" volume. See example further down.
 ```
 
 ### ContainerSecurityContext
@@ -1255,6 +1257,24 @@ Please refer to the
 documentation and the
 [SecurityContext specification](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#securitycontext-v1-core)
 for more information.
+
+### Workaround for read/write to temporary folders
+
+If the application needs to read/write temporary data to a `/tmp` or a `/cache` folder, this can be achieved
+**without** giving the full benefit of write access to the container by overriding the default `readOnlyRootFilesystem`
+setting. The simplest way to do this is to add one or more `emptyDir` volumes to the HelmRelease. Example:
+
+```
+volumes:
+  - name: tmp-volume
+    emptyDir: {}
+volumeMounts:
+  - name: tmp-volume
+    mountPath: /tmp
+```
+
+The `name` must be unique, but the `mountPath` can be customized to the applications needs. Remember that data
+in these volumes will be lost on pod restart.
 
 ### PodSecurityContext
 
