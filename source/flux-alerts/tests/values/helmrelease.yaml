@@ -1,0 +1,10 @@
+cluster: "test-cluster"
+slack:
+  channel: "test-channel"
+  token: "test-token"
+eventSeverity: warning
+eventSources:
+  - kind: GitRepository
+    name: '*'
+exclusionList:
+  - "Exclude this message"

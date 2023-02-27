@@ -1,0 +1,57 @@
+should render Alert:
+  1: |
+    apiVersion: notification.toolkit.fluxcd.io/v1beta2
+    kind: Alert
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: Tiller
+        app.kubernetes.io/version: "1.0"
+        helm.sh/chart: flux-alerts-1.0.2
+      name: flux-alert-flux-alerts
+    spec:
+      eventSeverity: warning
+      eventSources:
+      - kind: GitRepository
+        name: '*'
+      exclusionList:
+      - Exclude this message
+      providerRef:
+        name: flux-alert-flux-alerts
+      summary: Alert from test-cluster
+should render Provider:
+  1: |
+    apiVersion: notification.toolkit.fluxcd.io/v1beta2
+    kind: Provider
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: Tiller
+        app.kubernetes.io/version: "1.0"
+        helm.sh/chart: flux-alerts-1.0.2
+      name: flux-alert-flux-alerts
+    spec:
+      address: https://slack.com/api/chat.postMessage
+      channel: test-channel
+      secretRef:
+        name: flux-alert-flux-alerts
+      type: slack
+should render SealedSecret:
+  1: |
+    apiVersion: bitnami.com/v1alpha1
+    kind: SealedSecret
+    metadata:
+      annotations:
+        sealedsecrets.bitnami.com/cluster-wide: "true"
+      labels:
+        app.kubernetes.io/managed-by: Tiller
+        app.kubernetes.io/version: "1.0"
+        helm.sh/chart: flux-alerts-1.0.2
+      name: flux-alert-flux-alerts
+    spec:
+      encryptedData:
+        token: test-token
+      template:
+        data: null
+        metadata:
+          annotations:
+            sealedsecrets.bitnami.com/cluster-wide: "true"
+          name: flux-alert-flux-alerts

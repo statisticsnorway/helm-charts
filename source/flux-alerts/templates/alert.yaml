@@ -1,0 +1,19 @@
+apiVersion: notification.toolkit.fluxcd.io/v1beta2
+kind: Alert
+metadata:
+  name: {{ include "flux-alerts.fullname" . }}
+  labels:
+    {{- include "flux-alerts.labels" . | nindent 4 }}
+spec:
+  eventSeverity: {{ .Values.eventSeverity }}
+  eventSources:
+  {{- with .Values.eventSources }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  exclusionList:
+    {{- range .Values.exclusionList }}
+    - {{ . | quote }}
+    {{- end }}
+  providerRef:
+    name: {{ include "flux-alerts.fullname" . }}
+  summary: Alert from {{ .Values.cluster }}
