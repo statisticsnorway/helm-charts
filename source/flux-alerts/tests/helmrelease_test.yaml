@@ -1,0 +1,47 @@
+suite: test helmrelease for backend with minimal config
+
+tests:
+  - it: should render Alert
+    templates:
+      - alert.yaml
+    values:
+      - ./values/helmrelease.yaml
+    release:
+      name: flux-alert
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Alert
+      - matchSnapshot: {}
+
+  - it: should render Provider
+    templates:
+      - provider.yaml
+    values:
+      - ./values/helmrelease.yaml
+    release:
+      name: flux-alert
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Provider
+      - matchSnapshot: {}
+
+  - it: should render SealedSecret
+    templates:
+      - sealedsecret.yaml
+    values:
+      - ./values/helmrelease.yaml
+    release:
+      name: flux-alert
+      namespace: unittest
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: SealedSecret
+      - matchSnapshot: {}

@@ -1,0 +1,39 @@
+# -- The name of the cluster. Used in the Slack message.
+# Optional.
+cluster: "Flux v2"
+# -- Slack channel and token to send notifications to.
+# Channel name is required. Token is optional. The token must be a
+# SealedSecret.encryptedData value. If no token is provided, a Secret or
+# SealedSecret with the same name as the HelmRelease must be added separately.
+slack:
+  channel: ""
+  token: ""
+# -- Set the event severity to be notified about.
+# Valid values are: info, warning, error. Default is info.
+eventSeverity: info
+# -- Defines a list of Flux v2 event sources.
+# Optional. Default is sending notifications for all event sources.
+eventSources:
+  - kind: GitRepository
+    name: '*'
+  - kind: Kustomization
+    name: '*'
+  - kind: HelmRepository
+    name: '*'
+  - kind: HelmChart
+    name: '*'
+  - kind: HelmRelease
+    name: '*'
+  - kind: ImageRepository
+    name: '*'
+  - kind: ImagePolicy
+    name: '*'
+  - kind: ImageUpdateAutomation
+    name: '*'
+  - kind: Bucket
+    name: '*'
+  - kind: OCIRepository
+    name: '*'
+# -- Defines a list of Flux v2 event messages to exclude.
+exclusionList:
+  - "Dependencies do not meet ready condition"
