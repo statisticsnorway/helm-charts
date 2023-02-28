@@ -10,6 +10,7 @@ pr:
   paths:
     include:
     - source/ssb-chart/*
+    - source/flux-alerts/*
     - azure-pipelines.yml
 
 pool:
@@ -25,8 +26,11 @@ jobs:
     displayName: 'Installing helm unittest'
 
   # Run the Helm unittests
-  - script: helm unittest source/ssb-chart -o helm_unittest_testresults.xml -t JUnit
+  - script: helm unittest source/ssb-chart -o source/ssb-chart/helm_unittest_testresults.xml -t JUnit
     displayName: 'Running unittests for ssb-chart'
+
+  - script: helm unittest source/flux-alerts -o source/flux-alerts/helm_unittest_testresults.xml -t JUnit
+    displayName: 'Running unittests for flux-alerts'
 
   # Publish testresults for Helm unittest in Junit-format    
   - task: PublishTestResults@2
