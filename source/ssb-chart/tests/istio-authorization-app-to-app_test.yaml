@@ -1,0 +1,78 @@
+# The authorization-policy.yaml actually includes minimum 2, maximum 4 yamls in one file so to be able to check all the tag documentindex must be used
+
+# This file tests the allow-metrics part of the istio-authentication.yaml template
+
+suite: test authorzation-policy-app-to-app-allow-metrics
+templates:
+  - istio-app-to-app-auth.yaml
+tests:
+# Render nothing if not enabled (enabled=false by default)
+  - it: should render nothing if not enabled
+    values:
+      - ./values/default-values.yaml
+    set:
+      appType: frontend
+    asserts:
+      - hasDocuments:
+          count: 0
+# If enabled and nothing more, the policy allowing for metrics scraping should be created
+  - it: should render one document if enabled
+    values:
+      - ./values/istio-authorization-app-to-app-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+# If enabled a policy which allows Prometheus scraping should be created
+  - it: should render name, ALLOW action and metrics path in app-to-app policy
+    values:
+      - ./values/istio-authorization-app-to-app-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/monitoring/sa/ssb-prometheus-server
+              to:
+                - operation:
+                    paths:
+                      - /metrics
+
+# If enabled and service accounts specified a policy with the service accounts should be created
+  - it: should render name, ALLOW action and service accounts in the app-to-app policy
+    values:
+      - ./values/istio-authorization-app-to-app-values.yaml
+    set:
+      istioAppToAppAuth.serviceAccounts:
+        - cluster.local/ns/cumulus/sa/unittest-app-b-sa
+        - cluster.local/ns/cumulus/sa/unittest-app-c-sa
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/cumulus/sa/unittest-app-b-sa
+                      - cluster.local/ns/cumulus/sa/unittest-app-c-sa
