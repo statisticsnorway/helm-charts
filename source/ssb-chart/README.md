@@ -599,6 +599,37 @@ string
 			<td>Image tag. Required.</td>
 		</tr>
 		<tr>
+			<td id="istioAppToAppAuth"><a href="./values.yaml#L362">istioAppToAppAuth</a></td>
+			<td>
+object
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="yaml">
+# -- Enable or disable authentication between applications.
+# Istio app to app auth is disabled by default for "AppType: backend".
+enabled: false
+
+</pre>
+</div>
+			</td>
+			<td>Application authentication with Istio policies. A list with serviceaccounts (principles) which is to be granted access to endpoints on this application must be provided. Prometheus is granted access by default Optional.</td>
+		</tr>
+		<tr>
+			<td id="istioAppToAppAuth--enabled"><a href="./values.yaml#L365">istioAppToAppAuth.enabled</a></td>
+			<td>
+bool
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+false
+</pre>
+</div>
+			</td>
+			<td>Enable or disable authentication between applications. Istio app to app auth is disabled by default for "AppType: backend".</td>
+		</tr>
+		<tr>
 			<td id="istioEndUserAuth"><a href="./values.yaml#L351">istioEndUserAuth</a></td>
 			<td>
 object
@@ -1050,7 +1081,7 @@ requests:
 			<td>Defines restrictions on resources requested and consumed by a single pod. Total calculated resources = resources*replicaCount. Ref:  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/ Optional.</td>
 		</tr>
 		<tr>
-			<td id="routes"><a href="./values.yaml#L362">routes</a></td>
+			<td id="routes"><a href="./values.yaml#L373">routes</a></td>
 			<td>
 list
 </td>
@@ -1109,7 +1140,7 @@ null
 			<td>Defines additional containers to run in a pod. Bundles container settings into one yaml structure for simplicity. Follows the Kubernetes container spec. Optional.</td>
 		</tr>
 		<tr>
-			<td id="subdomains"><a href="./values.yaml#L368">subdomains</a></td>
+			<td id="subdomains"><a href="./values.yaml#L379">subdomains</a></td>
 			<td>
 list
 </td>
@@ -1151,7 +1182,7 @@ string
 			<td>Kubernetes deployment type. Optional.</td>
 		</tr>
 		<tr>
-			<td id="urlhosts"><a href="./values.yaml#L374">urlhosts</a></td>
+			<td id="urlhosts"><a href="./values.yaml#L385">urlhosts</a></td>
 			<td>
 list
 </td>

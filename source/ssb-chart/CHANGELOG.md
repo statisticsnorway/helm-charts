@@ -1,5 +1,11 @@
 # Changelog - ssb-chart
 
+## v3.1.0
+
+Updates in this release:
+* Add the possibility to specify which service accounts that should have access to 
+  endpoints in an app
+
 ## v3.0.1
 
 Updates in this release:
