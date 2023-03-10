@@ -353,6 +353,17 @@ istioEndUserAuth:
   # Istio end-user auth is enabled by default for "AppType: backend".
   enabled: true
 
+# -- (object) Application authentication with Istio policies.
+# A list with serviceaccounts (principles) which is to be
+# granted access to endpoints on this application must be
+# provided. Prometheus is granted access by default
+# Optional.
+# @notationType -- yaml
+istioAppToAppAuth:
+  # -- Enable or disable authentication between applications.
+  # Istio app to app auth is disabled by default for "AppType: backend".
+  enabled: false
+
 # -- Support for adding additional matching rules and routes to the Istio VirtualService object.
 # Route traffic to a path specified in `name` to the service port specified `serviceport`.
 # Note that "serviceport" must be unique and different from the default service port specified

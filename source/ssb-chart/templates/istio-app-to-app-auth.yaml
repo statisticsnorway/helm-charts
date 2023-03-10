@@ -1,0 +1,48 @@
+{{- if and (eq "backend" .Values.appType) (and ( or (eq (toString .Values.istioAppToAppAuth.enabled) "true") (eq (toString .Values.istioAppToAppAuth.enabled) "True")) .Values.istioAppToAppAuth.enabled) }}
+# Prometheus
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: "{{ template "app.name" . }}-app-to-app-allow-metrics-auth-policy"
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  action: ALLOW
+  rules:
+    # Application metrics endpoint
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/monitoring/sa/ssb-prometheus-server
+      to:
+        - operation:
+            paths:
+              - "{{ .Values.metrics.path }}"
+---
+
+{{- if .Values.istioAppToAppAuth.serviceAccounts }}
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: "{{ template "app.name" . }}-app-to-app-policy"
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  action: ALLOW
+  rules:
+    - to:
+        - operation:
+            paths:
+{{- range .Values.istioAppToAppAuth.serviceAccounts }}
+              - "{{ . }}"
+{{- end }}
+---
+{{- end }}
+{{- end }}
