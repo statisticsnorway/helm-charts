@@ -31,6 +31,8 @@ tests:
       namespace: unittesting
     documentIndex: 0
     asserts:
+      - hasDocuments:
+          count: 1
       - equal:
           path: spec.selector.matchLabels.app
           value: unittest-app
@@ -62,6 +64,8 @@ tests:
       namespace: unittesting
     documentIndex: 1
     asserts:
+      - hasDocuments:
+          count: 2
       - equal:
           path: spec.selector.matchLabels.app
           value: unittest-app
