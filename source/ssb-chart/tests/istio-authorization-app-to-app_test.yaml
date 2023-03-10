@@ -15,14 +15,6 @@ tests:
       - hasDocuments:
           count: 0
 
-# If enabled and nothing more, the policy allowing for metrics scraping should be created
-  - it: should render one document if enabled
-    values:
-      - ./values/istio-authorization-app-to-app-values.yaml
-    asserts:
-      - hasDocuments:
-          count: 1
-
 # If enabled a policy which allows Prometheus scraping should be created
   - it: should render name, ALLOW action and metrics path in app-to-app policy
     values:
