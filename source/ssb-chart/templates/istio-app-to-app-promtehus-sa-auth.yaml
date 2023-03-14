@@ -1,0 +1,27 @@
+{{- if and (eq "backend" .Values.appType) (and ( or (eq (toString .Values.istioAppToAppAuth.enabled) "true") (eq (toString .Values.istioAppToAppAuth.enabled) "True")) .Values.istioAppToAppAuth.enabled) }}
+# Authorization policy to allow for metrics scraping
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: "{{ template "app.name" . }}-app-to-app-allow-metrics-auth-policy"
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  action: ALLOW
+  rules:
+    # From Prometheus service account
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/monitoring/sa/ssb-prometheus-server
+      # To application metrics endpoint
+      to:
+        - operation:
+            paths:
+              - "{{ .Values.metrics.path }}"
+
+{{- end }}

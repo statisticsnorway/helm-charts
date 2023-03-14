@@ -1,51 +1,48 @@
 {{- if and (eq "backend" .Values.appType) (and ( or (eq (toString .Values.istioAppToAppAuth.enabled) "true") (eq (toString .Values.istioAppToAppAuth.enabled) "True")) .Values.istioAppToAppAuth.enabled) }}
-# Authorization policy to allow for metrics scraping
----
-apiVersion: security.istio.io/v1beta1
-kind: AuthorizationPolicy
-metadata:
-  name: "{{ template "app.name" . }}-app-to-app-allow-metrics-auth-policy"
-  labels:
-{{ include "default.labels" . | indent 4 }}
-spec:
-  selector:
-    matchLabels:
-      app: {{ template "app.name" . }}
-  action: ALLOW
-  rules:
-    # From Prometheus service account
-    - from:
-        - source:
-            principals:
-              - cluster.local/ns/monitoring/sa/ssb-prometheus-server
-      # To application metrics endpoint
-      to:
-        - operation:
-            paths:
-              - "{{ .Values.metrics.path }}"
----
 
-# Authorization policy to allow for another app to access (any) endpoints in this app
-{{- if .Values.istioAppToAppAuth.serviceAccounts }}
+# Define template values as variables here, due to range changing scope
+{{- $applicationName := include "app.name" . }}
+{{- $defaultLabels := include "default.labels" . }}
+
+{{- range .Values.istioAppToAppAuth.from }}
+# Authorization policy to allow for another app to access (any) endpoints in this app.
+# One policy for each service account that is allowed to access this app.
+---
+{{- if and .serviceAccount (or .namespace .appName) }}
+{{- fail "You must specify either 'serviceAccount' or 'namespace' & 'appName', not both." }}
+{{- end }}
+
+{{- if and (or .namespace .appName) (not (and .namespace .appName)) }}
+{{- fail "Only one the values ('namespace' or 'appName') were specified. Both must be specified." }}
+{{- end }}
+
+{{- $constructedServiceAccount := "" }}
+{{- if not .serviceAccount }}
+# Construct the service account string when '.namespace' '.appName' configuration is used
+{{- $constructedServiceAccount = printf "cluster.local/ns/%s/sa/%s-sa" .namespace .appName }}
+{{- end }}
+
+{{- $serviceAccount := (default $constructedServiceAccount .serviceAccount) }}
+
+# Create a "user-friendly" name for the service account, used in policy name
+{{- $serviceAccountName := splitList "/" $serviceAccount | last }}
+
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: "{{ template "app.name" . }}-app-to-app-allow-policy"
+  name: "{{ $applicationName }}-to-{{ $serviceAccountName }}-app-to-app-allow-policy"
   labels:
-{{ include "default.labels" . | indent 4 }}
+{{ $defaultLabels | indent 4 }}
 spec:
   selector:
     matchLabels:
-      app: {{ template "app.name" . }}
+      app: {{ $applicationName }}
   action: ALLOW
   rules:
     - from:
         - source:
             # The list of service accounts to grant access
             principals:
-{{- range .Values.istioAppToAppAuth.serviceAccounts }}
-              - "{{ . }}"
-{{- end }}
----
+              - "{{ $serviceAccount }}"
 {{- end }}
 {{- end }}

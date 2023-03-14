@@ -15,14 +15,67 @@ tests:
       - hasDocuments:
           count: 0
 
-# If enabled a policy which allows Prometheus scraping should be created
-  - it: should render name, ALLOW action and metrics path in app-to-app policy
+
+# If enabled and service accounts specified a policy with the service accounts should be created
+  - it: should render name, ALLOW action and service accounts in the app-to-app policy
     values:
       - ./values/istio-authorization-app-to-app-values.yaml
+    set:
+      istioAppToAppAuth.from:
+        - serviceAccount: cluster.local/ns/cumulus/sa/unittest-app-b-sa
+        - serviceAccount: cluster.local/ns/cumulus/sa/unittest-app-c-sa
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.action
+          value: ALLOW
+
+
+  - it: should render name, ALLOW action and service accounts in the app-to-app policy, one instance check
+    values:
+      - ./values/istio-authorization-app-to-app-values.yaml
+    set:
+      istioAppToAppAuth.from:
+        - serviceAccount: cluster.local/ns/cumulus/sa/unittest-app-b-sa
+        - serviceAccount: cluster.local/ns/cumulus/sa/unittest-app-c-sa
     release:
       name: unittest-app-release
       namespace: unittesting
     documentIndex: 0
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+              - source:
+                  principals:
+                    - cluster.local/ns/cumulus/sa/unittest-app-b-sa
+
+
+# If enabled and service accounts specified a policy with the service accounts should be created
+  - it: should render name, ALLOW action and namespace appName in the app-to-app policy
+    values:
+      - ./values/istio-authorization-app-to-app-values.yaml
+    set:
+      istioAppToAppAuth.from:
+        - namespace: cumulus
+          appName: unittest-app-c
+    release:
+      name: unittest-app-release
+      namespace: unittesting
     asserts:
       - hasDocuments:
           count: 1
@@ -38,38 +91,26 @@ tests:
             - from:
                 - source:
                     principals:
-                      - cluster.local/ns/monitoring/sa/ssb-prometheus-server
-              to:
-                - operation:
-                    paths:
-                      - /metrics
+                      - cluster.local/ns/cumulus/sa/unittest-app-c-sa
 
-# If enabled and service accounts specified a policy with the service accounts should be created
-  - it: should render name, ALLOW action and service accounts in the app-to-app policy
+  - it: should render name, ALLOW action and service accounts and namespace&appname in the app-to-app policy
     values:
       - ./values/istio-authorization-app-to-app-values.yaml
     set:
-      istioAppToAppAuth.serviceAccounts:
-        - cluster.local/ns/cumulus/sa/unittest-app-b-sa
-        - cluster.local/ns/cumulus/sa/unittest-app-c-sa
+      istioAppToAppAuth.from:
+        - serviceAccount: cluster.local/ns/cumulus/sa/unittest-app-b-sa
+        - serviceAccount: cluster.local/ns/cumulus/sa/unittest-app-c-sa
+        - namespace: cumulus
+          appName: unittest-app-c
     release:
       name: unittest-app-release
       namespace: unittesting
-    documentIndex: 1
     asserts:
       - hasDocuments:
-          count: 2
+          count: 3
       - equal:
           path: spec.selector.matchLabels.app
           value: unittest-app
       - equal:
           path: spec.action
           value: ALLOW
-      - equal:
-          path: spec.rules
-          value:
-            - from:
-                - source:
-                    principals:
-                      - cluster.local/ns/cumulus/sa/unittest-app-b-sa
-                      - cluster.local/ns/cumulus/sa/unittest-app-c-sa

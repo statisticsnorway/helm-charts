@@ -1,0 +1,44 @@
+# Tests the istio-app-to-app authorization policies. This should render 0,1 or 2 policies
+# depending on configuration
+
+suite: test authorzation-policy-app-to-app-allow-metrics
+templates:
+  - istio-app-to-app-promtehus-sa-auth.yaml
+tests:
+# Render nothing if not enabled (enabled=false by default)
+  - it: should render nothing if not enabled
+    values:
+      - ./values/default-values.yaml
+    set:
+      appType: frontend
+    asserts:
+      - hasDocuments:
+          count: 0
+
+# If enabled a policy which allows Prometheus scraping should be created
+  - it: should render name, ALLOW action and metrics path in app-to-app policy
+    values:
+      - ./values/istio-authorization-app-to-app-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/monitoring/sa/ssb-prometheus-server
+              to:
+                - operation:
+                    paths:
+                      - /metrics

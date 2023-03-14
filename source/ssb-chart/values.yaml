@@ -354,9 +354,14 @@ istioEndUserAuth:
   enabled: true
 
 # -- (object) Application authentication with Istio policies.
-# A list with serviceaccounts (principles) which is to be
-# granted access to endpoints on this application must be
-# provided. Prometheus is granted access by default
+# A list of serviceaccounts (principles) or namespace & appnames
+# which is to be granted access to endpoints on this application must be
+# provided via `from` field. Prometheus is granted access by default.
+# Eg:
+# from:
+# - namespace: cumulus
+#   appname: my-app-name
+# - serviceaccount: my-app-service-account-sa
 # Optional.
 # @notationType -- yaml
 istioAppToAppAuth:
