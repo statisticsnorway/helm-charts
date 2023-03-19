@@ -1,0 +1,29 @@
+{{- if and ( or (eq (toString .Values.metrics.enabled) "true") (eq (toString .Values.metrics.enabled) "True")) .Values.metrics.enabled }}
+# --- Allow metrics policy ---
+#
+# Allow unauthenticated requests to the metrics endpoint. Note that there is a
+# rule in the VirtualService config that will deny public requests to this
+# metric endpoint.
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: "{{ template "app.name" . }}-allow-prometheus-metrics-auth-policy"
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  action: ALLOW
+  rules:
+    # From Prometheus service account
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/monitoring/sa/ssb-prometheus-server
+      # To application metrics endpoint
+      to:
+        - operation:
+            paths:
+              - "{{ .Values.metrics.path }}"
+{{- end }}
