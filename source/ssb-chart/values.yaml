@@ -232,6 +232,97 @@ networkpolicy:
   # -- Optionally create your own NetworkPolicy for the current application.
   overrideDefaultPolicy: {}
 
+
+  # Two unique ID's are available for use with user/app authentication in todays platform
+  #
+  # 1. Keycloak unique client ID in the SSB Realm
+  #    This is "audience" referenced in the current IstioEndUserAuth config.
+  #    Caller and callee must agree on this authentication through the client config
+  #    and the validation.
+  #
+  # 2. Istio Spiffe ID/K8s SA
+  #   This is the "principal" referenced in AuthorizationPolicy manifest.
+  #
+  #   Applications must be referenced by their principal name
+  #   which is the unique Service Account name tied to a Spiffe/ID assigned by Istio.
+  #   This is needed to ensure the originity of the request (non-repudiation).
+  #
+  # The next (first) layer of security is Network policies. But note that these does not guarantee
+  # non-repuditation. Inside K8s applications in network policies are referenced by namespace and/or pod
+  # labels/names. These labels might not be unique.
+
+  # Policy example for an app with SA/name "app1" in namespace "n1"
+access:
+  ingress:
+#    external:
+#      # Technical impl. details: In order to allow ingress from an ingress gateway
+#      # the Istio AuthorizationPolicy need to specify the principal of the gateway. E.g:
+#      #   principal: cluster.local/ns/istio-system/sa/istio-ingressgateway
+#      gateways:
+#        - type: public # Same as current "exposed: true"
+#          rules:
+#            - method: ["get"]
+#              path: ["api/"]
+#              jwt:
+#                issuer: https://sso.example.com/auth/realms/ssb
+#                audience: ekstern-client-id
+#        - type: ssb-internal # Does not exist today, but could be used for SSB internal ingress.
+#          rules:
+#            - methods: ["POST"]
+#              paths: ["api/"]
+    internal:
+      # Allow from app2 in same namespace (n1)
+      - application: app2
+        namespace: n1
+      # Allow from app3 in same namespace (n2)
+      - application: app3
+        namespace: n2
+      # Allow traffic and do JWT validering from app3 from namespace n3
+      - application: app3
+        namespace: n3
+        rules:
+          - method: ["GET"]
+            path: ["api/"]
+            jwt:
+              issuer: https://keycloak.ssb.no/auth/realms/ssb
+              audience: app3 # <keycloak unik klientid i issuer>
+      # Allow from app3 from namespace n3 for specific only on specified method and path (optional)
+      - application: app3
+        namespace: n3
+        rules:
+          - methods: ["GET"]
+            paths: ["api/"]
+          - methods: ["POST"]
+            paths: ["internal/api/"]
+      - application: app3
+        namespace: n3
+        rules:
+          - methods: ["GET"]
+            paths: ["api/"]
+            when: #TODO: Consider to support when
+              - key: request.headers["x-ssb-ekstern-id"]
+                values: ["123456789"]
+              - key: request.headers[Authorization]
+                values: ["Bearer *"]
+#  egress:
+#    external:
+#      # Ekstern egress kan implementeres med en kombinasjon av
+#      # NetworkPolicy og (Istio ServiceEntry eller FQDN NetworkPolicy)
+#      # Allow HTTPS traffic to host
+#      - host: pypi.org
+#      # Allow TCP traffic to host or IP address on port/protocol
+#      - host: x.x.x.x
+#        ports:
+#          - name: cloudsql
+#            port: 3307
+#            protocol: TCP
+#
+#    internal:
+#      # Intern egress kan kun implementeres med NetworkPolicy på L4
+#      # Allow egress to app3 in namespace n3
+#      - application: app3
+#        namespace: n3
+
 # -- (object) PodSecurityContext.
 # Default security context for pods. If set in both SecurityContext and PodSecurityContext,
 # the value specified in SecurityContext takes precedence.

@@ -1,0 +1,124 @@
+suite: test access ingress internal where rules are specified
+templates:
+  - access-ingress-internal-authorization-policy.yaml
+tests:
+
+  - it: should render two documents if enabled
+    values:
+      - ./values/access-ingress-internal-authorization-policy-rules-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+
+  - it: should include default labels and name in auth-policy
+    values:
+       - ./values/access-ingress-internal-authorization-policy-rules-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n1-app2-auth-policy
+      - isKind:
+          of: AuthorizationPolicy
+
+  - it: should include default labels and name in auth-policy
+    values:
+       - ./values/access-ingress-internal-authorization-policy-rules-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n3-app3-auth-policy
+      - isKind:
+          of: AuthorizationPolicy
+
+  - it: should render name, ALLOW action to all paths
+    values:
+       - ./values/access-ingress-internal-authorization-policy-rules-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - "cluster.local/ns/n1/sa/app2-sa"
+
+  - it: should render name, ALLOW action to all paths
+    values:
+       - ./values/access-ingress-internal-authorization-policy-rules-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - "cluster.local/ns/n3/sa/app3-sa"
+              to:
+                - operation:
+                    paths:
+                      - "api/"
+                      - "/status"
+                    methods:
+                      - "GET"
+            - from:
+                - source:
+                    principals:
+                      - "cluster.local/ns/n3/sa/app3-sa"
+              to:
+                - operation:
+                    paths:
+                      - "internal/api/"
+                    methods:
+                      - "POST"
