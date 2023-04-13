@@ -1,0 +1,16 @@
+{{/*# NetworkPolicy which only allows egress to the specified application*/}}
+# Default deny all egress network traffic
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: "{{ template "app.name" $ }}-egress-deny-all-netpol"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  policyTypes:
+  - Egress
+  egress: []
+{{/*  TODO: consider if kube dns should be allowed*/}}

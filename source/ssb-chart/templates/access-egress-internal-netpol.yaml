@@ -1,0 +1,26 @@
+{{- if and .Values.access (and .Values.access.egress .Values.access.egress.internal) }}
+{{- range .Values.access.egress.internal }}
+{{/*# NetworkPolicy which only allows egress to the specified application*/}}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: "{{ template "app.name" $ }}-egress-{{.namespace }}-{{ .application }}-netpol"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "app.name" $ }}
+  policyTypes:
+  - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: {{ .application }}
+          namespaceSelector:
+            matchLabels:
+              name: {{ .namespace }}
+---
+{{- end}}
+{{- end}}

@@ -1,0 +1,75 @@
+suite: test access ingress internal authorization policy
+templates:
+  - access-egress-internal-netpol.yaml
+tests:
+
+  - it: should not panic if access is empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not panic if egress is empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render nothing if empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+          egress:
+            internal: []
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render one network policy for each element
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+          egress:
+            internal:
+              - application: app2
+                namespace: n1
+              - application: app3
+                namespace: n1
+    asserts:
+      - hasDocuments:
+          count: 2
+
+  - it: should render network policy with 'to' spec when application and namespace is specified
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          internal:
+            - application: app2
+              namespace: n1
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-n1-app2-netpol
+      - equal:
+          path: spec.egress
+          value:
+            - to:
+                - podSelector:
+                    matchLabels:
+                      app: app2
+                  namespaceSelector:
+                    matchLabels:
+                      name: n1

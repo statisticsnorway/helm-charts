@@ -300,7 +300,7 @@ access:
         rules:
           - methods: ["GET"]
             paths: ["api/"]
-#  egress:
+  egress:
 #    external:
 #      # Ekstern egress kan implementeres med en kombinasjon av
 #      # NetworkPolicy og (Istio ServiceEntry eller FQDN NetworkPolicy)
@@ -313,11 +313,11 @@ access:
 #            port: 3307
 #            protocol: TCP
 #
-#    internal:
-#      # Intern egress kan kun implementeres med NetworkPolicy på L4
-#      # Allow egress to app3 in namespace n3
-#      - application: app3
-#        namespace: n3
+    internal:
+      # Intern egress kan kun implementeres med NetworkPolicy på L4
+      # Allow egress to app3 in namespace n3
+      - application: app3
+        namespace: n3
 
 # -- (object) PodSecurityContext.
 # Default security context for pods. If set in both SecurityContext and PodSecurityContext,

@@ -1,0 +1,36 @@
+suite: test access ingress internal authorization policy
+templates:
+  - access-egress-default-netpol-deny-all.yaml
+tests:
+
+  - it: should always render
+    values:
+      - ./values/default-values.yaml
+    set:
+      access: {}
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should render egress policy with deny all (empty rule set)
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          internal:
+            - application: app2
+              namespace: n1
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-deny-all-netpol
+      - equal:
+          path: spec.policyTypes
+          value:
+            - Egress
+      - equal:
+          path: spec.egress
+          value: []
