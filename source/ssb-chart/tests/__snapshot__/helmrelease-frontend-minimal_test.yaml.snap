@@ -6,7 +6,7 @@ should render Deployment:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app
@@ -59,7 +59,7 @@ should render NetworkPolicy:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: np-unittest-app
@@ -92,7 +92,7 @@ should render Service:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app
@@ -113,7 +113,7 @@ should render ServiceAccount:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-sa

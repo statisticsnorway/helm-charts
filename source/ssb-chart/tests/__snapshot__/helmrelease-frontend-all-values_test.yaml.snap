@@ -13,7 +13,7 @@ should render ConfigMap for application config:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-application-config
@@ -54,7 +54,7 @@ should render ConfigMap for nginx config:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-nginx-vhost-config
@@ -66,7 +66,7 @@ should render Deployment:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app
@@ -79,8 +79,8 @@ should render Deployment:
       template:
         metadata:
           annotations:
-            checksum/application-config: e213521121a8f1475a85da57496871a8d4be2200907a5571a6339d5063c0fd91
-            checksum/nginx-vhost-config: aa3a7ef8481c268f4ec3ff8f3a821de69ce5d0ad7ca3e910529c556417f5e380
+            checksum/application-config: d26e68deb91b459a81f09708ca042603b16383d3a8c04e55be2b7e530713a48e
+            checksum/nginx-vhost-config: 8e4dc88a6c0070f32fcca10b90fb7a2cbf6a5cb0367a89c30acd46d78f1a4f20
             prometheus.io/path: /metrics/path
             prometheus.io/port: "8080"
             prometheus.io/scheme: https
@@ -289,7 +289,7 @@ should render NetworkPolicy:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: np-unittest-app
@@ -334,7 +334,7 @@ should render Service:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app
@@ -358,7 +358,7 @@ should render ServiceAccount:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-sa
@@ -370,7 +370,7 @@ should render ServiceEntry for cloudsql:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-cloudsql
@@ -394,7 +394,7 @@ should render ServiceEntry for https:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app-pypi.org
@@ -417,7 +417,7 @@ should render VirtualService:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-3.0.1
+        chart: ssb-chart-4.0.0
         heritage: Tiller
         release: unittest-app
       name: unittest-app

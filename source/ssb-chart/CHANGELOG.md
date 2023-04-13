@@ -1,5 +1,15 @@
 # Changelog - ssb-chart
 
+## v4.0.0
+
+NB: WIP
+Updates in this release:
+* Introduce access field
+* Remove fields:
+
+---
+
+
 ## v3.0.1
 
 Updates in this release:
