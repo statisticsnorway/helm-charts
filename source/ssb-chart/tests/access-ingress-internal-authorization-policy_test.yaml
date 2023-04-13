@@ -52,7 +52,7 @@ tests:
       - ./values/access-ingress-internal-authorization-policy-values.yaml
     asserts:
       - hasDocuments:
-          count: 3
+          count: 4
 
   - it: should include default labels and name in authorization policy
     values:
@@ -79,6 +79,34 @@ tests:
           value: unittest-app-ingress-n1-app2-auth-policy
       - isKind:
           of: AuthorizationPolicy
+
+
+
+  - it: request authentication should include default labels and name in request authentication
+    values:
+      - ./values/access-ingress-internal-authorization-policy-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 2
+    asserts:
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n3-app3-request-auth
+      - isKind:
+          of: RequestAuthentication
 
 
   - it: should render authorization policy
@@ -133,7 +161,7 @@ tests:
     release:
       name: unittest-app-release
       namespace: unittesting
-    documentIndex: 2
+    documentIndex: 3
     asserts:
       - equal:
           path: spec.action
