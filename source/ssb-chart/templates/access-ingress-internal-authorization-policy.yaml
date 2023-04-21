@@ -56,6 +56,7 @@ spec:
   {{- end }}
 ---
   {{- if .rules }}
+    {{/* Merge all jwt-rules into one list, such that we only need one RequestAuthentication per element in access.ingress.internal */}}
     {{- $jwtRules := list }}
     {{- range .rules }}
       {{- if .jwt }}
