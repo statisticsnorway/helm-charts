@@ -1,0 +1,169 @@
+suite: test access ingress external authorization policy
+templates:
+  - access-egress-external-netpol.yaml
+tests:
+
+  - it: should not panic if access is empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not panic if egress is empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render nothing if empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external: [ ]
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render a network policy with no egress since no addresses or ports defined
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - hosts:
+                - "ssb.no"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-external-netpol
+      - equal:
+          path: spec.egress
+          value: null
+
+  - it: should render a network policy with egress for ipBlocks defined
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - addresses:
+                - "104.154.0.0/15"
+                - "35.228.140.242/32"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-external-netpol
+      - equal:
+          path: spec.egress
+          value:
+            - to:
+                - ipBlock:
+                    cidr: "104.154.0.0/15"
+                - ipBlock:
+                    cidr: "35.228.140.242/32"
+
+  - it: should render a network policy with egress for ports defined, and should rewrite https protocol to tcp
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - ports:
+                - name: https
+                  number: 443
+                  protocol: HTTPS
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-external-netpol
+      - equal:
+          path: spec.egress
+          value:
+            - ports:
+                - protocol: "TCP"
+                  port: "443"
+
+  - it: should render a network policy with egress and ports defined
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - addresses:
+                - "104.154.0.0/15"
+                - "35.228.140.242/32"
+              ports:
+                - name: https
+                  port: 443
+                  protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-external-netpol
+      - equal:
+          path: spec.egress
+          value:
+            - to:
+                - ipBlock:
+                    cidr: "104.154.0.0/15"
+                - ipBlock:
+                    cidr: "35.228.140.242/32"
+              ports:
+                - protocol: TCP
+                  port: 443
+
+  - it: should render a network policy with multiple egress and ports defined
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - addresses:
+                - "104.154.0.0/15"
+              ports:
+                - name: https
+                  port: 443
+                  protocol: TCP
+            - addresses:
+                - "35.228.140.242/32"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-external-netpol
+      - equal:
+          path: spec.egress
+          value:
+            - to:
+                - ipBlock:
+                    cidr: "104.154.0.0/15"
+              ports:
+                - protocol: TCP
+                  port: 443
+            - to:
+                - ipBlock:
+                    cidr: "35.228.140.242/32"
+

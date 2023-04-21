@@ -301,18 +301,37 @@ access:
           - methods: ["GET"]
             paths: ["api/"]
   egress:
-#    external:
-#      # Ekstern egress kan implementeres med en kombinasjon av
-#      # NetworkPolicy og (Istio ServiceEntry eller FQDN NetworkPolicy)
-#      # Allow HTTPS traffic to host
-#      - host: pypi.org
-#      # Allow TCP traffic to host or IP address on port/protocol
-#      - host: x.x.x.x
-#        ports:
-#          - name: cloudsql
-#            port: 3307
-#            protocol: TCP
-#
+  # Note: Cloudsql should still be configured via cloudsql-flag
+    external:
+      # Ekstern egress kan implementeres med en kombinasjon av
+      # NetworkPolicy og (Istio ServiceEntry eller FQDN NetworkPolicy)
+      # Allow HTTPS traffic to host
+      - hosts:
+          - "pypi.org"
+        addresses:
+          - "104.154.0.0/15"
+        ports:
+          - name: rabbit-mq
+            port: 5671
+            #TODO: Consider if only netpol protocols should be allowed (i.e. not HTTPS and other that ServiceEntry supports)
+            protocol: TCP
+      # Allow TCP traffic to host or IP address on port/protocol
+      - addresses:
+          - x.x.x.x
+        ports:
+          - name: rabbit-mq
+            port: 5671
+            #TODO: Consider if only netpol protocols should be allowed (i.e. not HTTPS and other that ServiceEntry supports)
+            protocol: TCP
+      - hosts:
+          - "firestore.googleapis.com"
+          - "ssb-team-forbruk-firebase-default-rtdb.europe-west1.firebasedatabase.app"
+          - "ssb-team-forbruk-firebase.firebaseapp.com"
+        ports:
+          - name: https
+            number: 443
+            #TODO: Consider if only netpol protocols should be allowed (i.e. not HTTPS and other that ServiceEntry supports)
+            protocol: HTTPS
     internal:
       # Intern egress kan kun implementeres med NetworkPolicy på L4
       # Allow egress to app3 in namespace n3

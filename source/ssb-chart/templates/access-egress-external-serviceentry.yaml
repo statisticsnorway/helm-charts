@@ -1,0 +1,39 @@
+{{- if and .Values.access (and .Values.access.egress .Values.access.egress.external) }}
+{{- range $index, $value := .Values.access.egress.external }}
+kind: ServiceEntry
+apiVersion: networking.istio.io/v1beta1
+metadata:
+  name: "{{ template "app.name" $ }}-egress-{{ $index }}-external-se"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+{{/*  TODO: Can both hosts and addresses be specified at the same time? */}}
+  {{- if $value.hosts }}
+  hosts:
+    {{- range $value.hosts }}
+    - {{ . }}
+    {{- end }}
+  # Only add resolution if hosts is specified
+  resolution: DNS
+  {{- end }}
+  {{- if $value.addresses }}
+  addresses:
+    {{- range $value.addresses }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- if $value.ports }}
+  ports:
+    {{- range $value.ports }}
+    - name: {{ .name }}
+      number: {{ .port }}
+      protocol: {{ .protocol }}
+    {{- end }}
+  {{- end }}
+  # Export to current namespace to avoid leakage to other namespaces
+  exportTo:
+    - "."
+  location: MESH_EXTERNAL
+---
+{{- end}}
+{{- end}}
