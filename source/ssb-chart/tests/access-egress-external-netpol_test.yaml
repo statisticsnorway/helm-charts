@@ -50,7 +50,7 @@ tests:
           value: unittest-app-egress-external-netpol
       - equal:
           path: spec.egress
-          value: null
+          value: []
 
   - it: should render a network policy with egress for ipBlocks defined
     values:
@@ -86,7 +86,7 @@ tests:
           external:
             - ports:
                 - name: https
-                  number: 443
+                  port: 443
                   protocol: HTTPS
     asserts:
       - hasDocuments:
@@ -99,7 +99,7 @@ tests:
           value:
             - ports:
                 - protocol: "TCP"
-                  port: "443"
+                  port: 443
 
   - it: should render a network policy with egress and ports defined
     values:

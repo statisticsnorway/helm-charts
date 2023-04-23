@@ -11,29 +11,41 @@ spec:
     matchLabels:
       app: {{ template "app.name" $ }}
   policyTypes:
-  - Egress
+    - Egress
   egress:
-  # If egress.external is empty this policy will efficiently be like deny all
+    # If egress.external is empty this policy will efficiently be like deny all
+    # Construct objects in this array as JSON, since YAML-templating was limited with optional records
+    [
   {{- range .Values.access.egress.external }}
-  {{ if or .addresses .ports}}
-{{/*TODO: Fix support for one of ( '-' in the wild is not supported)*/}}
+    {{ if or .addresses .ports}}
+    {
       {{ if .addresses }}
-       - to:
+      to: [
         {{- range .addresses }}
-         - ipBlock:
-             cidr: {{ . }}
+        {
+          ipBlock: {
+            cidr: {{ . }}
+          },
+        },
         {{- end}}
+      ],
       {{- end}}
-{{/*       TODO: Fix ports (same as todo above) */}}
-{{/*      {{ if .ports}}*/}}
-{{/*      ports:*/}}
-{{/*        {{- range .ports }}*/}}
-{{/*        - protocol: {{ .protocol | replace "HTTPS" "TCP"}}*/}}
-{{/*          port: {{ .port }}*/}}
-{{/*        {{- end}}*/}}
-{{/*      {{- end}}*/}}
+
+      {{ if .ports}}
+      ports: [
+        {{- range .ports }}
+        {
+          protocol: {{ .protocol | replace "HTTPS" "TCP"}},
+          port: {{ .port }},
+        },
+        {{- end}}
+      ]
+      {{- end}}
+      
+    },
     {{- end}}
   {{- end}}
+  ]
 
 ---
 {{- end}}
