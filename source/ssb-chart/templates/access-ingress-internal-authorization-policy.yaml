@@ -1,9 +1,10 @@
-{{- if and .Values.access (and .Values.access.ingress .Values.access.ingress.internal) }}
+{{- if (((.Values.access).ingress).internal) }}
 {{- range .Values.access.ingress.internal }}
+---
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: "{{ template "app.name" $ }}-ingress-{{.namespace }}-{{ .application }}"
+  name: "{{ template "app.name" $ }}-ingress-{{ required "Missing namespace" .namespace }}-{{ required "Missing application" .application }}"
   labels:
 {{ include "default.labels" $ | indent 4 }}
 spec:
@@ -24,9 +25,8 @@ spec:
             principals: [ "{{ $fromPrincipal }}" ]
             {{- if .jwt }}
             {{- /* The request identity is in the format of "<ISS>/<SUB>" */}}
-            requestPrincipals: [ "{{ .jwt.issuer }}/*" ]
+            requestPrincipals: [ "{{ required "issuer is required when jwt is in use" .jwt.issuer }}/*" ]
             {{- end}}
-{{/*      If .paths or .methods are defined*/}}
       {{- if or .paths .methods }}
       to:
         - operation:
@@ -89,7 +89,6 @@ spec:
       {{- end }}
     {{- end }}
   {{- end }}
----
 {{- end}}
 {{- end}}
 
