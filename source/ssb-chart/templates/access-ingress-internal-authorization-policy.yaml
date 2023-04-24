@@ -3,7 +3,7 @@
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: "{{ template "app.name" $ }}-ingress-{{.namespace }}-{{ .application }}-auth-policy"
+  name: "{{ template "app.name" $ }}-ingress-{{.namespace }}-{{ .application }}"
   labels:
 {{ include "default.labels" $ | indent 4 }}
 spec:

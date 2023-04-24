@@ -32,7 +32,7 @@ tests:
           value: unittest-app-release
       - equal:
           path: metadata.name
-          value: unittest-app-ingress-n1-app2-auth-policy
+          value: unittest-app-ingress-n1-app2
       - isKind:
           of: AuthorizationPolicy
 
@@ -58,7 +58,7 @@ tests:
           value: unittest-app-release
       - equal:
           path: metadata.name
-          value: unittest-app-ingress-n3-app3-auth-policy
+          value: unittest-app-ingress-n3-app3
       - isKind:
           of: AuthorizationPolicy
 
