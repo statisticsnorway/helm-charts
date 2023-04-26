@@ -4,7 +4,9 @@
 
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence,
-# @statisticsnorway/stratus will be requested for
-# review when someone opens a pull request.
+# @statisticsnorway/dapla-utvik-developers and 
+# @statisticsnorway/dapla-skyinfra-developers will be
+# requested for review when someone opens a pull request.
 #
-* @statisticsnorway/stratus
+* @statisticsnorway/dapla-utvik-developers
+* @statisticsnorway/dapla-skyinfra-developers
