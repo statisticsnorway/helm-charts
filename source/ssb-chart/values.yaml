@@ -271,12 +271,13 @@ access:
 #            - methods: ["POST"]
 #              paths: ["api/"]
     internal:
-      # Allow from app2 in same namespace (n1)
       - application: app2
         namespace: n1
+        serviceaccount: "cluster.local/ns/my-namespace/sa/some-app"
       # Allow from app3 in same namespace (n2)
       - application: app3
         namespace: n2
+
       # Allow traffic and do JWT validering from app3 from namespace n3
       - application: app3
         namespace: n3

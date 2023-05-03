@@ -13,7 +13,8 @@ spec:
       app: {{ template "app.name" $ }}
   action: ALLOW
   rules:
-    {{- $fromPrincipal := printf "cluster.local/ns/%s/sa/%s-sa" .namespace .application }}
+    {{- $potentialFromPrincipal := printf "cluster.local/ns/%s/sa/%s-sa" .namespace .application }}
+    {{- $fromPrincipal := coalesce .serviceaccount $potentialFromPrincipal }}
   {{- if not .rules }}
     - from:
         - source:
