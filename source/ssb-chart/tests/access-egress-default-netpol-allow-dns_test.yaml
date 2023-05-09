@@ -1,6 +1,6 @@
 suite: test access ingress internal authorization policy
 templates:
-  - access-egress-default-netpol-deny-all.yaml
+  - access-egress-default-netpol-allow-dns.yaml
 tests:
 
   - it: should always render
@@ -12,7 +12,7 @@ tests:
       - hasDocuments:
           count: 1
 
-  - it: should render egress policy with deny all (empty rule set)
+  - it: should render egress policy with deny all except kube dns
     values:
       - ./values/default-values.yaml
     set:
@@ -26,11 +26,23 @@ tests:
           count: 1
       - equal:
           path: metadata.name
-          value: unittest-app-egress-deny-all-netpol
+          value: unittest-app-egress-allow-dns-netpol
       - equal:
           path: spec.policyTypes
           value:
             - Egress
       - equal:
           path: spec.egress
-          value: []
+          value:
+            - to:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: kube-system
+                  podSelector:
+                    matchLabels:
+                      k8s-app: kube-dns
+              ports:
+                - port: 53
+                  protocol: UDP
+                - port: 53
+                  protocol: TCP
