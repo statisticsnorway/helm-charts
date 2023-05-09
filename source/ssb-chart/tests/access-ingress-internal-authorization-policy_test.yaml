@@ -1,0 +1,206 @@
+suite: test access ingress internal authorization policy
+templates:
+  - access-ingress-internal-authorization-policy.yaml
+tests:
+
+  - it: should not panic if empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render nothing if empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          internal: []
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render authorization policy without 'to' if only application and namespace is specified
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          internal:
+            - application: app2
+              namespace: n1
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n1-app2
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/n1/sa/app2-sa
+
+  - it: should render authorization policies and RequestAuthentication
+    values:
+      - ./values/access-ingress-internal-authorization-policy-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 4
+
+  - it: should include default labels and name in authorization policy
+    values:
+       - ./values/access-ingress-internal-authorization-policy-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n1-app2
+      - isKind:
+          of: AuthorizationPolicy
+
+
+
+  - it: request authentication should include default labels and name in request authentication
+    values:
+      - ./values/access-ingress-internal-authorization-policy-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 2
+    asserts:
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n3-app3-request-auth
+      - isKind:
+          of: RequestAuthentication
+
+
+  - it: should render authorization policy
+    values:
+       - ./values/access-ingress-internal-authorization-policy-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n1-app2
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/n1/sa/app2-sa
+
+  - it: should render correct principals when specifying service account
+    set:
+      name: "unittest-app"
+      access:
+        ingress:
+          internal:
+            - application: app2
+              namespace: n1
+              serviceaccount: "cluster.local/ns/my-namespace/sa/some-app"
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n1-app2
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/my-namespace/sa/some-app
+
+  - it: should render authorization policy with request principal if jwt is present
+    values:
+       - ./values/access-ingress-internal-authorization-policy-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-n3-app3
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/n3/sa/app3-sa
+                    requestPrincipals:
+                      - "https://keycloak.ssb.no/auth/realms/ssb/*"
+              to:
+                - operation:
+                    methods:
+                     - "GET"
+                    paths:
+                     - "api/"
+
+  - it: should ALLOW action to paths and methods specified
+    values:
+       - ./values/access-ingress-internal-authorization-policy-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 3
+    asserts:
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/n4/sa/app4-sa
+              to:
+              - operation:
+                  paths:
+                    - "internal/api/"
+                  methods:
+                    - "POST"
