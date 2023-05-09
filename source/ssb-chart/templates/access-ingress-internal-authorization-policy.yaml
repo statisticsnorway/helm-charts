@@ -45,14 +45,6 @@ spec:
               {{- end }}
             {{- end }}
       {{- end }}
-{{/*     TODO: Consider if 'when' should be supported       */}}
-      {{- if .when }}
-      when:
-        {{- range .when  }}
-{{/*        TODO: Fix if 'when' should be supported  */}}
-        - {{ . }}
-        {{- end }}
-      {{- end }}
     {{- end }}
   {{- end }}
 ---

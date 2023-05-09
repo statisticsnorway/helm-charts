@@ -300,11 +300,6 @@ access:
         rules:
           - methods: ["GET"]
             paths: ["api/"]
-            when: #TODO: Consider to support when
-              - key: request.headers["x-ssb-ekstern-id"]
-                values: ["123456789"]
-              - key: request.headers[Authorization]
-                values: ["Bearer *"]
 #  egress:
 #    external:
 #      # Ekstern egress kan implementeres med en kombinasjon av

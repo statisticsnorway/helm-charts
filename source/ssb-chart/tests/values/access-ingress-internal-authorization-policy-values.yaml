@@ -24,8 +24,3 @@ access:
         rules:
           - methods: ["POST"]
             paths: ["internal/api/"]
-#            when: #TODO: Consider to support when
-#              - key: request.headers["x-ssb-ekstern-id"]
-#                values: ["123456789"]
-#              - key: request.headers[Authorization]
-#                values: ["Bearer *"]
