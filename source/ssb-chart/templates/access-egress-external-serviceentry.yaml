@@ -12,7 +12,7 @@ metadata:
   labels:
 {{ include "default.labels" $ | indent 4 }}
 spec:
-{{/*  TODO: Can both hosts and addresses be specified at the same time? */}}
+{{/*  TODO: Suggestion: throw service entry and implement FQDN Netpol*/}}
   {{- if $value.hosts }}
   hosts:
     {{- range $value.hosts }}
