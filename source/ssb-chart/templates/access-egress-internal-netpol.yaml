@@ -1,6 +1,7 @@
-{{- if and .Values.access (and .Values.access.egress .Values.access.egress.internal) }}
+{{- if  (((.Values.access).egress).internal) }}
 {{- range .Values.access.egress.internal }}
 {{/*# NetworkPolicy which only allows egress to the specified application*/}}
+---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
@@ -21,6 +22,5 @@ spec:
           namespaceSelector:
             matchLabels:
               name: {{ .namespace }}
----
 {{- end}}
 {{- end}}
