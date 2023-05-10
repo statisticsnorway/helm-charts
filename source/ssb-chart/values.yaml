@@ -278,7 +278,7 @@ access:
       - application: app3
         namespace: n2
 
-      # Allow traffic and do JWT validering from app3 from namespace n3
+      # Allow traffic and do JWT validation from app3 from namespace n3
       - application: app3
         namespace: n3
         rules:
@@ -301,25 +301,13 @@ access:
           - methods: ["GET"]
             paths: ["api/"]
   egress:
-  # Note: Cloudsql should still be configured via cloudsql-flag
     external:
-      # Ekstern egress kan implementeres med en kombinasjon av
-      # NetworkPolicy og (Istio ServiceEntry eller FQDN NetworkPolicy)
-      # Allow HTTPS traffic to host
+      # Note: Cloudsql should still be configured via cloudsql-flag
       - addresses:
           - "104.154.0.0/15"
         ports:
           - name: rabbit-mq
             port: 5671
-            #TODO: Consider if only netpol protocols should be allowed (i.e. not HTTPS and other that ServiceEntry supports)
-            protocol: TCP
-      # Allow TCP traffic to host or IP address on port/protocol
-      - addresses:
-          - x.x.x.x
-        ports:
-          - name: rabbit-mq
-            port: 5671
-            #TODO: Consider if only netpol protocols should be allowed (i.e. not HTTPS and other that ServiceEntry supports)
             protocol: TCP
       - hosts:
           - "firestore.googleapis.com"
@@ -328,11 +316,9 @@ access:
         ports:
           - name: https
             number: 443
-            #TODO: Consider if only netpol protocols should be allowed (i.e. not HTTPS and other that ServiceEntry supports)
+            # HTTPS are supported, and will be replaced with TCP in netpol (implementation detail)
             protocol: HTTPS
     internal:
-      # Intern egress kan kun implementeres med NetworkPolicy på L4
-      # Allow egress to app3 in namespace n3
       - application: app3
         namespace: n3
 
