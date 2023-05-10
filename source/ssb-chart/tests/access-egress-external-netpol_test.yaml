@@ -33,7 +33,7 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: should render a network policy with no egress since no addresses or ports defined
+  - it: should render a network policy with allow egress all ips when hosts is defined
     values:
       - ./values/default-values.yaml
     set:
@@ -42,6 +42,8 @@ tests:
           external:
             - hosts:
                 - "ssb.no"
+              addresses:
+                - "104.154.0.0/15"
     asserts:
       - hasDocuments:
           count: 1
@@ -50,7 +52,13 @@ tests:
           value: unittest-app-egress-external-netpol
       - equal:
           path: spec.egress
-          value: []
+          value:
+            - to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+            - to:
+                - ipBlock:
+                    cidr: 104.154.0.0/15
 
   - it: should render a network policy with egress for ipBlocks defined
     values:

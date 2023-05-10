@@ -1,4 +1,4 @@
-{{- if and .Values.access (and .Values.access.egress .Values.access.egress.external) }}
+{{- if (((.Values.access).egress).external) }}
 # Will only render if addresses and/or ports are defined (need FqdnNetworkPolicy to support hosts field)
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -17,6 +17,18 @@ spec:
     # Construct objects in this array as JSON, since YAML-templating was limited with optional records
     [
   {{- range .Values.access.egress.external }}
+    {{ if .hosts }}
+    # PS: If egress.external has rules with hosts all ips (0.0.0.0/0) must be allowed since we don't have FQDNNetworkPolicies
+    {
+      to: [
+        {
+          ipBlock: {
+            cidr: '0.0.0.0/0'
+          }
+        },
+      ]
+    },
+    {{ end }}
     {{ if or .addresses .ports}}
     {
       {{ if .addresses }}
