@@ -306,9 +306,7 @@ access:
       # Ekstern egress kan implementeres med en kombinasjon av
       # NetworkPolicy og (Istio ServiceEntry eller FQDN NetworkPolicy)
       # Allow HTTPS traffic to host
-      - hosts:
-          - "pypi.org"
-        addresses:
+      - addresses:
           - "104.154.0.0/15"
         ports:
           - name: rabbit-mq
