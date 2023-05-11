@@ -1,0 +1,132 @@
+suite: test access ingress external authorization policy
+templates:
+  - access-egress-external-serviceentry.yaml
+tests:
+
+  - it: should not panic if access is empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not panic if egress is empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render nothing if empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external: [ ]
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render a service entry for each element
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - hosts:
+                - "nrk.no"
+                - "ssb.no"
+            - addresses:
+                - "104.154.0.0/15"
+    asserts:
+      - hasDocuments:
+          count: 2
+
+  - it: should render ServiceEntry with host and resolution DNS
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - hosts:
+                - "pypi.org"
+              ports:
+                - name: https
+                  port: 443
+                  protocol: HTTPS
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-0-external-se
+      - equal:
+          path: spec
+          value:
+            hosts:
+              - "pypi.org"
+            resolution: DNS
+            ports:
+              - name: https
+                number: 443
+                protocol: HTTPS
+            exportTo:
+              - "."
+            location: MESH_EXTERNAL
+
+  - it: should render ServiceEntry with addresses and port specification
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - addresses:
+                - "104.154.0.0/15"
+              ports:
+                - name: https
+                  port: 443
+                  protocol: HTTPS
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-egress-0-external-se
+      - equal:
+          path: spec
+          value:
+            hosts:
+              - "dummy-host-0.ssb.no"
+            addresses:
+              - "104.154.0.0/15"
+            ports:
+              - name: https
+                number: 443
+                protocol: HTTPS
+            exportTo:
+              - "."
+            location: MESH_EXTERNAL
+
+  - it: should fail if both hosts and adresses are specified
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        egress:
+          external:
+            - hosts:
+                - "pypi.org"
+              addresses:
+                - "104.154.0.0/15"
+    asserts:
+      - failedTemplate:
+          errorMessage: Only one of 'hosts' or 'adresses' can be specified in the same rule

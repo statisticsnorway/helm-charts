@@ -1,0 +1,63 @@
+{{- if (((.Values.access).egress).external) }}
+# Will only render if addresses and/or ports are defined (need FqdnNetworkPolicy to support hosts field)
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: "{{ template "app.name" $ }}-egress-external-netpol"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "app.name" $ }}
+  policyTypes:
+    - Egress
+  egress:
+    # If egress.external is empty this policy will efficiently be like deny all
+    # Construct objects in this array as JSON, since YAML-templating was limited with optional records
+    [
+  {{- range .Values.access.egress.external }}
+    {{ if .hosts }}
+    # PS: If egress.external has rules with hosts all ips (0.0.0.0/0) must be allowed since we don't have FQDNNetworkPolicies
+    {
+      to: [
+        {
+          ipBlock: {
+            cidr: '0.0.0.0/0'
+          }
+        },
+      ]
+    },
+    {{ end }}
+    {{ if or .addresses .ports}}
+    {
+      {{ if .addresses }}
+      to: [
+        {{- range .addresses }}
+        {
+          ipBlock: {
+            cidr: {{ . }}
+          },
+        },
+        {{- end}}
+      ],
+      {{- end}}
+
+      {{ if .ports}}
+      ports: [
+        {{- range .ports }}
+        {
+          protocol: {{ .protocol | replace "HTTPS" "TCP"}},
+          port: {{ .port }},
+        },
+        {{- end}}
+      ]
+      {{- end}}
+      
+    },
+    {{- end}}
+  {{- end}}
+  ]
+
+---
+{{- end}}
