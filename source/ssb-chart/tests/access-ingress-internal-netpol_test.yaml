@@ -1,0 +1,44 @@
+suite: test access ingress internal authorization policy
+templates:
+  - access-ingress-internal-netpol.yaml
+tests:
+
+  - it: should render ingress policy with allow from specified apps
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          internal:
+            - application: app2
+              namespace: n1
+            - application: app3
+              namespace: n2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-internal-netpol
+      - equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+      - equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app: "app2"
+                  namespaceSelector:
+                    matchLabels:
+                      name: "n1"
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app: "app3"
+                  namespaceSelector:
+                    matchLabels:
+                      name: "n2"
+

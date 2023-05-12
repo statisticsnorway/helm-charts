@@ -1,0 +1,32 @@
+suite: test access ingress internal authorization policy
+templates:
+  - access-ingress-external-istio-gateway-netpol.yaml
+tests:
+
+  - it: should render ingress policy with allow from istio ingress gateway
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          external:
+            gateways:
+              - type: public
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-istio-gateway-netpol
+      - equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+      - equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      istio: ingressgateway
+                  namespaceSelector: { }
