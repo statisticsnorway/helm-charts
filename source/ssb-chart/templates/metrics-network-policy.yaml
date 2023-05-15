@@ -1,0 +1,43 @@
+{{- if and ( or (eq (toString .Values.metrics.enabled) "true") (eq (toString .Values.metrics.enabled) "True")) .Values.metrics.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ template "app.name" . }}-metrics-netpol
+  labels:
+{{ include "default.labels" . | indent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  ingress:
+    # Allow prometheus scraping directly on container port
+    - ports:
+        # Don't need to open these in authorization policy due to
+        # Istio-proxy metrics port
+        - protocol: TCP
+          port: 15090
+        # Merged prometheus metrics port
+        - protocol: TCP
+          port: 15020
+      from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+          podSelector:
+            matchLabels:
+              app: prometheus
+              component: server
+    # Allow prometheus scraping directly on container port
+    - ports:
+        # App metrics port
+        - protocol: TCP
+          port: {{ .Values.port.containerport }}
+      from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+          podSelector:
+            matchLabels:
+              app: prometheus
+              component: server
+{{- end }}
