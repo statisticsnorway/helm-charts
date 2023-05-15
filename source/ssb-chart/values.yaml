@@ -254,18 +254,18 @@ networkpolicy:
   # Policy example for an app with SA/name "app1" in namespace "n1"
 access:
   ingress:
-#    external:
-#      # Technical impl. details: In order to allow ingress from an ingress gateway
-#      # the Istio AuthorizationPolicy need to specify the principal of the gateway. E.g:
-#      #   principal: cluster.local/ns/istio-system/sa/istio-ingressgateway
-#      gateways:
-#        - type: public # Same as current "exposed: true"
-#          rules:
-#            - method: ["get"]
-#              path: ["api/"]
-#              jwt:
-#                issuer: https://sso.example.com/auth/realms/ssb
-#                audience: ekstern-client-id
+    external:
+      # Technical impl. details: In order to allow ingress from an ingress gateway
+      # the Istio AuthorizationPolicy need to specify the principal of the gateway. E.g:
+      #   principal: cluster.local/ns/istio-system/sa/istio-ingressgateway
+      gateways:
+        - type: public # Same as current "exposed: true"
+          rules:
+            - methods: ["get"]
+              paths: ["api/"]
+              jwt:
+                issuer: https://sso.example.com/auth/realms/ssb
+                audience: ekstern-client-id
 #        - type: ssb-internal # Does not exist today, but could be used for SSB internal ingress.
 #          rules:
 #            - methods: ["POST"]

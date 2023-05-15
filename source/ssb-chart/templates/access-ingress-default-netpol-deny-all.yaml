@@ -1,0 +1,14 @@
+# Default deny all ingress network traffic
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: "{{ template "app.name" $ }}-ingress-deny-all"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  policyTypes:
+    - Ingress
+  ingress: [ ]

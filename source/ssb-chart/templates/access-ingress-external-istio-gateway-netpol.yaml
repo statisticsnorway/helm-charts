@@ -1,0 +1,22 @@
+{{- if ((((.Values.access).ingress).external).gateways) }}
+{{/*  TODO: CHeck if this netpol already exist in platform or k8s-config-overlays */}}
+# Allow ingress from istio ingress gateway
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: "{{ template "app.name" $ }}-ingress-istio-gateway-netpol"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              istio: ingressgateway
+          namespaceSelector: {}
+  {{- end }}

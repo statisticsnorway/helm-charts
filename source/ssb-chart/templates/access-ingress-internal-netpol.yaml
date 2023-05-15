@@ -1,0 +1,24 @@
+{{- if (((.Values.access).ingress).internal) }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: "{{ template "app.name" $ }}-ingress-internal-netpol"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "app.name" . }}
+  policyTypes:
+    - Ingress
+  ingress:
+    {{- range .Values.access.ingress.internal }}
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ .application }}
+          namespaceSelector:
+            matchLabels:
+              name: {{ .namespace }}
+  {{- end }}
+  {{- end }}
