@@ -255,72 +255,11 @@ networkpolicy:
 access:
   ingress:
     external:
-      # Technical impl. details: In order to allow ingress from an ingress gateway
-      # the Istio AuthorizationPolicy need to specify the principal of the gateway. E.g:
-      #   principal: cluster.local/ns/istio-system/sa/istio-ingressgateway
-      gateways:
-        - type: public # Same as current "exposed: true"
-          rules:
-            - methods: ["get"]
-              paths: ["api/"]
-              jwt:
-                issuer: https://sso.example.com/auth/realms/ssb
-                audience: ekstern-client-id
-#        - type: ssb-internal # Does not exist today, but could be used for SSB internal ingress.
-#          rules:
-#            - methods: ["POST"]
-#              paths: ["api/"]
-    internal:
-      - application: app2
-        namespace: n1
-        serviceaccount: "cluster.local/ns/my-namespace/sa/some-app"
-      # Allow from app3 in same namespace (n2)
-      - application: app3
-        namespace: n2
-
-      # Allow traffic and do JWT validation from app3 from namespace n3
-      - application: app3
-        namespace: n3
-        rules:
-          - method: ["GET"]
-            path: ["api/"]
-            jwt:
-              issuer: https://keycloak.ssb.no/auth/realms/ssb
-              audience: app3 # <keycloak unik klientid i issuer>
-      # Allow from app3 from namespace n3 for specific only on specified method and path (optional)
-      - application: app3
-        namespace: n3
-        rules:
-          - methods: ["GET"]
-            paths: ["api/"]
-          - methods: ["POST"]
-            paths: ["internal/api/"]
-      - application: app3
-        namespace: n3
-        rules:
-          - methods: ["GET"]
-            paths: ["api/"]
+      gateways: []
+    internal: []
   egress:
-    external:
-      # Note: Cloudsql should still be configured via cloudsql-flag
-      - addresses:
-          - "104.154.0.0/15"
-        ports:
-          - name: rabbit-mq
-            port: 5671
-            protocol: TCP
-      - hosts:
-          - "firestore.googleapis.com"
-          - "ssb-team-forbruk-firebase-default-rtdb.europe-west1.firebasedatabase.app"
-          - "ssb-team-forbruk-firebase.firebaseapp.com"
-        ports:
-          - name: https
-            number: 443
-            # HTTPS are supported, and will be replaced with TCP in netpol (implementation detail)
-            protocol: HTTPS
-    internal:
-      - application: app3
-        namespace: n3
+    external: []
+    internal: []
 
 # -- (object) PodSecurityContext.
 # Default security context for pods. If set in both SecurityContext and PodSecurityContext,
