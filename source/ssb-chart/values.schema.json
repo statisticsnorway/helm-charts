@@ -83,7 +83,7 @@
       }
     },
     "tolerations": {
-      "type": "list",
+      "type": "array",
       "required": false,
       "description": "Tolerations allow the scheduler to schedule pods on nodes with matching taints.\n The following taints exists for jupyter nodepools: `ssb-node=jupyter`\n See examples section below for more details.",
       "items": {
@@ -128,7 +128,7 @@
       }
     },
     "extraPorts": {
-      "type": "list",
+      "type": "array",
       "required": false,
       "default": "default",
       "description": "List of extra application ports in case the application needs to expose ports in addition to the normal application port. Usually not needed, unless using things like 'grpc' in addition to 'http'. For these extra ports it usually makes sense to use the same port for 'containerport' and 'targetport' to avoid collision with the normal application port. This should only be used if your application exposes more than one port. If your application exposes more than one port, you should override 'port' to suit your needs (e.g. if you only need 'http' or 'grpc'). See examples section below for more details.",
@@ -156,7 +156,10 @@
       }
     },
     "environmentVariables": {
-      "type": "list",
+      "type": [
+        "array",
+        "null"
+      ],
       "required": false,
       "description": "Defines a set of environment variables for a main container of an app. In case of referring to volumes/secrets/configmaps remember to create those resources first. See examples section below for more details.",
       "items": {
@@ -172,17 +175,17 @@
       }
     },
     "configs": {
-      "type": "list",
+      "type": "array",
       "required": false,
       "description": "Defines a set of configs that should be deployed as a ConfigMap. Note that all configs will be created within one ConfigMap called <application_name>-config, but can be mounted to separate locations. See examples section below for more details."
     },
     "volumes": {
-      "type": "list",
+      "type": "array",
       "required": false,
       "description": "Defines volumes available for mounting in pods. See examples section below for more details."
     },
     "volumeMounts": {
-      "type": "list",
+      "type": "array",
       "required": false,
       "description": "Defines volume mounts for the application. See examples section below for more details."
     },
@@ -196,7 +199,10 @@
           "description": "Enable persistent volume"
         },
         "storageClass": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Supported storage classes: \"standard\", \"ssd\"",
           "default": "standard",
           "enum": [
@@ -229,13 +235,19 @@
           "description": "Enable persistent volume"
         },
         "owner": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Define owner user and owner group for the mounted volume. NOTE: Only use this option if setting the `PodSecurityContext.fsGroup` to the containers process UID (runAsUser) does NOT work."
         }
       }
     },
     "sidecars": {
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "Defines additional containers to run in a pod. Bundles container settings into one yaml structure for simplicity. Follows the Kubernetes container spec."
     },
     "service": {
@@ -334,14 +346,14 @@
       "type": "object",
       "properties": {
         "ingress": {
-          "type": "list",
-          "items": {
-            "type": "object",
-            "properties": {
-              "external": {
-                "type": "object",
-                "properties": {
-                  "gateways": {
+          "type": "object",
+          "properties": {
+            "external": {
+              "type": "object",
+              "properties": {
+                "gateways": {
+                  "type": "array",
+                  "items": {
                     "type": "object",
                     "properties": {
                       "type": {
@@ -361,22 +373,22 @@
                     }
                   }
                 }
-              },
-              "internal": {
-                "type": "list",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "application": {},
-                    "namespace": {},
-                    "serviceaccount": {},
-                    "rules": {
-                      "methods": {},
-                      "paths": {},
-                      "jwt": {
-                        "issuer": {},
-                        "audience": {}
-                      }
+              }
+            },
+            "internal": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "application": {},
+                  "namespace": {},
+                  "serviceaccount": {},
+                  "rules": {
+                    "methods": {},
+                    "paths": {},
+                    "jwt": {
+                      "issuer": {},
+                      "audience": {}
                     }
                   }
                 }
@@ -387,10 +399,9 @@
         "egress": {
           "type": "object",
           "properties": {
-            "type": "list",
-            "items": {
-              "type": "object",
-              "external": {
+            "external": {
+              "type": "array",
+              "items": {
                 "addresses": {},
                 "ports": {
                   "name": {},
@@ -398,15 +409,15 @@
                   "protocol": {}
                 },
                 "hosts": {}
-              },
-              "internal": {
-                "type": "list",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "application": {},
-                    "namespace": {}
-                  }
+              }
+            },
+            "internal": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "application": {},
+                  "namespace": {}
                 }
               }
             }
@@ -465,7 +476,7 @@
           "description": "If container should have a read-only root filesystem."
         },
         "runAsNonRoot": {
-          "type": "boolan",
+          "type": "boolean",
           "description": "Containers in pod must run as a non-root user (e.g. not run as UID 0)."
         },
         "runAsUser": {
@@ -481,10 +492,10 @@
           "description": "The capabilities to add/drop when running containers. Defaults to the default set of capabilities granted by the container runtime",
           "properties": {
             "drop": {
-              "type": "list"
+              "type": "array"
             },
             "add": {
-              "type": "list"
+              "type": "array"
             }
           }
         },
@@ -502,11 +513,11 @@
       }
     },
     "egress": {
-      "type": "list",
+      "type": "array",
       "description": "Defines a list of external https resources you need to be able to reach from your application. Wildcard is supported, but the Helm chart will replace '*' with 'wildcard' to avoid errors. See examples section below for more details.",
       "required": false,
       "items": {
-        "type": "list"
+        "type": "array"
       }
     },
     "cloudsql": {
@@ -554,7 +565,7 @@
       }
     },
     "backends": {
-      "type": "list",
+      "type": "array",
       "description": "The 'backends' list is used to configure a backend-for-frontend (API gateway) to enable authenticated requests to other applications/API's. The proxy will forward request headers, including the authorization header. This will allow the app to make authenticated requests to the applications listed. Note that the application receiving the request must have the calling app in it's allowed audience list. A \"backend\" application is identified by a service name and a namespace. Required fields: \"name\" and \"namespace\". See examples section below",
       "items": {
         "type": "object",
@@ -593,19 +604,19 @@
           "type": "boolean"
         },
         "excludePaths": {
-          "type": "list",
+          "type": "array",
           "items": {
             "type": "string"
           }
         },
         "includePaths": {
-          "type": "list",
+          "type": "array",
           "items": {
             "type": "string"
           }
         },
         "audience": {
-          "type": "list",
+          "type": "array",
           "items": {
             "type": "string"
           }
@@ -613,7 +624,7 @@
       }
     },
     "routes": {
-      "type": "list",
+      "type": "array",
       "description": "Support for adding additional matching rules and routes to the Istio VirtualService object. Route traffic to a path specified in `name` to the service port specified `serviceport`. Note that \"serviceport\" must be unique and different from the default service port specified in \"port.serviceport\". See examples section below for more details.",
       "items": {
         "type": "object",
@@ -631,14 +642,14 @@
       }
     },
     "subdomains": {
-      "type": "list",
+      "type": "array",
       "description": "Alternative subdomains for the application. The default subdomain is `<cluster-name>`. Note that subdomains must be added to DNS for this to work. See examples section below for more details.",
       "items": {
         "type": "string"
       }
     },
     "urlhosts": {
-      "type": "list",
+      "type": "array",
       "description": "Alternative hostnames for the application. The default hostname is `<application name>`. Note that urlhosts must be added to DNS for this to work. See examples section below for more details.",
       "items": {
         "type": "string"
