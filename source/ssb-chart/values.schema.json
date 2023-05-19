@@ -363,11 +363,22 @@
                         ]
                       },
                       "rules": {
-                        "methods": {},
-                        "paths": {},
+                        "methods": {
+                          "type": "string"
+                        },
+                        "paths": {
+                          "type": "string"
+                        },
                         "jwt": {
-                          "issuer": {},
-                          "audience": {}
+                          "type": "object",
+                          "properties": {
+                            "issuer": {
+                              "type": "string"
+                            },
+                            "audience": {
+                              "type": "string"
+                            }
+                          }
                         }
                       }
                     }
@@ -380,15 +391,32 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "application": {},
-                  "namespace": {},
-                  "serviceaccount": {},
+                  "application": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  },
+                  "serviceaccount": {
+                    "type": "string"
+                  },
                   "rules": {
-                    "methods": {},
-                    "paths": {},
+                    "methods": {
+                      "type": "string"
+                    },
+                    "paths": {
+                      "type": "string"
+                    },
                     "jwt": {
-                      "issuer": {},
-                      "audience": {}
+                      "type": "object",
+                      "properties": {
+                        "issuer": {
+                          "type": "string"
+                        },
+                        "audience": {
+                          "type": "string"
+                        }
+                      }
                     }
                   }
                 }
@@ -402,13 +430,26 @@
             "external": {
               "type": "array",
               "items": {
-                "addresses": {},
-                "ports": {
-                  "name": {},
-                  "port": {},
-                  "protocol": {}
+                "addresses": {
+                  "type": "string"
                 },
-                "hosts": {}
+                "ports": {
+                  "type": "array",
+                  "items": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "integer"
+                    },
+                    "protocol": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "hosts": {
+                  "type": "string"
+                }
               }
             },
             "internal": {
@@ -416,8 +457,12 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "application": {},
-                  "namespace": {}
+                  "application": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  }
                 }
               }
             }
