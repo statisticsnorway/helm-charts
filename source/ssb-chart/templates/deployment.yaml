@@ -87,7 +87,7 @@ spec:
           - --config=/configmaps/oauth2-proxy-client-config.yaml
           env:
           - name: OAUTH2_PROXY_UPSTREAMS
-            value: "https://127.0.0.1:{{ default .Values.port.containerport .Values.apiGateway.port }}"
+            value: "http://127.0.0.1:{{ default .Values.port.containerport .Values.apiGateway.port }}"
           - name: OAUTH2_PROXY_CLIENT_ID
             valueFrom:
               secretKeyRef:
