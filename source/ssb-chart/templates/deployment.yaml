@@ -92,17 +92,17 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ template "app.name" . }}-oauth2-proxy
-                value: client-id
+                key: client-id
           - name: OAUTH2_PROXY_CLIENT_SECRET
             valueFrom:
               secretKeyRef:
                 name: {{ template "app.name" . }}-oauth2-proxy
-                value: client-secret
+                key: client-secret
           - name: OAUTH2_PROXY_COOKIE_SECRET
             valueFrom:
               secretKeyRef:
                 name: {{ template "app.name" . }}-oauth2-proxy
-                value: cookie-secret
+                key: cookie-secret
           volumeMounts:
           - name: oauth2-proxy-client-config
             mountPath: "/configmaps/"
