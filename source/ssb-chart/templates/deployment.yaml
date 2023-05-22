@@ -84,10 +84,28 @@ spec:
           - name: http-oauth2
             containerPort: {{ .Values.oauth2Proxy.port }}
           args:
-          - --config=/secrets/oauth2-proxy-client-config.yaml
+          - --config=/configmaps/oauth2-proxy-client-config.yaml
+          env:
+          - name: OAUTH2_PROXY_UPSTREAMS
+            value: "https://127.0.0.1:{{ .Values.port.containerport }}"
+          - name: OAUTH2_PROXY_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ app.name }}-oauth2-proxy
+                value: client-id
+          - name: OAUTH2_PROXY_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ app.name }}-oauth2-proxy
+                value: client-secret
+          - name: OAUTH2_PROXY_COOKIE_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ app.name }}-oauth2-proxy
+                value: cookie-secret
           volumeMounts:
           - name: oauth2-proxy-client-config
-            mountPath: "/secrets/"
+            mountPath: "/configmaps/"
             readOnly: true
           securityContext:
 {{ include "global.ContainerSecurityContext" . | indent 12 }}
@@ -215,8 +233,8 @@ spec:
 {{- end }}
 {{- if and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend") }}
         - name: "oauth2-proxy-client-config"
-          secret:
-            secretName: "oauth2-proxy-config-{{ template "app.name" . }}"
+          configMap:
+            name: "{{ template "app.name" . }}-oauth2-proxy-client-config"
 {{- end }}
 {{- if .Values.configs }}
         - name: application-config-volume
