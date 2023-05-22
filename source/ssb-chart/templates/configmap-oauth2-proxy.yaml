@@ -44,7 +44,7 @@ data:
     redeem_url = "http://keycloak.sso.svc.cluster.local/realms/ssb/protocol/openid-connect/token"
     oidc_issuer_url = "https://sso.dev-bip-app.ssb.no/realms/ssb"
     login_url = "https://sso.dev-bip-app.ssb.no/realms/ssb/protocol/openid-connect/auth"
-    oidc_jwks_url = "http://keycloak.sso.svc.cluster.local/realms/ssb/protocol/openid-connect/certs"   oidc_issuer_url = "https://sso.dev-bip-app.ssb.no/realms/ssb"
+    oidc_jwks_url = "http://keycloak.sso.svc.cluster.local/realms/ssb/protocol/openid-connect/certs"
 
     # Tenant ID for Microsoft IdP (Azure AD)
 
