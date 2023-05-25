@@ -15,10 +15,6 @@ appType: ""
 # Required.
 cluster:
 
-# -- Set to `true´ to expose application publicly through the ingress gateway.
-# Optional.
-exposed: false
-
 # -- Which domain the app will belong to.
 # Optional.
 domain: ssb.no

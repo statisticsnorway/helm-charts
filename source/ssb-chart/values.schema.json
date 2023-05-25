@@ -27,12 +27,6 @@
       "required": true,
       "description": "Which Kubernetes cluster the app will be deployd to."
     },
-    "exposed": {
-      "type": "boolean",
-      "required": true,
-      "default": false,
-      "description": "Expose application publicly through the ingress gateway."
-    },
     "domain": {
       "type": "string",
       "required": false,

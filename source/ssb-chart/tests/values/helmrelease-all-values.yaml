@@ -8,8 +8,6 @@ image:
   tag: '1.0'
   pullPolicy: Never
 
-exposed: true
-
 replicaCount: 2
 
 nodeSelector:
@@ -81,6 +79,25 @@ volumeMounts:
   - name: config-volume
     mountPath: /etc/config
     readOnly: true
+
+access:
+  ingress:
+    external:
+      gateways:
+        - type: public
+#TODO: add full example
+#    internal:
+#      - application: app2
+#        namespace: n1
+#      egress:
+#        internal:
+#          - application: app2
+#            namespace: n1
+#        external:
+#          - hosts:
+#              - "ssb.no"
+#            addresses:
+#              - "104.154.0.0/15"
 
 persistence:
   enabled: true
