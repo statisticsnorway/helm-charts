@@ -316,35 +316,6 @@ backends:
     namespace: "backend"
 ```
 
-### istioEndUserAuth
-
-Skip authentication for selected paths:
-```yaml
-istioEndUserAuth:
-  excludePaths:
-    - "/public"   # Matches exactly "/public" path
-    - "/public/*" # Matches everything under the "/public/" path
-                  # but not the "/public/" path itself
-```
-Require authentication for selected paths use includePaths:
-```yaml
-istioEndUserAuth:
-  includePaths:
-    - "/auth"   # Matches exactly "/auth" path
-    - "/auth/*" # Matches everything under "/auth/" path
-```
-Customize apps that can authenticate to get access:
-```yaml
-istioEndUserAuth:
-  audience:
-    - custom-audience-1
-    - custom-audience-2
-```
-
-Please refer to the Istio documentation for more details:
-- https://istio.io/latest/docs/reference/config/security/authorization-policy/
-- https://istio.io/latest/docs/reference/config/security/request_authentication/
-
 ### routes
 
 ```yaml

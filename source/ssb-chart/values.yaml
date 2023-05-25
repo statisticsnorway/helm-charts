@@ -347,19 +347,6 @@ apiGateway:
   version:
   port:
 
-# -- (object) Application authentication with Istio policies.
-# Skip authentication for selected paths with "excludePaths".
-# Require authentication for selected paths with "includePaths".
-# Note that "includePaths" have precedence over "excludePaths".
-# Customize which apps that can authenticate to get access using "audience".
-# See examples section below for more details.
-# Optional.
-# @notationType -- yaml
-istioEndUserAuth:
-  # -- Enable or disable authentication.
-  # Istio end-user auth is enabled by default for "AppType: backend".
-  enabled: true
-
 # -- Support for adding additional matching rules and routes to the Istio VirtualService object.
 # Route traffic to a path specified in `name` to the service port specified `serviceport`.
 # Note that "serviceport" must be unique and different from the default service port specified

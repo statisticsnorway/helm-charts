@@ -222,12 +222,3 @@ subdomains:
 
 urlhosts:
   - myaliasname
-
-istioEndUserAuth: # Backend only
-  enabled: true
-  excludePaths:
-    - "/public"
-    - "/public/*"
-  includePaths:
-    - "/oauth"
-    - "/oauth/*"

@@ -627,37 +627,6 @@ string
 			<td>Image tag. Required.</td>
 		</tr>
 		<tr>
-			<td id="istioEndUserAuth"><a href="./values.yaml#L358">istioEndUserAuth</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 400px;">
-<pre lang="yaml">
-# -- Enable or disable authentication.
-# Istio end-user auth is enabled by default for "AppType: backend".
-enabled: true
-
-</pre>
-</div>
-			</td>
-			<td>Application authentication with Istio policies. Skip authentication for selected paths with "excludePaths". Require authentication for selected paths with "includePaths". Note that "includePaths" have precedence over "excludePaths". Customize which apps that can authenticate to get access using "audience". See examples section below for more details. Optional.</td>
-		</tr>
-		<tr>
-			<td id="istioEndUserAuth--enabled"><a href="./values.yaml#L361">istioEndUserAuth.enabled</a></td>
-			<td>
-bool
-</td>
-			<td>
-				<div style="max-width: 400px;">
-<pre lang="json">
-true
-</pre>
-</div>
-			</td>
-			<td>Enable or disable authentication. Istio end-user auth is enabled by default for "AppType: backend".</td>
-		</tr>
-		<tr>
 			<td id="metrics"><a href="./values.yaml#L206">metrics</a></td>
 			<td>
 object
@@ -1047,7 +1016,7 @@ requests:
 			<td>Defines restrictions on resources requested and consumed by a single pod. Total calculated resources = resources*replicaCount. Ref:  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/ Optional.</td>
 		</tr>
 		<tr>
-			<td id="routes"><a href="./values.yaml#L369">routes</a></td>
+			<td id="routes"><a href="./values.yaml#L356">routes</a></td>
 			<td>
 list
 </td>
@@ -1125,7 +1094,7 @@ null
 			<td>Defines additional containers to run in a pod. Bundles container settings into one yaml structure for simplicity. Follows the Kubernetes container spec. Optional.</td>
 		</tr>
 		<tr>
-			<td id="subdomains"><a href="./values.yaml#L375">subdomains</a></td>
+			<td id="subdomains"><a href="./values.yaml#L362">subdomains</a></td>
 			<td>
 list
 </td>
@@ -1167,7 +1136,7 @@ string
 			<td>Kubernetes deployment type. Optional.</td>
 		</tr>
 		<tr>
-			<td id="urlhosts"><a href="./values.yaml#L381">urlhosts</a></td>
+			<td id="urlhosts"><a href="./values.yaml#L368">urlhosts</a></td>
 			<td>
 list
 </td>
@@ -1450,35 +1419,6 @@ backends:
   - name: "backend-service"
     namespace: "backend"
 ```
-
-### istioEndUserAuth
-
-Skip authentication for selected paths:
-```yaml
-istioEndUserAuth:
-  excludePaths:
-    - "/public"   # Matches exactly "/public" path
-    - "/public/*" # Matches everything under the "/public/" path
-                  # but not the "/public/" path itself
-```
-Require authentication for selected paths use includePaths:
-```yaml
-istioEndUserAuth:
-  includePaths:
-    - "/auth"   # Matches exactly "/auth" path
-    - "/auth/*" # Matches everything under "/auth/" path
-```
-Customize apps that can authenticate to get access:
-```yaml
-istioEndUserAuth:
-  audience:
-    - custom-audience-1
-    - custom-audience-2
-```
-
-Please refer to the Istio documentation for more details:
-- https://istio.io/latest/docs/reference/config/security/authorization-policy/
-- https://istio.io/latest/docs/reference/config/security/request_authentication/
 
 ### routes
 
