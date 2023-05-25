@@ -1,116 +1,3 @@
-should render AuthorizationPolicy:
-  1: |
-    apiVersion: security.istio.io/v1beta1
-    kind: AuthorizationPolicy
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: unittest-app-allow-metrics-auth-policy
-    spec:
-      action: ALLOW
-      rules:
-      - to:
-        - operation:
-            paths:
-            - /metrics/path
-      selector:
-        matchLabels:
-          app: unittest-app
-  2: |
-    apiVersion: security.istio.io/v1beta1
-    kind: AuthorizationPolicy
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: unittest-app-allow-health-auth-policy
-    spec:
-      action: ALLOW
-      rules:
-      - to:
-        - operation:
-            paths:
-            - /healthz/ready
-      selector:
-        matchLabels:
-          app: unittest-app
-  3: |
-    apiVersion: security.istio.io/v1beta1
-    kind: AuthorizationPolicy
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: unittest-app-allow-auth-policy
-    spec:
-      action: ALLOW
-      rules:
-      - to:
-        - operation:
-            paths:
-            - /public
-            - /public/*
-      selector:
-        matchLabels:
-          app: unittest-app
-  4: |
-    apiVersion: security.istio.io/v1beta1
-    kind: AuthorizationPolicy
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: unittest-app-deny-auth-policy
-    spec:
-      action: DENY
-      rules:
-      - from:
-        - source:
-            notRequestPrincipals:
-            - '*'
-        to:
-        - operation:
-            paths:
-            - /oauth
-            - /oauth/*
-      selector:
-        matchLabels:
-          app: unittest-app
-should render AuthorizationPolicy (require JWT):
-  1: |
-    apiVersion: security.istio.io/v1beta1
-    kind: AuthorizationPolicy
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: unittest-app-default-auth-policy
-    spec:
-      action: ALLOW
-      rules:
-      - from:
-        - source:
-            requestPrincipals:
-            - '*'
-      selector:
-        matchLabels:
-          app: unittest-app
 should render ConfigMap:
   1: |
     apiVersion: v1
@@ -367,39 +254,6 @@ should render Deployment:
           - configMap:
               name: unittest-app-nginx-vhost-config
             name: nginx-vhost-config-volume
-should render NetworkPolicy:
-  1: |
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: np-unittest-app
-    spec:
-      egress:
-      - ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
-        to:
-        - namespaceSelector: {}
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
-      ingress:
-      - from:
-        - namespaceSelector: {}
-        ports:
-        - port: 8080
-          protocol: TCP
-      podSelector:
-        matchLabels:
-          app: unittest-app
 should render PVC:
   1: |
     apiVersion: v1
@@ -412,27 +266,6 @@ should render PVC:
       resources:
         requests:
           storage: 1Gi
-should render RequestAuthentication:
-  1: |
-    apiVersion: security.istio.io/v1beta1
-    kind: RequestAuthentication
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: unittest-app-request-auth
-    spec:
-      jwtRules:
-      - audiences:
-        - unittest-app
-        forwardOriginalToken: true
-        issuer: https://keycloak.test-cluster.ssb.no/auth/realms/ssb
-      selector:
-        matchLabels:
-          app: unittest-app
 should render Service:
   1: |
     apiVersion: v1
@@ -493,29 +326,6 @@ should render ServiceEntry for cloudsql:
       - name: tcp
         number: 3307
         protocol: tcp
-should render ServiceEntry for https:
-  1: |
-    apiVersion: networking.istio.io/v1alpha3
-    kind: ServiceEntry
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: unittest-app-pypi.org
-    spec:
-      exportTo:
-      - .
-      hosts:
-      - pypi.org
-      location: MESH_EXTERNAL
-      ports:
-      - name: https
-        number: 443
-        protocol: HTTPS
-      resolution: DNS
 should render VirtualService:
   1: |
     apiVersion: networking.istio.io/v1alpha3

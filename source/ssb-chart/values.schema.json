@@ -27,12 +27,6 @@
       "required": true,
       "description": "Which Kubernetes cluster the app will be deployd to."
     },
-    "exposed": {
-      "type": "boolean",
-      "required": true,
-      "default": false,
-      "description": "Expose application publicly through the ingress gateway."
-    },
     "domain": {
       "type": "string",
       "required": false,
@@ -326,19 +320,6 @@
       "properties": {
         "create": {
           "type": "boolean"
-        }
-      }
-    },
-    "networkpolicy": {
-      "type": "object",
-      "description": "Generates a simple \"ingress\" network policy (i.e. restrict incoming traffic to the application), that only allows traffic to 'port.containerport' (default) or 'port.targetport' (if specified), as well as any 'extraPorts'. This is a simple \"ingress\" network policy, \"egress\" traffic is not restricted here. See examples section below for more details.",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "overrideDefaultPolicy": {
-          "type": "object",
-          "description": "Optionally create your own NetworkPolicy for the current application."
         }
       }
     },
@@ -638,33 +619,6 @@
         },
         "port": {
           "type": "integer"
-        }
-      }
-    },
-    "istioEndUserAuth": {
-      "type": "object",
-      "description": "Application authentication with Istio policies. Skip authentication for selected paths with \"excludePaths\". Require authentication for selected paths with \"includePaths\". Note that \"includePaths\" have precedence over \"excludePaths\". Customize which apps that can authenticate to get access using \"audience\". See examples section below for more details.",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "excludePaths": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "includePaths": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "audience": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },

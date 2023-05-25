@@ -6,12 +6,11 @@ billingProject: "ssb-unittest"
 image:
   repository: ssb.no/unittest-app
   tag: '1.0'
-istioEndUserAuth:
+port:
+  name: "http-container-port"
+  containerport: 8080
+metrics:
   enabled: true
-  excludePaths:
-  - "/"
-  - "/*"
-  includePaths:
-  - "/auth"
-  - "/auth/"
-  - "/auth/*"
+  path: "/my-metrics"
+  port: 8081
+  scheme: "https"

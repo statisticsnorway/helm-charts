@@ -1,5 +1,13 @@
-# If exposed is set to true, "true" or "True"
-{{- if and ( or (eq (toString .Values.exposed) "true") (eq (toString .Values.exposed) "True")) .Values.exposed }}
+{{- if ((((.Values.access).ingress).external).gateways) }}
+{{/*TODO: Make pretty...*/}}
+{{ $shouldRender := false }}
+{{- range .Values.access.ingress.external.gateways }}
+{{- if (eq (toString .type) "public") }}
+{{- $shouldRender = true}}
+{{- end }}
+{{- end }}
+
+{{- if $shouldRender }}
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
@@ -71,4 +79,5 @@ spec:
         host: {{ template "app.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
         port:
           number: {{ .Values.port.serviceport }}
+{{- end }}
 {{- end }}
