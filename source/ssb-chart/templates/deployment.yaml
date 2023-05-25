@@ -127,6 +127,8 @@ spec:
           {{- end }}
           {{- if or (.Values.configs) (.Values.volumeMounts) (and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled) }}
           volumeMounts:
+          - name: tmp-volume
+            mountPath: /tmp
           {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | trim | indent 10 }}
           {{- end }}
@@ -213,6 +215,8 @@ spec:
 {{- if .Values.volumes }}
 {{ toYaml .Values.volumes | trim | indent 8 }}
 {{- end }}
+        - name: tmp-volume
+          emptyDir: { }
 {{- if and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend") }}
         - name: "oauth2-proxy-client-config"
           secret:
