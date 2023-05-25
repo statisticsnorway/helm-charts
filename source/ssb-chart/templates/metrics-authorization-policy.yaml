@@ -7,7 +7,7 @@
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: "{{ template "app.name" . }}-allow-prometheus-metrics-auth-policy"
+  name: "{{ template "app.name" . }}-allow-prometheus-metrics"
   labels:
 {{ include "default.labels" . | indent 4 }}
 spec:
@@ -24,6 +24,10 @@ spec:
       # To application metrics endpoint
       to:
         - operation:
+            methods:
+              - "GET"
+            ports:
+              - {{ .Values.metrics.port }}
             paths:
               - "{{ .Values.metrics.path }}"
 {{- end }}

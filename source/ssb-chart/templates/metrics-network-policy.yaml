@@ -2,7 +2,7 @@
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: {{ template "app.name" . }}-metrics-netpol
+  name: {{ template "app.name" . }}-metrics
   labels:
 {{ include "default.labels" . | indent 4 }}
 spec:
@@ -31,7 +31,7 @@ spec:
     - ports:
         # App metrics port
         - protocol: TCP
-          port: {{ .Values.port.containerport }}
+          port: {{ .Values.metrics.port }}
       from:
         - namespaceSelector:
             matchLabels:

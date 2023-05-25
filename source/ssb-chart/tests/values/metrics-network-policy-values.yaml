@@ -1,0 +1,16 @@
+name: "unittest-app"
+namespace: "unittest"
+appType: "backend"
+cluster: "test-cluster"
+billingProject: "ssb-unittest"
+image:
+  repository: ssb.no/unittest-app
+  tag: '1.0'
+port:
+  name: "http-container-port"
+  containerport: 8080
+metrics:
+  enabled: true
+  path: "/my-metrics"
+  port: 8081
+  scheme: "https"
