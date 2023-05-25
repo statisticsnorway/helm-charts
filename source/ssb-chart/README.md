@@ -15,7 +15,7 @@ Generic chart for SSB applications
 	</thead>
 	<tbody>
 		<tr>
-			<td id="ContainerSecurityContext"><a href="./values.yaml#L264">ContainerSecurityContext</a></td>
+			<td id="ContainerSecurityContext"><a href="./values.yaml#L278">ContainerSecurityContext</a></td>
 			<td>
 object
 </td>
@@ -53,7 +53,7 @@ seccompProfile:
 			<td>Container SecurityContext for main application. Default restricted security context for the application. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Optional. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#securitycontext-v1-core</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--allowPrivilegeEscalation"><a href="./values.yaml#L266">ContainerSecurityContext.allowPrivilegeEscalation</a></td>
+			<td id="ContainerSecurityContext--allowPrivilegeEscalation"><a href="./values.yaml#L280">ContainerSecurityContext.allowPrivilegeEscalation</a></td>
 			<td>
 bool
 </td>
@@ -67,7 +67,7 @@ false
 			<td>If processes should be allowed to gain more privileges than its parent process.</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--capabilities"><a href="./values.yaml#L281">ContainerSecurityContext.capabilities</a></td>
+			<td id="ContainerSecurityContext--capabilities"><a href="./values.yaml#L295">ContainerSecurityContext.capabilities</a></td>
 			<td>
 object
 </td>
@@ -83,7 +83,7 @@ add: []
 			<td>The capabilities to add/drop when running containers. Defaults to the default set of capabilities granted by the container runtime</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--privileged"><a href="./values.yaml#L268">ContainerSecurityContext.privileged</a></td>
+			<td id="ContainerSecurityContext--privileged"><a href="./values.yaml#L282">ContainerSecurityContext.privileged</a></td>
 			<td>
 bool
 </td>
@@ -97,7 +97,7 @@ false
 			<td>If processes in container can run privileged. This is equivalent to running as root on the host.</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--readOnlyRootFilesystem"><a href="./values.yaml#L270">ContainerSecurityContext.readOnlyRootFilesystem</a></td>
+			<td id="ContainerSecurityContext--readOnlyRootFilesystem"><a href="./values.yaml#L284">ContainerSecurityContext.readOnlyRootFilesystem</a></td>
 			<td>
 bool
 </td>
@@ -111,7 +111,7 @@ true
 			<td>If container should have a read-only root filesystem.</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--runAsGroup"><a href="./values.yaml#L277">ContainerSecurityContext.runAsGroup</a></td>
+			<td id="ContainerSecurityContext--runAsGroup"><a href="./values.yaml#L291">ContainerSecurityContext.runAsGroup</a></td>
 			<td>
 int
 </td>
@@ -125,7 +125,7 @@ int
 			<td>The GID to run the entrypoint of the container process. Uses runtime default if unset.</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--runAsNonRoot"><a href="./values.yaml#L272">ContainerSecurityContext.runAsNonRoot</a></td>
+			<td id="ContainerSecurityContext--runAsNonRoot"><a href="./values.yaml#L286">ContainerSecurityContext.runAsNonRoot</a></td>
 			<td>
 bool
 </td>
@@ -139,7 +139,7 @@ true
 			<td>Container must run as a non-root user (e.g. not run as UID 0).</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--runAsUser"><a href="./values.yaml#L275">ContainerSecurityContext.runAsUser</a></td>
+			<td id="ContainerSecurityContext--runAsUser"><a href="./values.yaml#L289">ContainerSecurityContext.runAsUser</a></td>
 			<td>
 int
 </td>
@@ -153,7 +153,7 @@ int
 			<td>The UID to run the entrypoint of the container process. Defaults to the user specified in the image metadata if unspecified.</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--seccompProfile"><a href="./values.yaml#L286">ContainerSecurityContext.seccompProfile</a></td>
+			<td id="ContainerSecurityContext--seccompProfile"><a href="./values.yaml#L300">ContainerSecurityContext.seccompProfile</a></td>
 			<td>
 object
 </td>
@@ -169,7 +169,7 @@ type: RuntimeDefault
 			<td>Limit the range of system calls allowed.</td>
 		</tr>
 		<tr>
-			<td id="ContainerSecurityContext--seccompProfile--type"><a href="./values.yaml#L288">ContainerSecurityContext.seccompProfile.type</a></td>
+			<td id="ContainerSecurityContext--seccompProfile--type"><a href="./values.yaml#L302">ContainerSecurityContext.seccompProfile.type</a></td>
 			<td>
 string
 </td>
@@ -183,7 +183,7 @@ string
 			<td>RuntimeDefault: As defined by the container runtime.</td>
 		</tr>
 		<tr>
-			<td id="PodSecurityContext"><a href="./values.yaml#L241">PodSecurityContext</a></td>
+			<td id="PodSecurityContext"><a href="./values.yaml#L255">PodSecurityContext</a></td>
 			<td>
 object
 </td>
@@ -212,7 +212,7 @@ seccompProfile:
 			<td>PodSecurityContext. Default security context for pods. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podsecuritycontext-v1-core. Optional.</td>
 		</tr>
 		<tr>
-			<td id="PodSecurityContext--fsGroup"><a href="./values.yaml#L251">PodSecurityContext.fsGroup</a></td>
+			<td id="PodSecurityContext--fsGroup"><a href="./values.yaml#L265">PodSecurityContext.fsGroup</a></td>
 			<td>
 string
 </td>
@@ -226,7 +226,7 @@ null
 			<td>All processes in the pod will be part of this supplementary group. Supported volume mounts will be owned by this group.</td>
 		</tr>
 		<tr>
-			<td id="PodSecurityContext--runAsGroup"><a href="./values.yaml#L248">PodSecurityContext.runAsGroup</a></td>
+			<td id="PodSecurityContext--runAsGroup"><a href="./values.yaml#L262">PodSecurityContext.runAsGroup</a></td>
 			<td>
 string
 </td>
@@ -240,7 +240,7 @@ null
 			<td>The GID to run the entrypoint of the container process. Uses runtime default if unset.</td>
 		</tr>
 		<tr>
-			<td id="PodSecurityContext--runAsNonRoot"><a href="./values.yaml#L243">PodSecurityContext.runAsNonRoot</a></td>
+			<td id="PodSecurityContext--runAsNonRoot"><a href="./values.yaml#L257">PodSecurityContext.runAsNonRoot</a></td>
 			<td>
 string
 </td>
@@ -254,7 +254,7 @@ null
 			<td>Containers in pod must run as a non-root user (e.g. not run as UID 0).</td>
 		</tr>
 		<tr>
-			<td id="PodSecurityContext--runAsUser"><a href="./values.yaml#L246">PodSecurityContext.runAsUser</a></td>
+			<td id="PodSecurityContext--runAsUser"><a href="./values.yaml#L260">PodSecurityContext.runAsUser</a></td>
 			<td>
 string
 </td>
@@ -268,7 +268,7 @@ null
 			<td>The UID to run the entrypoint of the container process. Defaults to the user specified in the image metadata if unspecified.</td>
 		</tr>
 		<tr>
-			<td id="PodSecurityContext--seccompProfile"><a href="./values.yaml#L254">PodSecurityContext.seccompProfile</a></td>
+			<td id="PodSecurityContext--seccompProfile"><a href="./values.yaml#L268">PodSecurityContext.seccompProfile</a></td>
 			<td>
 object
 </td>
@@ -284,7 +284,7 @@ type: RuntimeDefault
 			<td>Limit the range of system calls allowed.</td>
 		</tr>
 		<tr>
-			<td id="PodSecurityContext--seccompProfile--type"><a href="./values.yaml#L256">PodSecurityContext.seccompProfile.type</a></td>
+			<td id="PodSecurityContext--seccompProfile--type"><a href="./values.yaml#L270">PodSecurityContext.seccompProfile.type</a></td>
 			<td>
 string
 </td>
@@ -298,7 +298,63 @@ string
 			<td>RuntimeDefault: As defined by the container runtime.</td>
 		</tr>
 		<tr>
-			<td id="affinity"><a href="./values.yaml#L66">affinity</a></td>
+			<td id="access--egress--external"><a href="./values.yaml#L246">access.egress.external</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="access--egress--internal"><a href="./values.yaml#L247">access.egress.internal</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="access--ingress--external--gateways"><a href="./values.yaml#L243">access.ingress.external.gateways</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="access--ingress--internal"><a href="./values.yaml#L244">access.ingress.internal</a></td>
+			<td>
+list
+</td>
+			<td>
+				<div style="max-width: 400px;">
+<pre lang="json">
+[]
+</pre>
+</div>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td id="affinity"><a href="./values.yaml#L62">affinity</a></td>
 			<td>
 object
 </td>
@@ -312,7 +368,7 @@ object
 			<td>Node affinity is a set of rules used by the scheduler to determine where a pod can be placed. The rules are defined using custom labels on nodes and label selectors specified in pods. Node affinity allows a pod to specify an affinity (or anti-affinity) towards a group of nodes it can be placed on. See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="apiGateway"><a href="./values.yaml#L338">apiGateway</a></td>
+			<td id="apiGateway"><a href="./values.yaml#L345">apiGateway</a></td>
 			<td>
 object
 </td>
@@ -343,7 +399,7 @@ string
 			<td>Application type: `"backend"` or `"frontend"`. Notet that this setting will impact how authentication is configured. Required.</td>
 		</tr>
 		<tr>
-			<td id="backends"><a href="./values.yaml#L331">backends</a></td>
+			<td id="backends"><a href="./values.yaml#L338">backends</a></td>
 			<td>
 list
 </td>
@@ -357,7 +413,7 @@ list
 			<td>The 'backends' list is used to configure a backend-for-frontend (API gateway) to enable authenticated requests to other applications/API's. The proxy will forward request headers, including the authorization header. This will allow the app to make authenticated requests to the applications listed. Note that the application receiving the request must have the calling app in it's allowed audience list. A "backend" application is identified by a service name and a namespace. Required fields: "name" and "namespace". See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="billingProject"><a href="./values.yaml#L28">billingProject</a></td>
+			<td id="billingProject"><a href="./values.yaml#L24">billingProject</a></td>
 			<td>
 string
 </td>
@@ -371,7 +427,7 @@ string
 			<td>What billing project to use as label for the objects. Required.</td>
 		</tr>
 		<tr>
-			<td id="cloudsql--enabled"><a href="./values.yaml#L304">cloudsql.enabled</a></td>
+			<td id="cloudsql--enabled"><a href="./values.yaml#L311">cloudsql.enabled</a></td>
 			<td>
 bool
 </td>
@@ -385,7 +441,7 @@ false
 			<td></td>
 		</tr>
 		<tr>
-			<td id="cloudsql--instance"><a href="./values.yaml#L307">cloudsql.instance</a></td>
+			<td id="cloudsql--instance"><a href="./values.yaml#L314">cloudsql.instance</a></td>
 			<td>
 string
 </td>
@@ -399,7 +455,7 @@ null
 			<td>Required.</td>
 		</tr>
 		<tr>
-			<td id="cloudsql--ip"><a href="./values.yaml#L309">cloudsql.ip</a></td>
+			<td id="cloudsql--ip"><a href="./values.yaml#L316">cloudsql.ip</a></td>
 			<td>
 string
 </td>
@@ -413,7 +469,7 @@ null
 			<td>Required.</td>
 		</tr>
 		<tr>
-			<td id="cloudsql--useSqlProxy"><a href="./values.yaml#L311">cloudsql.useSqlProxy</a></td>
+			<td id="cloudsql--useSqlProxy"><a href="./values.yaml#L318">cloudsql.useSqlProxy</a></td>
 			<td>
 bool
 </td>
@@ -427,7 +483,7 @@ true
 			<td>Optional. Set to false if using Google connectors directly to omit adding a cloudsql-proxy.</td>
 		</tr>
 		<tr>
-			<td id="cloudsql--version"><a href="./values.yaml#L305">cloudsql.version</a></td>
+			<td id="cloudsql--version"><a href="./values.yaml#L312">cloudsql.version</a></td>
 			<td>
 string
 </td>
@@ -455,7 +511,7 @@ null
 			<td>Which Kubernetes cluster the app will be deployd to. Required.</td>
 		</tr>
 		<tr>
-			<td id="configs"><a href="./values.yaml#L111">configs</a></td>
+			<td id="configs"><a href="./values.yaml#L107">configs</a></td>
 			<td>
 list
 </td>
@@ -469,7 +525,7 @@ list
 			<td>Defines a set of configs that should be deployed as a ConfigMap. Note that all configs will be created within one ConfigMap called <application_name>-config, but can be mounted to separate locations. See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="domain"><a href="./values.yaml#L24">domain</a></td>
+			<td id="domain"><a href="./values.yaml#L20">domain</a></td>
 			<td>
 string
 </td>
@@ -483,21 +539,7 @@ string
 			<td>Which domain the app will belong to. Optional.</td>
 		</tr>
 		<tr>
-			<td id="egress"><a href="./values.yaml#L295">egress</a></td>
-			<td>
-list
-</td>
-			<td>
-				<div style="max-width: 400px;">
-<pre lang="json">
-[]
-</pre>
-</div>
-			</td>
-			<td>Defines a list of external https resources you need to be able to reach from your application. Wildcard is supported, but the Helm chart will replace '*' with 'wildcard' to avoid errors. See examples section below for more details. Optional.</td>
-		</tr>
-		<tr>
-			<td id="environmentVariables"><a href="./values.yaml#L104">environmentVariables</a></td>
+			<td id="environmentVariables"><a href="./values.yaml#L100">environmentVariables</a></td>
 			<td>
 string
 </td>
@@ -511,21 +553,7 @@ null
 			<td>Defines a set of environment variables for a main container of an app. In case of referring to volumes/secrets/configmaps remember to create those resources first See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="exposed"><a href="./values.yaml#L20">exposed</a></td>
-			<td>
-bool
-</td>
-			<td>
-				<div style="max-width: 400px;">
-<pre lang="json">
-false
-</pre>
-</div>
-			</td>
-			<td>Set to `true´ to expose application publicly through the ingress gateway. Optional.</td>
-		</tr>
-		<tr>
-			<td id="extraPorts"><a href="./values.yaml#L98">extraPorts</a></td>
+			<td id="extraPorts"><a href="./values.yaml#L94">extraPorts</a></td>
 			<td>
 list
 </td>
@@ -539,7 +567,7 @@ list
 			<td>List of extra application ports in case the application needs to expose ports in addition to the normal application port. Usually not needed, unless using things like 'grpc' in addition to 'http'. For these extra ports it usually makes sense to use the same port for 'containerport' and 'targetport' to avoid collision with the normal application port. This should only be used if your application exposes more than one port. If your application exposes more than one port, you should override 'port' to suit your needs (e.g. if you only need 'http' or 'grpc'). See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="image"><a href="./values.yaml#L34">image</a></td>
+			<td id="image"><a href="./values.yaml#L30">image</a></td>
 			<td>
 object
 </td>
@@ -557,7 +585,7 @@ object
 			<td>Application image. Required.</td>
 		</tr>
 		<tr>
-			<td id="image--pullPolicy"><a href="./values.yaml#L42">image.pullPolicy</a></td>
+			<td id="image--pullPolicy"><a href="./values.yaml#L38">image.pullPolicy</a></td>
 			<td>
 string
 </td>
@@ -571,7 +599,7 @@ string
 			<td>Image pullPolicy. Optional.</td>
 		</tr>
 		<tr>
-			<td id="image--repository"><a href="./values.yaml#L37">image.repository</a></td>
+			<td id="image--repository"><a href="./values.yaml#L33">image.repository</a></td>
 			<td>
 string
 </td>
@@ -585,7 +613,7 @@ string
 			<td>Image repository. Required.</td>
 		</tr>
 		<tr>
-			<td id="image--tag"><a href="./values.yaml#L40">image.tag</a></td>
+			<td id="image--tag"><a href="./values.yaml#L36">image.tag</a></td>
 			<td>
 string
 </td>
@@ -599,7 +627,7 @@ string
 			<td>Image tag. Required.</td>
 		</tr>
 		<tr>
-			<td id="istioEndUserAuth"><a href="./values.yaml#L351">istioEndUserAuth</a></td>
+			<td id="istioEndUserAuth"><a href="./values.yaml#L358">istioEndUserAuth</a></td>
 			<td>
 object
 </td>
@@ -616,7 +644,7 @@ enabled: true
 			<td>Application authentication with Istio policies. Skip authentication for selected paths with "excludePaths". Require authentication for selected paths with "includePaths". Note that "includePaths" have precedence over "excludePaths". Customize which apps that can authenticate to get access using "audience". See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="istioEndUserAuth--enabled"><a href="./values.yaml#L354">istioEndUserAuth.enabled</a></td>
+			<td id="istioEndUserAuth--enabled"><a href="./values.yaml#L361">istioEndUserAuth.enabled</a></td>
 			<td>
 bool
 </td>
@@ -630,7 +658,7 @@ true
 			<td>Enable or disable authentication. Istio end-user auth is enabled by default for "AppType: backend".</td>
 		</tr>
 		<tr>
-			<td id="metrics"><a href="./values.yaml#L210">metrics</a></td>
+			<td id="metrics"><a href="./values.yaml#L206">metrics</a></td>
 			<td>
 object
 </td>
@@ -662,38 +690,7 @@ string
 			<td>Name of the application (also used for naming other Kubernetes resources). Required.</td>
 		</tr>
 		<tr>
-			<td id="networkpolicy"><a href="./values.yaml#L230">networkpolicy</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 400px;">
-<pre lang="yaml">
-enabled: true
-# -- Optionally create your own NetworkPolicy for the current application.
-overrideDefaultPolicy: {}
-
-</pre>
-</div>
-			</td>
-			<td>Generates a simple "ingress" network policy (i.e. restrict incoming traffic to the application), that only allows traffic to 'port.containerport' (default) or 'port.targetport' (if specified), as well as any 'extraPorts'. This is a simple "ingress" network policy, "egress" traffic is not restricted here. See examples section below for more details. Optional.</td>
-		</tr>
-		<tr>
-			<td id="networkpolicy--overrideDefaultPolicy"><a href="./values.yaml#L233">networkpolicy.overrideDefaultPolicy</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 400px;">
-<pre lang="json">
-{}
-</pre>
-</div>
-			</td>
-			<td>Optionally create your own NetworkPolicy for the current application.</td>
-		</tr>
-		<tr>
-			<td id="nodeSelector"><a href="./values.yaml#L52">nodeSelector</a></td>
+			<td id="nodeSelector"><a href="./values.yaml#L48">nodeSelector</a></td>
 			<td>
 object
 </td>
@@ -707,7 +704,7 @@ object
 			<td>Node selector for selecting where the to schedule the workload. Standard nodes are labeled "ssb-node: standard". Jupyter nodes are labeled "ssb-node: jupyter". See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="oauth2Proxy--enabled"><a href="./values.yaml#L319">oauth2Proxy.enabled</a></td>
+			<td id="oauth2Proxy--enabled"><a href="./values.yaml#L326">oauth2Proxy.enabled</a></td>
 			<td>
 string
 </td>
@@ -721,7 +718,7 @@ null
 			<td></td>
 		</tr>
 		<tr>
-			<td id="oauth2Proxy--image"><a href="./values.yaml#L320">oauth2Proxy.image</a></td>
+			<td id="oauth2Proxy--image"><a href="./values.yaml#L327">oauth2Proxy.image</a></td>
 			<td>
 string
 </td>
@@ -735,7 +732,7 @@ null
 			<td></td>
 		</tr>
 		<tr>
-			<td id="oauth2Proxy--port"><a href="./values.yaml#L322">oauth2Proxy.port</a></td>
+			<td id="oauth2Proxy--port"><a href="./values.yaml#L329">oauth2Proxy.port</a></td>
 			<td>
 string
 </td>
@@ -749,7 +746,7 @@ null
 			<td></td>
 		</tr>
 		<tr>
-			<td id="oauth2Proxy--version"><a href="./values.yaml#L321">oauth2Proxy.version</a></td>
+			<td id="oauth2Proxy--version"><a href="./values.yaml#L328">oauth2Proxy.version</a></td>
 			<td>
 string
 </td>
@@ -763,7 +760,7 @@ null
 			<td></td>
 		</tr>
 		<tr>
-			<td id="persistence"><a href="./values.yaml#L128">persistence</a></td>
+			<td id="persistence"><a href="./values.yaml#L124">persistence</a></td>
 			<td>
 object
 </td>
@@ -801,7 +798,7 @@ owner:
 			<td>Persistence defines whether app requires persistent volume. Once `enabled: true` is defined, corresponding sections under `volumes:` and `volumeMounts` will be automatically added to the deployment template. Only one persistent volume is supported at the moment. Optional.</td>
 		</tr>
 		<tr>
-			<td id="persistence--accessMode"><a href="./values.yaml#L141">persistence.accessMode</a></td>
+			<td id="persistence--accessMode"><a href="./values.yaml#L137">persistence.accessMode</a></td>
 			<td>
 string
 </td>
@@ -815,7 +812,7 @@ string
 			<td>Set access mode: "ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod". Required if "createPvc: true".</td>
 		</tr>
 		<tr>
-			<td id="persistence--createPvc"><a href="./values.yaml#L138">persistence.createPvc</a></td>
+			<td id="persistence--createPvc"><a href="./values.yaml#L134">persistence.createPvc</a></td>
 			<td>
 bool
 </td>
@@ -829,7 +826,7 @@ true
 			<td>Create PVC. Set to "false" to use existing manifest file. Optional.</td>
 		</tr>
 		<tr>
-			<td id="persistence--enabled"><a href="./values.yaml#L131">persistence.enabled</a></td>
+			<td id="persistence--enabled"><a href="./values.yaml#L127">persistence.enabled</a></td>
 			<td>
 bool
 </td>
@@ -843,7 +840,7 @@ false
 			<td>Enable persistent volume. Optional.</td>
 		</tr>
 		<tr>
-			<td id="persistence--folder"><a href="./values.yaml#L147">persistence.folder</a></td>
+			<td id="persistence--folder"><a href="./values.yaml#L143">persistence.folder</a></td>
 			<td>
 string
 </td>
@@ -857,7 +854,7 @@ string
 			<td>Mount path. Required.</td>
 		</tr>
 		<tr>
-			<td id="persistence--owner"><a href="./values.yaml#L152">persistence.owner</a></td>
+			<td id="persistence--owner"><a href="./values.yaml#L148">persistence.owner</a></td>
 			<td>
 string
 </td>
@@ -871,7 +868,7 @@ null
 			<td>Define owner user and owner group for the mounted volume. NOTE: Only use this option if setting the `PodSecurityContext.fsGroup` to the containers process UID (runAsUser) does NOT work. Optional.</td>
 		</tr>
 		<tr>
-			<td id="persistence--size"><a href="./values.yaml#L144">persistence.size</a></td>
+			<td id="persistence--size"><a href="./values.yaml#L140">persistence.size</a></td>
 			<td>
 string
 </td>
@@ -885,7 +882,7 @@ string
 			<td>PVC disk size. Required if "createPvc: true".</td>
 		</tr>
 		<tr>
-			<td id="persistence--storageClass"><a href="./values.yaml#L135">persistence.storageClass</a></td>
+			<td id="persistence--storageClass"><a href="./values.yaml#L131">persistence.storageClass</a></td>
 			<td>
 string
 </td>
@@ -899,7 +896,7 @@ string
 			<td>Supported storage classes: "standard", "ssd" Optional.</td>
 		</tr>
 		<tr>
-			<td id="port"><a href="./values.yaml#L72">port</a></td>
+			<td id="port"><a href="./values.yaml#L68">port</a></td>
 			<td>
 object
 </td>
@@ -927,7 +924,7 @@ targetport:
 			<td>Main application port. Use 'extraPorts' for additional ports. This was separated to simplify the automation for developer usage. Optional.</td>
 		</tr>
 		<tr>
-			<td id="port--containerport"><a href="./values.yaml#L79">port.containerport</a></td>
+			<td id="port--containerport"><a href="./values.yaml#L75">port.containerport</a></td>
 			<td>
 int
 </td>
@@ -941,7 +938,7 @@ int
 			<td>Port exposed by container. Optional.</td>
 		</tr>
 		<tr>
-			<td id="port--name"><a href="./values.yaml#L76">port.name</a></td>
+			<td id="port--name"><a href="./values.yaml#L72">port.name</a></td>
 			<td>
 string
 </td>
@@ -955,7 +952,7 @@ string
 			<td>name must start with protocol name (i.e.http or tcp). The name field is automatically truncated to 15 symbols. Optional.</td>
 		</tr>
 		<tr>
-			<td id="port--serviceport"><a href="./values.yaml#L82">port.serviceport</a></td>
+			<td id="port--serviceport"><a href="./values.yaml#L78">port.serviceport</a></td>
 			<td>
 int
 </td>
@@ -969,7 +966,7 @@ int
 			<td>Port exposed by service object. Optional.</td>
 		</tr>
 		<tr>
-			<td id="port--targetport"><a href="./values.yaml#L86">port.targetport</a></td>
+			<td id="port--targetport"><a href="./values.yaml#L82">port.targetport</a></td>
 			<td>
 string
 </td>
@@ -983,7 +980,7 @@ null
 			<td>The target port on the POD to redirect traffic from the Service. This will usually be the applications container port. Optional.</td>
 		</tr>
 		<tr>
-			<td id="probes"><a href="./values.yaml#L186">probes</a></td>
+			<td id="probes"><a href="./values.yaml#L182">probes</a></td>
 			<td>
 object
 </td>
@@ -1015,7 +1012,7 @@ readiness:
 			<td>Readiness and liveness probes for containers. Used format: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes. Don't put quotes on boolean and numerical values.</td>
 		</tr>
 		<tr>
-			<td id="replicaCount"><a href="./values.yaml#L46">replicaCount</a></td>
+			<td id="replicaCount"><a href="./values.yaml#L42">replicaCount</a></td>
 			<td>
 int
 </td>
@@ -1029,7 +1026,7 @@ int
 			<td>Number of pods to scale to (not HPA). Optional.</td>
 		</tr>
 		<tr>
-			<td id="resources"><a href="./values.yaml#L173">resources</a></td>
+			<td id="resources"><a href="./values.yaml#L169">resources</a></td>
 			<td>
 object
 </td>
@@ -1050,7 +1047,7 @@ requests:
 			<td>Defines restrictions on resources requested and consumed by a single pod. Total calculated resources = resources*replicaCount. Ref:  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/  * https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/ Optional.</td>
 		</tr>
 		<tr>
-			<td id="routes"><a href="./values.yaml#L362">routes</a></td>
+			<td id="routes"><a href="./values.yaml#L369">routes</a></td>
 			<td>
 list
 </td>
@@ -1064,7 +1061,7 @@ list
 			<td>Support for adding additional matching rules and routes to the Istio VirtualService object. Route traffic to a path specified in `name` to the service port specified `serviceport`. Note that "serviceport" must be unique and different from the default service port specified in "port.serviceport". See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="service"><a href="./values.yaml#L162">service</a></td>
+			<td id="service"><a href="./values.yaml#L158">service</a></td>
 			<td>
 object
 </td>
@@ -1080,7 +1077,7 @@ type: "ClusterIP"
 			<td>Defines whether to create a service object for loadbalancing of pods and sets service type. Optional.</td>
 		</tr>
 		<tr>
-			<td id="serviceAccount"><a href="./values.yaml#L221">serviceAccount</a></td>
+			<td id="serviceAccount"><a href="./values.yaml#L217">serviceAccount</a></td>
 			<td>
 object
 </td>
@@ -1088,6 +1085,25 @@ object
 				<div style="max-width: 400px;">
 <pre lang="yaml">
 create: true
+# Two unique ID's are available for use with user/app authentication in todays platform
+#
+# 1. Keycloak unique client ID in the SSB Realm
+#    This is "audience" referenced in the current IstioEndUserAuth config.
+#    Caller and callee must agree on this authentication through the client config
+#    and the validation.
+#
+# 2. Istio Spiffe ID/K8s SA
+#   This is the "principal" referenced in AuthorizationPolicy manifest.
+#
+#   Applications must be referenced by their principal name
+#   which is the unique Service Account name tied to a Spiffe/ID assigned by Istio.
+#   This is needed to ensure the originity of the request (non-repudiation).
+#
+# The next (first) layer of security is Network policies. But note that these does not guarantee
+# non-repuditation. Inside K8s applications in network policies are referenced by namespace and/or pod
+# labels/names. These labels might not be unique.
+
+# Policy example for an app with SA/name "app1" in namespace "n1"
 
 </pre>
 </div>
@@ -1095,7 +1111,7 @@ create: true
 			<td>Kubernetes service account. SA name is generated from the application name with a "-sa" suffix. Ref. https://github.com/helm/helm/blob/master/docs/chart_best_practices/rbac.md. Optional.</td>
 		</tr>
 		<tr>
-			<td id="sidecars"><a href="./values.yaml#L157">sidecars</a></td>
+			<td id="sidecars"><a href="./values.yaml#L153">sidecars</a></td>
 			<td>
 string
 </td>
@@ -1109,7 +1125,7 @@ null
 			<td>Defines additional containers to run in a pod. Bundles container settings into one yaml structure for simplicity. Follows the Kubernetes container spec. Optional.</td>
 		</tr>
 		<tr>
-			<td id="subdomains"><a href="./values.yaml#L368">subdomains</a></td>
+			<td id="subdomains"><a href="./values.yaml#L375">subdomains</a></td>
 			<td>
 list
 </td>
@@ -1123,7 +1139,7 @@ list
 			<td>Alternative subdomains for the application. The default subdomain is `<cluster-name>`. Note that subdomains must be added to DNS for this to work. See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="tolerations"><a href="./values.yaml#L58">tolerations</a></td>
+			<td id="tolerations"><a href="./values.yaml#L54">tolerations</a></td>
 			<td>
 list
 </td>
@@ -1151,7 +1167,7 @@ string
 			<td>Kubernetes deployment type. Optional.</td>
 		</tr>
 		<tr>
-			<td id="urlhosts"><a href="./values.yaml#L374">urlhosts</a></td>
+			<td id="urlhosts"><a href="./values.yaml#L381">urlhosts</a></td>
 			<td>
 list
 </td>
@@ -1165,7 +1181,7 @@ list
 			<td>Alternative hostnames for the application. The default hostname is `<application name>`. Note that urlhosts must be added to DNS for this to work. See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="volumeMounts"><a href="./values.yaml#L121">volumeMounts</a></td>
+			<td id="volumeMounts"><a href="./values.yaml#L117">volumeMounts</a></td>
 			<td>
 list
 </td>
@@ -1179,7 +1195,7 @@ list
 			<td>Defines volume mounts for the application. See examples section below for more details. Optional.</td>
 		</tr>
 		<tr>
-			<td id="volumes"><a href="./values.yaml#L116">volumes</a></td>
+			<td id="volumes"><a href="./values.yaml#L112">volumes</a></td>
 			<td>
 list
 </td>
@@ -1424,46 +1440,6 @@ volumeMounts:
 
 See [mounting configmap as volume](https://kubernetes.io/docs/concepts/storage/volumes/#configmap)
 for more details.
-
-### networkpolicy
-
-Example using overrideDefaultPolicy:
-```yaml
-networkpolicy:
-  enabled: true
-  overrideDefaultPolicy:
-    ingress:
-      # Allow ingress traffic on port 80 from all namespaces / pods of the cluster
-      - ports:
-          - port: 80
-            protocol: TCP
-        from:
-          - namespaceSelector: {}
-
-    egress:
-      # Allow egress traffic to the Kubernetes DNS service
-      - ports:
-          - port: 53
-            protocol: UDP
-          - port: 53
-            protocol: TCP
-        to:
-          - namespaceSelector: {}
-            podSelector:
-              matchLabels:
-                k8s-app: kube-dns
-```
-
-Please refer to the [kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-for details.
-
-### egress
-
-```yaml
-egress:
-  - "dataproc.googleapis.com"
-  - "*.cloudfront.net"
-```
 
 ### backends
 
