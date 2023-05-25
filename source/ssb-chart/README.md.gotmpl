@@ -306,38 +306,6 @@ volumeMounts:
 See [mounting configmap as volume](https://kubernetes.io/docs/concepts/storage/volumes/#configmap)
 for more details.
 
-### networkpolicy
-
-Example using overrideDefaultPolicy:
-```yaml
-networkpolicy:
-  enabled: true
-  overrideDefaultPolicy:
-    ingress:
-      # Allow ingress traffic on port 80 from all namespaces / pods of the cluster
-      - ports:
-          - port: 80
-            protocol: TCP
-        from:
-          - namespaceSelector: {}
-
-    egress:
-      # Allow egress traffic to the Kubernetes DNS service
-      - ports:
-          - port: 53
-            protocol: UDP
-          - port: 53
-            protocol: TCP
-        to:
-          - namespaceSelector: {}
-            podSelector:
-              matchLabels:
-                k8s-app: kube-dns
-```
-
-Please refer to the [kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-for details.
-
 ### egress
 
 ```yaml

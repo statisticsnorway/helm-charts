@@ -367,39 +367,6 @@ should render Deployment:
           - configMap:
               name: unittest-app-nginx-vhost-config
             name: nginx-vhost-config-volume
-should render NetworkPolicy:
-  1: |
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: np-unittest-app
-    spec:
-      egress:
-      - ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
-        to:
-        - namespaceSelector: {}
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
-      ingress:
-      - from:
-        - namespaceSelector: {}
-        ports:
-        - port: 8080
-          protocol: TCP
-      podSelector:
-        matchLabels:
-          app: unittest-app
 should render PVC:
   1: |
     apiVersion: v1

@@ -217,17 +217,6 @@ metrics:
 serviceAccount:
   create: true
 
-# -- (object) Generates a simple "ingress" network policy (i.e. restrict incoming traffic to the application),
-# that only allows traffic to 'port.containerport' (default) or 'port.targetport' (if specified), as well
-# as any 'extraPorts'. This is a simple "ingress" network policy, "egress" traffic is not restricted here.
-# See examples section below for more details.
-# Optional.
-# @notationType -- yaml
-networkpolicy:
-  enabled: true
-  # -- Optionally create your own NetworkPolicy for the current application.
-  overrideDefaultPolicy: {}
-
 
   # Two unique ID's are available for use with user/app authentication in todays platform
   #

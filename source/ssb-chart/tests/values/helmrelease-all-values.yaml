@@ -165,28 +165,6 @@ metrics:
 serviceAccount:
   create: true
 
-networkpolicy:
-  enabled: true
-  overrideDefaultPolicy:
-    ingress:
-      - ports:
-          - port: 8080
-            protocol: TCP
-        from:
-          - namespaceSelector: {}
-
-    egress:
-      - ports:
-          - port: 53
-            protocol: UDP
-          - port: 53
-            protocol: TCP
-        to:
-          - namespaceSelector: {}
-            podSelector:
-              matchLabels:
-                k8s-app: kube-dns
-
 # Test that we can override the default pod security context settings.
 PodSecurityContext:
   runAsNonRoot: true

@@ -18,23 +18,6 @@ tests:
           of: Deployment
       - matchSnapshot: {}
 
-  - it: should render NetworkPolicy
-    templates:
-      - network-policy.yaml
-    values:
-      - ./values/helmrelease-minimal.yaml
-    set:
-      appType: "frontend"
-    release:
-      name: unittest-app
-      namespace: unittest
-    asserts:
-      - hasDocuments:
-          count: 1
-      - isKind:
-          of: NetworkPolicy
-      - matchSnapshot: {}
-
   - it: should render ServiceAccount
     templates:
       - serviceaccount.yaml
