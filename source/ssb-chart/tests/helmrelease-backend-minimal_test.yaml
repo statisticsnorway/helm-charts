@@ -88,19 +88,3 @@ tests:
           of: AuthorizationPolicy
       - matchSnapshot: {}
 
-  - it: should render AuthorizationPolicy
-    templates:
-      - authorization-policy.yaml
-    values:
-      - ./values/helmrelease-minimal.yaml
-    set:
-      appType: "backend"
-    release:
-      name: unittest-app
-      namespace: unittest
-    asserts:
-      - hasDocuments:
-          count: 2
-      - isKind:
-          of: AuthorizationPolicy
-      - matchSnapshot: {}
