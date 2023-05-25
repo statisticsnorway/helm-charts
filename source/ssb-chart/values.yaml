@@ -301,13 +301,6 @@ ContainerSecurityContext:
     # -- RuntimeDefault: As defined by the container runtime.
     type: RuntimeDefault
 
-# -- Defines a list of external https resources you need to be able to reach from
-# your application. Wildcard is supported, but the Helm chart will replace '*'
-# with 'wildcard' to avoid errors.
-# See examples section below for more details.
-# Optional.
-egress: []
-
 # (object) If enabled, you will get a Cloud SQL Proxy sidecar container to your application that can
 # connect to an external instance specified in 'cloudsql.instance'. Aa egress entry is automatically added
 # to allow access to the external instance using the 'cloudsql.ip'. Note that the default `cloudsql.version`

@@ -188,9 +188,6 @@ ContainerSecurityContext:
   seccompProfile:
     type: Unrestricted
 
-egress:
-  - "pypi.org"
-
 cloudsql:
   enabled: true
   instance: "test-dev-7978:europe-north1:test-sqlinstance"

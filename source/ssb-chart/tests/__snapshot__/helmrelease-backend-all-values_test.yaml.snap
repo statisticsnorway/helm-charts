@@ -460,29 +460,6 @@ should render ServiceEntry for cloudsql:
       - name: tcp
         number: 3307
         protocol: tcp
-should render ServiceEntry for https:
-  1: |
-    apiVersion: networking.istio.io/v1alpha3
-    kind: ServiceEntry
-    metadata:
-      labels:
-        app: unittest-app
-        billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
-        release: unittest-app
-      name: unittest-app-pypi.org
-    spec:
-      exportTo:
-      - .
-      hosts:
-      - pypi.org
-      location: MESH_EXTERNAL
-      ports:
-      - name: https
-        number: 443
-        protocol: HTTPS
-      resolution: DNS
 should render VirtualService:
   1: |
     apiVersion: networking.istio.io/v1alpha3
