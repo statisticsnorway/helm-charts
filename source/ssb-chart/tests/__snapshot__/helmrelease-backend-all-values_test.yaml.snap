@@ -197,6 +197,8 @@ should render Deployment:
               seccompProfile:
                 type: Unrestricted
             volumeMounts:
+            - mountPath: /tmp
+              name: tmp-volume
             - mountPath: /path/to/secrets
               name: secret-volume
               readOnly: true
@@ -245,6 +247,8 @@ should render Deployment:
                 path: myconfig.cfg
               name: configmap-name
             name: config-volume
+          - emptyDir: {}
+            name: tmp-volume
           - configMap:
               name: unittest-app-application-config
             name: application-config-volume
