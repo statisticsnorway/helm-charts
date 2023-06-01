@@ -141,17 +141,18 @@ for more information.
 
 ### Workaround for read/write to temporary folders
 
-If the application needs to read/write temporary data to a `/tmp` or a `/cache` folder, this can be achieved
-**without** giving the full benefit of write access to the container by overriding the default `readOnlyRootFilesystem`
-setting. The simplest way to do this is to add one or more `emptyDir` volumes to the HelmRelease. Example:
+Some applications need to read/write temporary data to a `/tmp` or a `/cache` folder. Because of this we take an optimistic
+approach and mount a `/tmp` volume on all pods, such that the container don't have to override the default
+`readOnlyRootFilesystem` setting. The simplest way to do to add  one or more temporary volumes (if `/tmp` is
+not sufficient) is by adding `emptyDir` volumes to the HelmRelease. Example:
 
 ```
 volumes:
-  - name: tmp-volume
+  - name: cache-volume
     emptyDir: {}
 volumeMounts:
-  - name: tmp-volume
-    mountPath: /tmp
+  - name: cache-volume
+    mountPath: /cache
 ```
 
 The `name` must be unique, but the `mountPath` can be customized to the applications needs. Remember that data
