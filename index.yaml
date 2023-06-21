@@ -3,7 +3,7 @@ entries:
   flux-alerts:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:20.990399+02:00"
+    created: "2023-06-21T23:51:34.380783+02:00"
     description: Helm chart for configuring Flux Alerts
     digest: d7a59075f0a980a7a7e573716b543dfc5feacd4b6eb6dee1660e2a103c4fd316
     icon: https://avatars.githubusercontent.com/u/5849578
@@ -14,9 +14,9 @@ entries:
   ssb-chart:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:21.009386+02:00"
+    created: "2023-06-21T23:51:34.399157+02:00"
     description: Generic chart for SSB applications
-    digest: 85c62b23ee0c3df6aebdf143c185ecf9a1d933a87f540c75f081362faf8f9f7b
+    digest: 3c8fb5b48c8956fe30a251eaa2b547d99d7f89f0680deb0ac3e850c8d6b579e0
     icon: https://avatars.githubusercontent.com/u/5849578
     name: ssb-chart
     urls:
@@ -24,7 +24,7 @@ entries:
     version: 4.0.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:21.006689+02:00"
+    created: "2023-06-21T23:51:34.396901+02:00"
     description: Generic chart for SSB applications
     digest: a2ba851f6e98b57c40c4c86d1018cdcd2296828b83c8d7df48c30336c254cf9a
     icon: https://avatars.githubusercontent.com/u/5849578
@@ -34,7 +34,7 @@ entries:
     version: 3.0.1
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:21.004888+02:00"
+    created: "2023-06-21T23:51:34.395347+02:00"
     description: Generic chart for SSB applications
     digest: 756419333ff7c416f2f6bdc6ab36cae90372b9fe111e90a0f4027e7dd033a3ff
     icon: https://avatars.githubusercontent.com/u/5849578
@@ -44,7 +44,7 @@ entries:
     version: 3.0.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:21.003397+02:00"
+    created: "2023-06-21T23:51:34.393892+02:00"
     description: Generic chart for SSB applications
     digest: 2356f5037cdfdb5cb6119308a0b24238c613e579c59df4ef29dce1444900fb83
     icon: https://avatars.githubusercontent.com/u/5849578
@@ -54,7 +54,7 @@ entries:
     version: 2.3.4
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:21.002052+02:00"
+    created: "2023-06-21T23:51:34.392565+02:00"
     description: Generic chart for SSB applications
     digest: 8d739d4614f8effa805f1a5da0bc846824e016471fd33ec8c10cdba6a35fe6b0
     name: ssb-chart
@@ -63,7 +63,7 @@ entries:
     version: 2.3.3
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:21.000625+02:00"
+    created: "2023-06-21T23:51:34.391156+02:00"
     description: Generic chart for SSB applications
     digest: aa347385adc26b325066986cf6365154c71b9f503066013598c747b67ba72c81
     name: ssb-chart
@@ -72,7 +72,7 @@ entries:
     version: 2.3.2
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:20.998652+02:00"
+    created: "2023-06-21T23:51:34.389548+02:00"
     description: Generic chart for SSB applications
     digest: 327bc7d26e65f6af480c6f5cac7cde86bd4d2e5fa608804c4641c99363691df2
     name: ssb-chart
@@ -81,7 +81,7 @@ entries:
     version: 2.3.1
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:20.997423+02:00"
+    created: "2023-06-21T23:51:34.38719+02:00"
     description: Generic chart for SSB applications
     digest: 2b4704f41dde0817a5d5924604a8d00f3a1176380d6fac29cd21a6fa6ea7feba
     name: ssb-chart
@@ -90,7 +90,7 @@ entries:
     version: 2.3.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:20.996222+02:00"
+    created: "2023-06-21T23:51:34.385919+02:00"
     description: Generic chart for SSB applications
     digest: ceca72c6625c6c800257a76a7b15dc92f111aa483e2c2d7fac02979b41ef80ae
     name: ssb-chart
@@ -99,7 +99,7 @@ entries:
     version: 2.2.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:20.995022+02:00"
+    created: "2023-06-21T23:51:34.38465+02:00"
     description: Generic chart for SSB applications
     digest: cbc36095a1e2f5335c69568b78603b5ff78bd999e34914bbe556ae9406e1ec1b
     name: ssb-chart
@@ -108,7 +108,7 @@ entries:
     version: 2.1.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:20.99382+02:00"
+    created: "2023-06-21T23:51:34.383485+02:00"
     description: Generic chart for SSB applications
     digest: 433af426d60f00cb2ff7942e2a268d504202c1322957d15252ce28ff384e6d1a
     name: ssb-chart
@@ -117,11 +117,11 @@ entries:
     version: 2.0.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-05-15T08:48:20.992573+02:00"
+    created: "2023-06-21T23:51:34.382294+02:00"
     description: Generic chart for SSB applications
     digest: e297125c0f5336864ff2d4173246e6e19c3f31a1b918294ce09dee9f6c86a53a
     name: ssb-chart
     urls:
     - charts/ssb-chart-1.3.1.tgz
     version: 1.3.1
-generated: "2023-05-15T08:48:20.989503+02:00"
+generated: "2023-06-21T23:51:34.37995+02:00"
