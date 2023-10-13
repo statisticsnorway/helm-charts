@@ -221,7 +221,7 @@ serviceAccount:
   # Two unique ID's are available for use with user/app authentication in todays platform
   #
   # 1. Keycloak unique client ID in the SSB Realm
-  #    This is "audience" referenced in the current IstioEndUserAuth config.
+  #    This is "audience" referenced in the old IstioEndUserAuth config.
   #    Caller and callee must agree on this authentication through the client config
   #    and the validation.
   #
