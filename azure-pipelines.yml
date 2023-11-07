@@ -25,7 +25,7 @@ jobs:
   - script:  helm plugin install https://github.com/quintush/helm-unittest
     displayName: 'Installing helm unittest'
 
-  - script:  helm plugin install https://github.com/quintush/helm-unittest
+  - script:  helm plugin list
     displayName: 'Print helm plugin versions'
 
   # Run the Helm unittests
