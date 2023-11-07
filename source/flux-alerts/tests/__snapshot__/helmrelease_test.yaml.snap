@@ -4,17 +4,17 @@ should render Alert:
     kind: Alert
     metadata:
       labels:
-        app.kubernetes.io/managed-by: Tiller
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.0"
         helm.sh/chart: flux-alerts-1.0.2
       name: flux-alert-flux-alerts
     spec:
       eventSeverity: warning
       eventSources:
-      - kind: GitRepository
-        name: '*'
+        - kind: GitRepository
+          name: '*'
       exclusionList:
-      - Exclude this message
+        - Exclude this message
       providerRef:
         name: flux-alert-flux-alerts
       summary: Alert from test-cluster
@@ -24,7 +24,7 @@ should render Provider:
     kind: Provider
     metadata:
       labels:
-        app.kubernetes.io/managed-by: Tiller
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.0"
         helm.sh/chart: flux-alerts-1.0.2
       name: flux-alert-flux-alerts
@@ -42,7 +42,7 @@ should render SealedSecret:
       annotations:
         sealedsecrets.bitnami.com/cluster-wide: "true"
       labels:
-        app.kubernetes.io/managed-by: Tiller
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.0"
         helm.sh/chart: flux-alerts-1.0.2
       name: flux-alert-flux-alerts

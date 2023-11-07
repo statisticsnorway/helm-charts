@@ -13,7 +13,7 @@ should render ConfigMap:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0-RC1
+        chart: ssb-chart-4.0.0
         heritage: Helm
         release: unittest-app
       name: unittest-app-application-config
@@ -27,7 +27,7 @@ should render ConfigMap for nginx config:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0-RC1
+        chart: ssb-chart-4.0.0
         heritage: Helm
         release: unittest-app
       name: unittest-app-nginx-vhost-config
@@ -39,7 +39,7 @@ should render Deployment:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0-RC1
+        chart: ssb-chart-4.0.0
         heritage: Helm
         release: unittest-app
       name: unittest-app
@@ -52,8 +52,8 @@ should render Deployment:
       template:
         metadata:
           annotations:
-            checksum/application-config: 413d7c17505729cc269c51ea884da5ec5b838e189c1a80abb0ed568d5b0e3cf2
-            checksum/nginx-vhost-config: 0e0a83d04b4465157570afa73c818aab77841b08b882673d80e528c5a5e04095
+            checksum/application-config: 9798b0917f14d8a8e708e16376cedc41eb82361978f7e616a6b999b53ec67bd1
+            checksum/nginx-vhost-config: 821c2ada1fac0e76ed4e03b87084224fc3593351d2682dcae71e9f5185f70f41
             prometheus.io/path: /metrics/path
             prometheus.io/port: "8080"
             prometheus.io/scheme: https
@@ -251,7 +251,7 @@ should render Service:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0-RC1
+        chart: ssb-chart-4.0.0
         heritage: Helm
         release: unittest-app
       name: unittest-app
@@ -275,7 +275,7 @@ should render ServiceAccount:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0-RC1
+        chart: ssb-chart-4.0.0
         heritage: Helm
         release: unittest-app
       name: unittest-app-sa
@@ -287,7 +287,7 @@ should render ServiceEntry for cloudsql:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0-RC1
+        chart: ssb-chart-4.0.0
         heritage: Helm
         release: unittest-app
       name: unittest-app-cloudsql
@@ -311,7 +311,7 @@ should render VirtualService:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0-RC1
+        chart: ssb-chart-4.0.0
         heritage: Helm
         release: unittest-app
       name: unittest-app
