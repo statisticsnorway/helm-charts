@@ -43,9 +43,8 @@ tests:
       - equal:
           path: spec.resources.requests.storage
           value: 1Gi
-      - equal:
+      - notExists:
           path: spec.storageClassName
-          value: null          
 
 # persistence.enabled: true set and also overriding some settings 
   - it: should render overridden values when they are specified

@@ -27,7 +27,7 @@ spec:
             methods:
               - "GET"
             ports:
-              - {{ .Values.metrics.port }}
+              - {{ .Values.metrics.port | quote }}
             paths:
-              - "{{ .Values.metrics.path }}"
+              - {{ .Values.metrics.path | quote }}
 {{- end }}

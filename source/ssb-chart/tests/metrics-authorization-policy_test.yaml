@@ -68,6 +68,6 @@ tests:
                     methods:
                       - GET
                     ports:
-                      - 8081
+                      - "8081"
                     paths:
-                      - /my-metrics
+                      - "/my-metrics"

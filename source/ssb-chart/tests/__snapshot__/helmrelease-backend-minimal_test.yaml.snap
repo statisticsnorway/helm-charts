@@ -6,8 +6,8 @@ should render Deployment:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
+        chart: ssb-chart-4.0.0-RC1
+        heritage: Helm
         release: unittest-app
       name: unittest-app
     spec:
@@ -23,30 +23,30 @@ should render Deployment:
             release: unittest-app
         spec:
           containers:
-          - image: ssb.no/unittest-app:1.0
-            imagePullPolicy: Always
-            name: unittest-app-cont
-            ports:
-            - containerPort: 80
-              name: http-main
-            resources:
-              limits:
-                memory: 128Mi
-              requests:
-                cpu: 100m
-                memory: 128Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                - ALL
-              privileged: false
-              readOnlyRootFilesystem: true
-              runAsGroup: 1000
-              runAsNonRoot: true
-              runAsUser: 1000
-              seccompProfile:
-                type: RuntimeDefault
+            - image: ssb.no/unittest-app:1.0
+              imagePullPolicy: Always
+              name: unittest-app-cont
+              ports:
+                - containerPort: 80
+                  name: http-main
+              resources:
+                limits:
+                  memory: 128Mi
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                privileged: false
+                readOnlyRootFilesystem: true
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+                seccompProfile:
+                  type: RuntimeDefault
           securityContext:
             seccompProfile:
               type: RuntimeDefault
@@ -59,15 +59,15 @@ should render Service:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
+        chart: ssb-chart-4.0.0-RC1
+        heritage: Helm
         release: unittest-app
       name: unittest-app
     spec:
       ports:
-      - name: http-main
-        port: 80
-        targetPort: 80
+        - name: http-main
+          port: 80
+          targetPort: 80
       selector:
         app: unittest-app
         release: unittest-app
@@ -80,7 +80,7 @@ should render ServiceAccount:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.0
-        heritage: Tiller
+        chart: ssb-chart-4.0.0-RC1
+        heritage: Helm
         release: unittest-app
       name: unittest-app-sa
