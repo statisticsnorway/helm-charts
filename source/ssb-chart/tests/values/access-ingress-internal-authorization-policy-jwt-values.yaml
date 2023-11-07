@@ -16,14 +16,12 @@ access:
             paths: ["api/"]
             jwt:
               issuer: https://keycloak.ssb.no/auth/realms/ssb
-              audience: app3
-          - methods: ["GET"]
-            paths: ["api/"]
-            jwt:
-              issuer: https://keycloak.ssb.no/auth/realms/ssb
-              audience: app3-ssb
+              audiences:
+                - app3
+                - app3-ssb
           - methods: ["GET"]
             paths: ["api/"]
             jwt:
               issuer: https://keycloak.ssb.no/auth/realms/other-realm
-              audience: app3-other
+              audiences:
+                - app3-other

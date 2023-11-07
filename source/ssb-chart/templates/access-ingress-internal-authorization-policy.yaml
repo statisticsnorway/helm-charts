@@ -72,10 +72,12 @@ spec:
     # the public certificate needed to validate JWT signatures.
       {{- range $jwtRules }}
     - issuer: "{{ .issuer }}"
-      # Only allow the request if the JWT contains at least one audience match
+      # Only allow the request if the JWT contains at least one of the audiences
       # in the list below.
       audiences:
-        - "{{ required "Audience is required if jwt is in use" .audience }}"
+        {{-  range required "Audiences are required when jwt is in use" .audiences }}
+        - {{ . }}
+        {{ end }}
       # Forward this token to the upstream application so it can read user info
       # from the JWT or use it for authentication in calls to other backends.
       forwardOriginalToken: true

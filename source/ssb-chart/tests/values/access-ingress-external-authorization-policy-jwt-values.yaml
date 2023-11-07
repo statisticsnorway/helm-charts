@@ -16,4 +16,5 @@ access:
               paths: [ "api/" ]
               jwt:
                 issuer: https://sso.example.com/auth/realms/ssb
-                audience: ekstern-client-id
+                audiences:
+                  - ekstern-client-id

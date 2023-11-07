@@ -107,18 +107,6 @@ tests:
                     principals:
                       - "cluster.local/ns/n3/sa/app3-sa"
                     requestPrincipals:
-                      - "https://keycloak.ssb.no/auth/realms/ssb/*"
-              to:
-              - operation:
-                  paths:
-                    - "api/"
-                  methods:
-                    - "GET"
-            - from:
-                - source:
-                    principals:
-                      - "cluster.local/ns/n3/sa/app3-sa"
-                    requestPrincipals:
                       - "https://keycloak.ssb.no/auth/realms/other-realm/*"
               to:
               - operation:
@@ -144,9 +132,6 @@ tests:
             - issuer: "https://keycloak.ssb.no/auth/realms/ssb"
               audiences:
                 - "app3"
-              forwardOriginalToken: true
-            - issuer: "https://keycloak.ssb.no/auth/realms/ssb"
-              audiences:
                 - "app3-ssb"
               forwardOriginalToken: true
             - issuer: "https://keycloak.ssb.no/auth/realms/other-realm"

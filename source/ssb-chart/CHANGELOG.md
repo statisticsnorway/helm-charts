@@ -92,7 +92,7 @@ access:
         - "secretmanager.googleapis.com"
       ports:
         - name: https
-          number: 443
+          port: 443
           protocol: HTTPS
 ```
 
@@ -100,7 +100,7 @@ access:
 Before:
 ```yaml
 istioEndUserAuth:
-  audience:
+  audiences:
   - jupyterhub
   excludePaths:
   - "/api-docs"
@@ -119,7 +119,8 @@ access:
           rules:
             - jwt:
                 issuer: https://keycloak.ssb.no/auth/realms/ssb
-                audience: jupyterhub
+                audiences:
+                  - jupyterhub
             - paths: [ "/api-docs/", "/api-docs/*" ]
 ```
 

@@ -18,7 +18,8 @@ access:
             paths: ["api/"]
             jwt:
               issuer: https://keycloak.ssb.no/auth/realms/ssb
-              audience: app3
+              audiences:
+                - app3
       - application: app4
         namespace: n4
         rules:
