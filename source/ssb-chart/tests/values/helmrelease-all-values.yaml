@@ -8,8 +8,6 @@ image:
   tag: '1.0'
   pullPolicy: Never
 
-exposed: true
-
 replicaCount: 2
 
 nodeSelector:
@@ -82,6 +80,25 @@ volumeMounts:
     mountPath: /etc/config
     readOnly: true
 
+access:
+  ingress:
+    external:
+      gateways:
+        - type: public
+#TODO: add full example
+#    internal:
+#      - application: app2
+#        namespace: n1
+#      egress:
+#        internal:
+#          - application: app2
+#            namespace: n1
+#        external:
+#          - hosts:
+#              - "ssb.no"
+#            addresses:
+#              - "104.154.0.0/15"
+
 persistence:
   enabled: true
   createPvc: true
@@ -148,28 +165,6 @@ metrics:
 serviceAccount:
   create: true
 
-networkpolicy:
-  enabled: true
-  overrideDefaultPolicy:
-    ingress:
-      - ports:
-          - port: 8080
-            protocol: TCP
-        from:
-          - namespaceSelector: {}
-
-    egress:
-      - ports:
-          - port: 53
-            protocol: UDP
-          - port: 53
-            protocol: TCP
-        to:
-          - namespaceSelector: {}
-            podSelector:
-              matchLabels:
-                k8s-app: kube-dns
-
 # Test that we can override the default pod security context settings.
 PodSecurityContext:
   runAsNonRoot: true
@@ -192,9 +187,6 @@ ContainerSecurityContext:
     add: ["ALL"]
   seccompProfile:
     type: Unrestricted
-
-egress:
-  - "pypi.org"
 
 cloudsql:
   enabled: true
@@ -230,12 +222,3 @@ subdomains:
 
 urlhosts:
   - myaliasname
-
-istioEndUserAuth: # Backend only
-  enabled: true
-  excludePaths:
-    - "/public"
-    - "/public/*"
-  includePaths:
-    - "/oauth"
-    - "/oauth/*"

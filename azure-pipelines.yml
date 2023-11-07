@@ -22,8 +22,11 @@ jobs:
   steps:
   - checkout: self
   # Install necessary plugin for helm unittest
-  - script:  helm plugin install https://github.com/quintush/helm-unittest
+  - script:  helm plugin install https://github.com/helm-unittest/helm-unittest
     displayName: 'Installing helm unittest'
+
+  - script:  helm plugin list
+    displayName: 'Print helm plugin versions'
 
   # Run the Helm unittests
   - script: helm unittest source/ssb-chart -o source/ssb-chart/helm_unittest_testresults.xml -t JUnit

@@ -1,0 +1,83 @@
+suite: test service
+templates:
+  - metrics-network-policy.yaml
+tests:
+
+  - it: should render nothing if not enabled
+    set:
+      metrics.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render one document if enabled
+    values:
+      - ./values/default-values.yaml
+    set:
+      metrics.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should include default labels and be of kind Service
+    values:
+      - ./values/metrics-network-policy-values.yaml
+    release:
+      namespace: unittest
+      name: unittest
+    asserts:
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest
+      - isKind:
+          of: NetworkPolicy
+
+  - it: should render networkpolicy and selector on istio and metrics.port port
+    values:
+      - ./values/metrics-network-policy-values.yaml
+    release:
+      namespace: unittest
+      name: unittest
+    asserts:
+      - equal:
+          path: spec.podSelector
+          value:
+            matchLabels:
+              app: unittest-app
+      - equal:
+          path: spec.ingress
+          value:
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      name: monitoring
+                  podSelector:
+                    matchLabels:
+                      app: prometheus
+                      component: server
+              ports:
+                - protocol: TCP
+                  port: 15090
+                - protocol: TCP
+                  port: 15020
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      name: monitoring
+                  podSelector:
+                    matchLabels:
+                      app: prometheus
+                      component:
+                        server
+              ports:
+                - protocol: TCP
+                  port: 8081

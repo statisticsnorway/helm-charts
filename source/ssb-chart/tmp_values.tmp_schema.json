@@ -1,0 +1,658 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "required": false,
+      "default": "deployment",
+      "description": "Kubernetes deployment type"
+    },
+    "name": {
+      "type": "string",
+      "required": true,
+      "description": "Name of the application (also used for naming other Kubernetes resources)"
+    },
+    "appType": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "backend",
+        "frontend"
+      ],
+      "description": "Application type. Note that this setting will impact how authentication is configured."
+    },
+    "cluster": {
+      "type": "string",
+      "required": true,
+      "description": "Which Kubernetes cluster the app will be deployd to."
+    },
+    "domain": {
+      "type": "string",
+      "required": false,
+      "default": "ssb.no",
+      "description": "Which domain the app will belong to."
+    },
+    "billingProject": {
+      "type": "string",
+      "required": true,
+      "default": "default",
+      "description": "What billing project to use as label for the objects."
+    },
+    "image": {
+      "type": "object",
+      "required": true,
+      "description": "Application image",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "required": true,
+          "description": "Image repository."
+        },
+        "tag": {
+          "type": "string",
+          "required": false,
+          "default": "latest",
+          "description": "Image tag."
+        },
+        "pullPolicy": {
+          "type": "string",
+          "required": false,
+          "default": "Always",
+          "description": "Image pullPolicy."
+        }
+      }
+    },
+    "replicaCount": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "description": "Number of pods to scale to (not HPA)."
+    },
+    "nodeSelector": {
+      "type": "object",
+      "required": false,
+      "description": "Node selector for selecting where the to schedule the workload.\n Standard nodes are labeled \"ssb-node: standard\". Jupyter nodes are labeled \"ssb-node: jupyter\".\n See examples section below for more details.",
+      "properties": {
+      }
+    },
+    "tolerations": {
+      "type": "array",
+      "required": false,
+      "description": "Tolerations allow the scheduler to schedule pods on nodes with matching taints.\n The following taints exists for jupyter nodepools: `ssb-node=jupyter`\n See examples section below for more details.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "affinity": {
+      "type": "object",
+      "required": false,
+      "description": "Node affinity is a set of rules used by the scheduler to determine where a pod\n can be placed. The rules are defined using custom labels on nodes and label\n selectors specified in pods. Node affinity allows a pod to specify an affinity\n (or anti-affinity) towards a group of nodes it can be placed on.\n See examples section below for more details.",
+      "properties": {
+      }
+    },
+    "port": {
+      "type": "object",
+      "required": false,
+      "description": "Main application port. Use 'extraPorts' for additional ports. This was separated to simplify the automation for developer usage.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "required": false,
+          "default": "http-main",
+          "description": "name must start with protocol name (i.e.http or tcp). The name field is automatically truncated to 15 symbols."
+        },
+        "containerport": {
+          "type": "integer",
+          "required": false,
+          "default": 80,
+          "description": "Port exposed by container."
+        },
+        "serviceport": {
+          "type": "integer",
+          "required": false,
+          "default": 80,
+          "description": "Port exposed by service object."
+        },
+        "targetport": {
+          "type": "integer",
+          "required": false,
+          "description": "The target port on the POD to redirect traffic from the Service. This will usually be the applications container port."
+        }
+      }
+    },
+    "extraPorts": {
+      "type": "array",
+      "required": false,
+      "default": "default",
+      "description": "List of extra application ports in case the application needs to expose ports in addition to the normal application port. Usually not needed, unless using things like 'grpc' in addition to 'http'. For these extra ports it usually makes sense to use the same port for 'containerport' and 'targetport' to avoid collision with the normal application port. This should only be used if your application exposes more than one port. If your application exposes more than one port, you should override 'port' to suit your needs (e.g. if you only need 'http' or 'grpc'). See examples section below for more details.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of port must start with the protocol (i.e. 'grpc'). The value is automatically truncated to 15 symbols.",
+            "required": true
+          },
+          "containerport": {
+            "type": "integer",
+            "description": "Container port. Must not be the same as application containerport or any other defined containerport."
+          },
+          "serviceport": {
+            "type": "integer",
+            "description": "Service port. Must not be the same as application serviceport or any other defined serviceport."
+          },
+          "targetport": {
+            "type": "integer",
+            "description": "Target port in the POD to redirect traffic to. If not specified this will default to containerport."
+          }
+        }
+      }
+    },
+    "environmentVariables": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "required": false,
+      "description": "Defines a set of environment variables for a main container of an app. In case of referring to volumes/secrets/configmaps remember to create those resources first. See examples section below for more details.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "configs": {
+      "type": "array",
+      "required": false,
+      "description": "Defines a set of configs that should be deployed as a ConfigMap. Note that all configs will be created within one ConfigMap called <application_name>-config, but can be mounted to separate locations. See examples section below for more details."
+    },
+    "volumes": {
+      "type": "array",
+      "required": false,
+      "description": "Defines volumes available for mounting in pods. See examples section below for more details."
+    },
+    "volumeMounts": {
+      "type": "array",
+      "required": false,
+      "description": "Defines volume mounts for the application. See examples section below for more details."
+    },
+    "persistence": {
+      "type": "object",
+      "required": false,
+      "description": "Persistence defines whether app requires persistent volume. Once `enabled: true` is defined, corresponding sections under `volumes:` and `volumeMounts` will be automatically added to the deployment template. Only one persistent volume is supported at the moment.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable persistent volume"
+        },
+        "storageClass": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Supported storage classes: \"standard\", \"ssd\"",
+          "default": "standard",
+          "enum": [
+            "standard",
+            "ssd"
+          ]
+        },
+        "createPvc": {
+          "type": "boolean",
+          "default": true,
+          "description": "Create PVC. Set to \"false\" to use existing manifest file."
+        },
+        "accessMode": {
+          "type": "string",
+          "enum": [
+            "ReadWriteOnce",
+            "ReadOnlyMany",
+            "ReadWriteMany",
+            "ReadWriteOncePod"
+          ],
+          "description": "Set access mode: \"ReadWriteOnce\", \"ReadOnlyMany\", \"ReadWriteMany\", \"ReadWriteOncePod\".Required if \"createPvc: true\"."
+        },
+        "size": {
+          "type": "string",
+          "description": "PVC disk size. Required if \"createPvc: true\"."
+        },
+        "folder": {
+          "type": "string",
+          "required": true,
+          "description": "Enable persistent volume"
+        },
+        "owner": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Define owner user and owner group for the mounted volume. NOTE: Only use this option if setting the `PodSecurityContext.fsGroup` to the containers process UID (runAsUser) does NOT work."
+        }
+      }
+    },
+    "sidecars": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Defines additional containers to run in a pod. Bundles container settings into one yaml structure for simplicity. Follows the Kubernetes container spec."
+    },
+    "service": {
+      "type": "object",
+      "description": "Defines whether to create a service object for loadbalancing of pods and sets service type.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": "true"
+        },
+        "type": {
+          "type": "string",
+          "default": "ClusterIP"
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "enabled": {},
+        "limits": {
+          "cpu": {},
+          "memory": {}
+        },
+        "requests": {
+          "cpu": {},
+          "memory": {}
+        }
+      }
+    },
+    "probes": {
+      "type": "object",
+      "properties": {
+        "liveness": {
+          "enabled": {},
+          "livenessProbe": {},
+          "httpGet": {
+            "port": {},
+            "path": {}
+          },
+          "initialDelaySeconds": {},
+          "periodSeconds": {}
+        },
+        "readiness": {
+          "enabled": {},
+          "livenessProbe": {},
+          "httpGet": {
+            "port": {},
+            "path": {}
+          },
+          "initialDelaySeconds": {},
+          "periodSeconds": {}
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "description": "If \"enabled: true\", sets prometheus label to a service to enable scraping by prometheus server. Don't put quotes on boolean and numerical values.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "port": {
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "scheme": {
+          "type": "string"
+        }
+      }
+    },
+    "serviceAccount": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "boolean"
+        }
+      }
+    },
+    "access": {
+      "type": "object",
+      "properties": {
+        "ingress": {
+          "type": "object",
+          "properties": {
+            "external": {
+              "type": "object",
+              "properties": {
+                "gateways": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "public"
+                        ]
+                      },
+                      "allow": {
+                        "methods": {
+                          "type": "string"
+                        },
+                        "paths": {
+                          "type": "string"
+                        },
+                        "jwt": {
+                          "type": "object",
+                          "properties": {
+                            "issuer": {
+                              "type": "string"
+                            },
+                            "audience": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "internal": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "application": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  },
+                  "serviceaccount": {
+                    "type": "string"
+                  },
+                  "allow": {
+                    "methods": {
+                      "type": "string"
+                    },
+                    "paths": {
+                      "type": "string"
+                    },
+                    "jwt": {
+                      "type": "object",
+                      "properties": {
+                        "issuer": {
+                          "type": "string"
+                        },
+                        "audience": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "egress": {
+          "type": "object",
+          "properties": {
+            "external": {
+              "type": "array",
+              "items": {
+                "addresses": {
+                  "type": "string"
+                },
+                "ports": {
+                  "type": "array",
+                  "items": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "integer"
+                    },
+                    "protocol": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "hosts": {
+                  "type": "string"
+                }
+              }
+            },
+            "internal": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "application": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "PodSecurityContext": {
+      "type": "object",
+      "description": "Default security context for pods. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podsecuritycontext-v1-core.",
+      "properties": {
+        "runAsNonRoot": {
+          "type": "boolean",
+          "description": "Containers in pod must run as a non-root user (e.g. not run as UID 0)."
+        },
+        "runAsUser": {
+          "type": "integer",
+          "description": "The UID to run the entrypoint of the container process. Defaults to the user specified in the image metadata if unspecified."
+        },
+        "runAsGroup": {
+          "type": "integer",
+          "description": "The GID to run the entrypoint of the container process. Uses runtime default if unset."
+        },
+        "fsGroup": {
+          "type": "string",
+          "description": "All processes in the pod will be part of this supplementary group.\n  # Supported volume mounts will be owned by this group."
+        },
+        "seccompProfile": {
+          "type": "object",
+          "description": "Limit the range of system calls allowed.",
+          "properties": {
+            "type": {
+              "type": "string",
+              "default": "RuntimeDefault",
+              "description": "RuntimeDefault: As defined by the container runtime."
+            }
+          }
+        }
+      }
+    },
+    "ContainerSecurityContext": {
+      "type": "object",
+      "required": false,
+      "description": "Container SecurityContext for main application. Default restricted security context for the application. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#securitycontext-v1-core",
+      "properties": {
+        "allowPrivilegeEscalation": {
+          "type": "boolean",
+          "description": "If processes should be allowed to gain more privileges than its parent process."
+        },
+        "privileged": {
+          "type": "boolean",
+          "description": "If processes in container can run privileged. This is equivalent to running as root on the host."
+        },
+        "readOnlyRootFilesystem": {
+          "type": "boolean",
+          "description": "If container should have a read-only root filesystem."
+        },
+        "runAsNonRoot": {
+          "type": "boolean",
+          "description": "Containers in pod must run as a non-root user (e.g. not run as UID 0)."
+        },
+        "runAsUser": {
+          "type": "integer",
+          "description": "The UID to run the entrypoint of the container process. Defaults to the user specified in the image metadata if unspecified."
+        },
+        "runAsGroup": {
+          "type": "integer",
+          "description": "The GID to run the entrypoint of the container process. Uses runtime default if unset."
+        },
+        "capabilities": {
+          "type": "object",
+          "description": "The capabilities to add/drop when running containers. Defaults to the default set of capabilities granted by the container runtime",
+          "properties": {
+            "drop": {
+              "type": "array"
+            },
+            "add": {
+              "type": "array"
+            }
+          }
+        },
+        "seccompProfile": {
+          "type": "object",
+          "description": "Limit the range of system calls allowed.",
+          "properties": {
+            "type": {
+              "type": "string",
+              "default": "RuntimeDefault",
+              "description": "RuntimeDefault: As defined by the container runtime."
+            }
+          }
+        }
+      }
+    },
+    "egress": {
+      "type": "array",
+      "description": "Defines a list of external https resources you need to be able to reach from your application. Wildcard is supported, but the Helm chart will replace '*' with 'wildcard' to avoid errors. See examples section below for more details.",
+      "required": false,
+      "items": {
+        "type": "array"
+      }
+    },
+    "cloudsql": {
+      "type": "object",
+      "description": "If enabled, you will get a Cloud SQL Proxy sidecar container to your application that can connect to an external instance specified in 'cloudsql.instance'. Aa egress entry is automatically added to allow access to the external instance using the 'cloudsql.ip'. Note that the default `cloudsql.version` is read from a shared configuration.",
+      "required": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "string"
+        },
+        "instance": {
+          "type": "string",
+          "required": true
+        },
+        "ip": {
+          "type": "string",
+          "required": true
+        },
+        "useSqlProxy": {
+          "type": "boolean",
+          "description": "Set to false if using Google connectors directly to omit adding a cloudsql-proxy."
+        }
+      }
+    },
+    "oauth2Proxy": {
+      "type": "object",
+      "description": "For \"appType: frontend\" an OAuth2 Proxy will be added as a sidecar and the \"targetPort\" will be set to \"oauth2Proxy.port\". The OAuth2 proxy depends on a Kubernetes secret containing the configuration and client credentials. Client configurations are added in the \"platform\" repository. NOTE: Do not add override default values here. Default values for oauth2Proxy is set in a shard config.",
+      "required": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "image": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer"
+        }
+      }
+    },
+    "backends": {
+      "type": "array",
+      "description": "The 'backends' list is used to configure a backend-for-frontend (API gateway) to enable authenticated requests to other applications/API's. The proxy will forward request headers, including the authorization header. This will allow the app to make authenticated requests to the applications listed. Note that the application receiving the request must have the calling app in it's allowed audience list. A \"backend\" application is identified by a service name and a namespace. Required fields: \"name\" and \"namespace\". See examples section below",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "required": true
+          },
+          "namespace": {
+            "type": "string",
+            "required": true
+          }
+        }
+      }
+    },
+    "apiGateway": {
+      "type": "object",
+      "description": "This is used together with the 'backends' config to specify which container image and port should be used for the backend-for-frontend (API gateway). NOTE: Do not add default values here. Default values for apiGateway is set in a shared config.",
+      "properties": {
+        "image": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer"
+        }
+      }
+    },
+    "routes": {
+      "type": "array",
+      "description": "Support for adding additional matching rules and routes to the Istio VirtualService object. Route traffic to a path specified in `name` to the service port specified `serviceport`. Note that \"serviceport\" must be unique and different from the default service port specified in \"port.serviceport\". See examples section below for more details.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "serviceport": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "subdomains": {
+      "type": "array",
+      "description": "Alternative subdomains for the application. The default subdomain is `<cluster-name>`. Note that subdomains must be added to DNS for this to work. See examples section below for more details.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "urlhosts": {
+      "type": "array",
+      "description": "Alternative hostnames for the application. The default hostname is `<application name>`. Note that urlhosts must be added to DNS for this to work. See examples section below for more details.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

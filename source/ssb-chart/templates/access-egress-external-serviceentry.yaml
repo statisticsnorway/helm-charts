@@ -1,0 +1,46 @@
+{{- if (((.Values.access).egress).external) }}
+{{/* use range with index such that we can create uniqe name for object*/}}
+{{- range $index, $value := .Values.access.egress.external }}
+---
+{{- if and $value.hosts $value.addresses }}
+{{- fail "Only one of 'hosts' or 'adresses' can be specified in the same rule"}}
+{{- end }}
+kind: ServiceEntry
+apiVersion: networking.istio.io/v1beta1
+metadata:
+  name: "{{ template "app.name" $ }}-egress-{{ $index }}-external-se"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+{{/*  TODO: Suggestion: throw service entry and implement FQDN Netpol*/}}
+  {{- if $value.hosts }}
+  hosts:
+    {{- range $value.hosts }}
+    - {{ . }}
+    {{- end }}
+  # Only add resolution if hosts is specified
+  resolution: DNS
+  {{- end }}
+  {{- if $value.addresses }}
+  # Hosts are required field. Set to dummy value
+  hosts:
+    - "dummy-host-{{ $index }}.ssb.no"
+  addresses:
+    {{- range $value.addresses }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- if $value.ports }}
+  ports:
+    {{- range $value.ports }}
+    - name: {{ .name }}
+      number: {{ .port }}
+      protocol: {{ .protocol }}
+    {{- end }}
+  {{- end }}
+  # Export to current namespace to avoid leakage to other namespaces
+  exportTo:
+    - "."
+  location: MESH_EXTERNAL
+{{- end}}
+{{- end}}

@@ -69,23 +69,6 @@ tests:
           of: ConfigMap
       - matchSnapshot: {}
 
-  - it: should render NetworkPolicy
-    templates:
-      - network-policy.yaml
-    values:
-      - ./values/helmrelease-all-values.yaml
-    set:
-      appType: "frontend"
-    release:
-      name: unittest-app
-      namespace: unittest
-    asserts:
-      - hasDocuments:
-          count: 1
-      - isKind:
-          of: NetworkPolicy
-      - matchSnapshot: {}
-
   - it: should render ServiceAccount
     templates:
       - serviceaccount.yaml
@@ -106,23 +89,6 @@ tests:
   - it: should render ServiceEntry for cloudsql
     templates:
       - serviceentry-cloudsql.yaml
-    values:
-      - ./values/helmrelease-all-values.yaml
-    set:
-      appType: "frontend"
-    release:
-      name: unittest-app
-      namespace: unittest
-    asserts:
-      - hasDocuments:
-          count: 1
-      - isKind:
-          of: ServiceEntry
-      - matchSnapshot: {}
-
-  - it: should render ServiceEntry for https
-    templates:
-      - serviceentry-https.yaml
     values:
       - ./values/helmrelease-all-values.yaml
     set:

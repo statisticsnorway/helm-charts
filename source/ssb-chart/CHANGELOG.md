@@ -1,5 +1,145 @@
 # Changelog - ssb-chart
 
+## v4.0.0
+
+Updates in this release:
+
+* Introduced new field: `access` which replaces `networkpolicy`, `egress`, `exposed` and `istioEndUserAuth`
+* Remove fields:
+  - `networkpolicy`
+  - `egress`
+  - `istioEndUserAuth`
+  - `exposed`
+* The volume `/tmp` is mounted as default into all deployments
+* Ingress and egress traffic is denied by default, except egress to kube-dns. Rules must be explicitly configured with the `access` field.
+
+In summary: The updates are mostly related to making network access more readable.
+
+PS: for access.egress.external we use Istio `ServiceEntry` p.t.. This opens egress for the entire namespace the deployment runs in.
+
+### Migration guide
+
+#### tmp volume
+
+The explicit `/tmp` volume mount can now be removed from the helm chart as this is mounted as default for all new
+volumes.
+
+This means you can remove the following configration from our manifest:
+```yaml
+volumes:
+- name: tmp-volume
+  emptyDir: {}
+volumeMounts:
+- name: tmp-volume
+  mountPath: /tmp
+```
+
+
+#### The new `access` field
+See also examples under `tests` folder.
+
+
+##### Exposed
+Before:
+```yaml
+exposed: true
+```
+
+After:
+```yaml
+access:
+  ingress:
+    external:
+      gateways:
+        - type: public
+```
+
+##### networkpolicy
+Before:
+```yaml
+networkpolicy:
+  enabled: true
+```
+
+After:
+No changes in access-fields necessary. All ingress traffic are not allowed by default.
+
+
+Before:
+```yaml
+networkpolicy:
+  enabled: false
+```
+
+After:
+Fields must be set for ingress and egress rules since all network traffic are blocked by default in v4 of chart.
+
+##### egress
+Before:
+```yaml
+egress:
+- "ssb.no"
+- "secretmanager.googleapis.com"
+```
+
+After:
+```yaml
+access:
+  egress:
+    external:
+    - hosts:
+        - "ssb.no"
+        - "secretmanager.googleapis.com"
+      ports:
+        - name: https
+          port: 443
+          protocol: HTTPS
+```
+
+##### istioEndUserAuth
+Before:
+```yaml
+istioEndUserAuth:
+  audiences:
+  - jupyterhub
+  excludePaths:
+  - "/api-docs"
+  - "/api-docs/*"
+
+```
+
+After:
+Issuer must be specified
+```yaml
+access:
+  ingress:
+    external:
+      gateways:
+        - type: public
+          allow:
+            - jwt:
+                issuer: https://keycloak.ssb.no/auth/realms/ssb
+                audiences:
+                  - jupyterhub
+            - paths: [ "/api-docs/", "/api-docs/*" ]
+```
+
+##### Not exposed, no istioEndUserAuth, nor egress
+Before:
+```yaml
+istioEndUserAuth:
+  enabled: false
+exposed: false
+egress: []
+```
+
+After
+No changes to access fields are necessary as it is restrictive and does not allow traffic by default.
+
+
+---
+
+
 ## v3.0.1
 
 Updates in this release:
@@ -61,7 +201,7 @@ The "exportTo" configuration with a value of "." defines an export to the same n
 Support for using Cloud SQL connectors instead of the CloudSql proxy.
 
 Cloud SQL connectors support IamAuthentication which gives improved security over cloudSql proxy.
-If you're using Go, Java, or Python, consider using the corresponding Cloud SQL connector which does everything the 
+If you're using Go, Java, or Python, consider using the corresponding Cloud SQL connector which does everything the
 proxy does:
 https://github.com/GoogleCloudPlatform/cloud-sql-proxy/blob/main/README.md
 
@@ -71,8 +211,8 @@ cloudsql:
   enabled: true
   useSqlProxy: false
 ```
-Setting the `useSqlProxy` option to `false` will skip the addition of the cloudsql-proxy, but will keep the creation 
-of the `ServiceEntry` making it possible to connect to the Cloud SQL database. The value defaults to `true` if not 
+Setting the `useSqlProxy` option to `false` will skip the addition of the cloudsql-proxy, but will keep the creation
+of the `ServiceEntry` making it possible to connect to the Cloud SQL database. The value defaults to `true` if not
 set, for backward compatibility.
 
 If the developers opt to use IamAuthentication to the Cloud SQL database the cloudsql-proxy is not needed.
@@ -91,9 +231,9 @@ is intended for connecting from your local machine (a database tool for instance
 Support for setting the "-enable-iam-login" argument for
 the cloudsql-proxy.
 
-This setting enables Postgresql database auth using the Workload Identity SA for the application. 
-Note that the Sqluser must be created with "type: CLOUD_IAM_SERVICE_ACCOUNT" and the username 
-must be set to the Workload Identity SA without the .gserviceaccount.com suffix. Requires 
+This setting enables Postgresql database auth using the Workload Identity SA for the application.
+Note that the Sqluser must be created with "type: CLOUD_IAM_SERVICE_ACCOUNT" and the username
+must be set to the Workload Identity SA without the .gserviceaccount.com suffix. Requires
 cloudsql-proxy >= 1.20.
 
 ---

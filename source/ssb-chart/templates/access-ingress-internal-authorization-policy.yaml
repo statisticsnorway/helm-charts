@@ -1,0 +1,91 @@
+{{- if (((.Values.access).ingress).internal) }}
+{{- range .Values.access.ingress.internal }}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: "{{ template "app.name" $ }}-ingress-{{ required "Missing namespace" .namespace }}-{{ required "Missing application" .application }}"
+  labels:
+{{ include "default.labels" $ | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "app.name" $ }}
+  action: ALLOW
+  rules:
+    {{- $potentialFromPrincipal := printf "cluster.local/ns/%s/sa/%s-sa" .namespace .application }}
+    {{- $fromPrincipal := coalesce .serviceaccount $potentialFromPrincipal }}
+  {{- if not .allow }}
+    - from:
+        - source:
+            principals: [ "{{ $fromPrincipal }}" ]
+  {{- else }}
+    {{- range .allow }}
+    - from:
+        - source:
+            principals: [ "{{ $fromPrincipal }}" ]
+            {{- if .jwt }}
+            {{- /* The request identity is in the format of "<ISS>/<SUB>" */}}
+            requestPrincipals: [ "{{ required "issuer is required when jwt is in use" .jwt.issuer }}/*" ]
+            {{- end}}
+      {{- if or .paths .methods }}
+      to:
+        - operation:
+
+            {{- if .paths}}
+            paths:
+              {{- range .paths }}
+              - "{{ . }}"
+              {{- end }}
+            {{- end }}
+            {{- if .methods}}
+            methods:
+              {{- range .methods }}
+              - "{{ . }}"
+              {{- end }}
+            {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+---
+  {{- if .allow }}
+    {{/* Merge all jwt-rules into one list, such that we only need one RequestAuthentication per element in access.ingress.internal */}}
+    {{- $jwtRules := list }}
+    {{- range .allow }}
+      {{- if .jwt }}
+        {{- $jwtRules = append $jwtRules .jwt }}
+      {{- end }}
+    {{- end }}
+    {{- if $jwtRules }}
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: "{{ template "app.name" $ }}-ingress-{{.namespace }}-{{ .application }}-request-auth"
+  labels:
+{{ include "default.labels" $| indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "app.name" $ }}
+  jwtRules:
+    # Istio will use OpenId discovery to fetch
+    # the public certificate needed to validate JWT signatures.
+      {{- range $jwtRules }}
+    - issuer: "{{ .issuer }}"
+      # Only allow the request if the JWT contains at least one of the audiences
+      # in the list below.
+      audiences:
+        {{-  range required "Audiences are required when jwt is in use" .audiences }}
+        - {{ . }}
+        {{ end }}
+      # Forward this token to the upstream application so it can read user info
+      # from the JWT or use it for authentication in calls to other backends.
+      forwardOriginalToken: true
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end}}
+{{- end}}
+
+
+

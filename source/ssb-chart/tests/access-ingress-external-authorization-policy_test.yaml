@@ -1,0 +1,184 @@
+suite: test access ingress internal authorization policy
+templates:
+  - access-ingress-external-authorization-policy.yaml
+tests:
+
+  - it: should not panic if empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render nothing if ingress external is empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          external: null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render nothing if gateways is empty
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          external:
+            gateways: [ ]
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should fail if invalid gateway type
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          external:
+            gateways:
+              - type: foo
+    asserts:
+      - failedTemplate:
+          errorMessage: "unsupported gateway type specified"
+
+  - it: should render authorization policy
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          external:
+            gateways:
+              - type: public
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-public-gateway
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/istio-system/sa/istio-ingressgateway
+
+  - it: should render authorization policy with methods in rule
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          external:
+            gateways:
+              - type: public
+                allow:
+                  - methods: [ "get", "post" ]
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-public-gateway
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/istio-system/sa/istio-ingressgateway
+              to:
+                - operation:
+                    methods:
+                      - "get"
+                      - "post"
+
+
+  - it: should render authorization policy with methods and when in rule
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          external:
+            gateways:
+              - type: public
+                allow:
+                  - methods: [ "GET" ]
+                    when:
+                      - key: request.headers[Authorization]
+                        values: [ "Bearer *" ]
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-public-gateway
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/istio-system/sa/istio-ingressgateway
+              to:
+                - operation:
+                    methods:
+                      - "GET"
+              when:
+                - key: request.headers[Authorization]
+                  values: [ "Bearer *" ]
+
+
+  - it: should render authorization policy with methods and paths in rule
+    values:
+      - ./values/default-values.yaml
+    set:
+      access:
+        ingress:
+          external:
+            gateways:
+              - type: public
+                allow:
+                  - methods: [ "get" ]
+                    paths: [ "api/" ]
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-public-gateway
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - cluster.local/ns/istio-system/sa/istio-ingressgateway
+              to:
+                - operation:
+                    paths:
+                      - "api/"
+                    methods:
+                      - "get"

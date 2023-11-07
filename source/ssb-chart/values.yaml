@@ -15,10 +15,6 @@ appType: ""
 # Required.
 cluster:
 
-# -- Set to `true´ to expose application publicly through the ingress gateway.
-# Optional.
-exposed: false
-
 # -- Which domain the app will belong to.
 # Optional.
 domain: ssb.no
@@ -221,16 +217,34 @@ metrics:
 serviceAccount:
   create: true
 
-# -- (object) Generates a simple "ingress" network policy (i.e. restrict incoming traffic to the application),
-# that only allows traffic to 'port.containerport' (default) or 'port.targetport' (if specified), as well
-# as any 'extraPorts'. This is a simple "ingress" network policy, "egress" traffic is not restricted here.
-# See examples section below for more details.
-# Optional.
-# @notationType -- yaml
-networkpolicy:
-  enabled: true
-  # -- Optionally create your own NetworkPolicy for the current application.
-  overrideDefaultPolicy: {}
+
+  # Two unique ID's are available for use with user/app authentication in todays platform
+  #
+  # 1. Keycloak unique client ID in the SSB Realm
+  #    This is "audience" referenced in the old IstioEndUserAuth config.
+  #    Caller and callee must agree on this authentication through the client config
+  #    and the validation.
+  #
+  # 2. Istio Spiffe ID/K8s SA
+  #   This is the "principal" referenced in AuthorizationPolicy manifest.
+  #
+  #   Applications must be referenced by their principal name
+  #   which is the unique Service Account name tied to a Spiffe/ID assigned by Istio.
+  #   This is needed to ensure the originity of the request (non-repudiation).
+  #
+  # The next (first) layer of security is Network policies. But note that these does not guarantee
+  # non-repuditation. Inside K8s applications in network policies are referenced by namespace and/or pod
+  # labels/names. These labels might not be unique.
+
+  # Policy example for an app with SA/name "app1" in namespace "n1"
+access:
+  ingress:
+    external:
+      gateways: []
+    internal: []
+  egress:
+    external: []
+    internal: []
 
 # -- (object) PodSecurityContext.
 # Default security context for pods. If set in both SecurityContext and PodSecurityContext,
@@ -287,13 +301,6 @@ ContainerSecurityContext:
     # -- RuntimeDefault: As defined by the container runtime.
     type: RuntimeDefault
 
-# -- Defines a list of external https resources you need to be able to reach from
-# your application. Wildcard is supported, but the Helm chart will replace '*'
-# with 'wildcard' to avoid errors.
-# See examples section below for more details.
-# Optional.
-egress: []
-
 # (object) If enabled, you will get a Cloud SQL Proxy sidecar container to your application that can
 # connect to an external instance specified in 'cloudsql.instance'. Aa egress entry is automatically added
 # to allow access to the external instance using the 'cloudsql.ip'. Note that the default `cloudsql.version`
@@ -339,19 +346,6 @@ apiGateway:
   image:
   version:
   port:
-
-# -- (object) Application authentication with Istio policies.
-# Skip authentication for selected paths with "excludePaths".
-# Require authentication for selected paths with "includePaths".
-# Note that "includePaths" have precedence over "excludePaths".
-# Customize which apps that can authenticate to get access using "audience".
-# See examples section below for more details.
-# Optional.
-# @notationType -- yaml
-istioEndUserAuth:
-  # -- Enable or disable authentication.
-  # Istio end-user auth is enabled by default for "AppType: backend".
-  enabled: true
 
 # -- Support for adding additional matching rules and routes to the Istio VirtualService object.
 # Route traffic to a path specified in `name` to the service port specified `serviceport`.

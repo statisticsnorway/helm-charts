@@ -1,0 +1,112 @@
+suite: test access ingress internal where jwt rules are specified
+templates:
+  - access-ingress-external-authorization-policy.yaml
+tests:
+
+  - it: should render two documents
+    values:
+      - ./values/access-ingress-external-authorization-policy-jwt-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+
+  - it: authorization policy  should include default labels and name
+    values:
+       - ./values/access-ingress-external-authorization-policy-jwt-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-public-gateway
+      - isKind:
+          of: AuthorizationPolicy
+
+  - it: request authentication should include default labels and name in request authentication
+    values:
+       - ./values/access-ingress-external-authorization-policy-jwt-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: metadata.labels.app
+          value: unittest-app
+      - equal:
+          path: metadata.labels.billing-project
+          value: ssb-unittest
+      - matchRegex:
+          path: metadata.labels.chart
+          pattern: ^ssb-chart-
+      - equal:
+          path: metadata.labels.release
+          value: unittest-app-release
+      - equal:
+          path: metadata.name
+          value: unittest-app-ingress-public-request-auth
+      - isKind:
+          of: RequestAuthentication
+
+  - it: authorization policy should render name, ALLOW action to paths in rules
+    values:
+       - ./values/access-ingress-external-authorization-policy-jwt-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.action
+          value: ALLOW
+      - equal:
+          path: spec.rules
+          value:
+            - from:
+                - source:
+                    principals:
+                      - "cluster.local/ns/istio-system/sa/istio-ingressgateway"
+                    requestPrincipals:
+                      - "https://sso.example.com/auth/realms/ssb/*"
+              to:
+              - operation:
+                  paths:
+                    - "api/"
+                  methods:
+                    - "GET"
+
+  - it: request authentication should render name, ALLOW action to paths in rules
+    values:
+       - ./values/access-ingress-external-authorization-policy-jwt-values.yaml
+    release:
+      name: unittest-app-release
+      namespace: unittesting
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: unittest-app
+      - equal:
+          path: spec.jwtRules
+          value:
+            - issuer: "https://sso.example.com/auth/realms/ssb"
+              audiences:
+                - "ekstern-client-id"
+              forwardOriginalToken: true
