@@ -15,12 +15,12 @@ spec:
   rules:
     {{- $potentialFromPrincipal := printf "cluster.local/ns/%s/sa/%s-sa" .namespace .application }}
     {{- $fromPrincipal := coalesce .serviceaccount $potentialFromPrincipal }}
-  {{- if not .rules }}
+  {{- if not .allow }}
     - from:
         - source:
             principals: [ "{{ $fromPrincipal }}" ]
   {{- else }}
-    {{- range .rules }}
+    {{- range .allow }}
     - from:
         - source:
             principals: [ "{{ $fromPrincipal }}" ]
@@ -48,10 +48,10 @@ spec:
     {{- end }}
   {{- end }}
 ---
-  {{- if .rules }}
+  {{- if .allow }}
     {{/* Merge all jwt-rules into one list, such that we only need one RequestAuthentication per element in access.ingress.internal */}}
     {{- $jwtRules := list }}
-    {{- range .rules }}
+    {{- range .allow }}
       {{- if .jwt }}
         {{- $jwtRules = append $jwtRules .jwt }}
       {{- end }}

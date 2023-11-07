@@ -15,13 +15,12 @@ spec:
   action: ALLOW
   rules:
     {{- $principalInUse := index $avaliableTypePrincipals .type }}
-  {{- if not .rules }}
+  {{- if not .allow }}
     - from:
         - source:
             principals: [ "{{ required "unsupported gateway type specified" $principalInUse }}" ]
   {{- else }}
-{{/*   TODO: rename rules to allow - */}}
-    {{- range .rules }}
+    {{- range .allow }}
     - from:
         - source:
             principals: [ "{{ $principalInUse }}" ]
@@ -53,10 +52,10 @@ spec:
     {{- end }}
   {{- end }}
 ---
-{{- if .rules }}
+{{- if .allow }}
     {{/* Merge all jwt-rules into one list, such that we only need one RequestAuthentication per element in access.ingress.internal */}}
     {{- $jwtRules := list }}
-    {{- range .rules }}
+    {{- range .allow }}
       {{- if .jwt }}
         {{- $jwtRules = append $jwtRules .jwt }}
       {{- end }}

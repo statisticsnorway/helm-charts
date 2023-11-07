@@ -11,7 +11,7 @@ access:
     internal:
       - application: app3
         namespace: n3
-        rules:
+        allow:
           - methods: ["GET"]
             paths: ["api/"]
             jwt:

@@ -13,7 +13,7 @@ access:
         namespace: n1
       - application: app3
         namespace: n3
-        rules:
+        allow:
           - methods: ["GET"]
             paths: ["api/", "/status"]
           - methods: ["POST"]

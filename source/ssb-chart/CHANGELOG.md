@@ -116,7 +116,7 @@ access:
     external:
       gateways:
         - type: public
-          rules:
+          allow:
             - jwt:
                 issuer: https://keycloak.ssb.no/auth/realms/ssb
                 audiences:

@@ -84,7 +84,7 @@ tests:
           external:
             gateways:
               - type: public
-                rules:
+                allow:
                   - methods: [ "get", "post" ]
     asserts:
       - hasDocuments:
@@ -118,7 +118,7 @@ tests:
           external:
             gateways:
               - type: public
-                rules:
+                allow:
                   - methods: [ "GET" ]
                     when:
                       - key: request.headers[Authorization]
@@ -157,7 +157,7 @@ tests:
           external:
             gateways:
               - type: public
-                rules:
+                allow:
                   - methods: [ "get" ]
                     paths: [ "api/" ]
     asserts:
