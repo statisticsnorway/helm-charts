@@ -343,7 +343,7 @@
                           "public"
                         ]
                       },
-                      "rules": {
+                      "allow": {
                         "methods": {
                           "type": "string"
                         },
@@ -381,7 +381,7 @@
                   "serviceaccount": {
                     "type": "string"
                   },
-                  "rules": {
+                  "allow": {
                     "methods": {
                       "type": "string"
                     },
