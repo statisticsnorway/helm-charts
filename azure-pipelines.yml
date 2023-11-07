@@ -25,6 +25,9 @@ jobs:
   - script:  helm plugin install https://github.com/quintush/helm-unittest
     displayName: 'Installing helm unittest'
 
+  - script:  helm plugin install https://github.com/quintush/helm-unittest
+    displayName: 'Print helm plugin versions'
+
   # Run the Helm unittests
   - script: helm unittest source/ssb-chart -o source/ssb-chart/helm_unittest_testresults.xml -t JUnit
     displayName: 'Running unittests for ssb-chart'
