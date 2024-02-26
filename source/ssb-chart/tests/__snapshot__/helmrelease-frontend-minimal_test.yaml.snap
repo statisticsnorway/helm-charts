@@ -47,10 +47,16 @@ should render Deployment:
                 runAsUser: 1000
                 seccompProfile:
                   type: RuntimeDefault
+              volumeMounts:
+                - mountPath: /tmp
+                  name: tmp-volume
           securityContext:
             seccompProfile:
               type: RuntimeDefault
           serviceAccountName: unittest-app-sa
+          volumes:
+            - emptyDir: {}
+              name: tmp-volume
 should render Service:
   1: |
     apiVersion: v1

@@ -206,6 +206,8 @@ should render Deployment:
               operator: Equal
               value: some-node-label
           volumes:
+            - emptyDir: {}
+              name: tmp-volume
             - name: secret-volume
               secret:
                 items:
@@ -220,8 +222,6 @@ should render Deployment:
                     path: myconfig.cfg
                 name: configmap-name
               name: config-volume
-            - emptyDir: {}
-              name: tmp-volume
             - configMap:
                 name: unittest-app-application-config
               name: application-config-volume

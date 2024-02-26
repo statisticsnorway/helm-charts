@@ -125,10 +125,10 @@ spec:
           {{-  range .Values.image.args }}
             - {{ . }}{{ end }}
           {{- end }}
-          {{- if or (.Values.configs) (.Values.volumeMounts) (and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled) }}
           volumeMounts:
           - name: tmp-volume
             mountPath: /tmp
+          {{- if or (.Values.configs) (.Values.volumeMounts) (and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled) }}
           {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | trim | indent 10 }}
           {{- end }}
@@ -210,13 +210,13 @@ spec:
       hostAliases:
 {{ toYaml .Values.hostAliases | trim | indent 8 }}
       {{- end }}
-{{- if or (.Values.volumes) (.Values.configs) (and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled) (.Values.backends) (and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend")) }}
       volumes:
+        - name: tmp-volume
+          emptyDir: { }
+{{- if or (.Values.volumes) (.Values.configs) (and ( or (eq (toString .Values.persistence.enabled) "true") (eq (toString .Values.persistence.enabled) "True")) .Values.persistence.enabled) (.Values.backends) (and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend")) }}
 {{- if .Values.volumes }}
 {{ toYaml .Values.volumes | trim | indent 8 }}
 {{- end }}
-        - name: tmp-volume
-          emptyDir: { }
 {{- if and (and ( or (eq (toString .Values.oauth2Proxy.enabled) "true") (eq (toString .Values.oauth2Proxy.enabled) "True")) .Values.oauth2Proxy.enabled) (eq .Values.appType "frontend") }}
         - name: "oauth2-proxy-client-config"
           secret:
