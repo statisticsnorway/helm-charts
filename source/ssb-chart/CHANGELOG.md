@@ -1,5 +1,13 @@
 # Changelog - ssb-chart
 
+## v4.0.2
+
+Bugfix of tmp volumes not being present in deployment. 
+
+## v4.0.1
+
+Bugfix
+
 ## v4.0.0
 
 Updates in this release:

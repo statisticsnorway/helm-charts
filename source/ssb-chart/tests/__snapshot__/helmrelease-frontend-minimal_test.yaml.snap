@@ -6,7 +6,7 @@ should render Deployment:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.1
+        chart: ssb-chart-4.0.2
         heritage: Helm
         release: unittest-app
       name: unittest-app
@@ -47,10 +47,16 @@ should render Deployment:
                 runAsUser: 1000
                 seccompProfile:
                   type: RuntimeDefault
+              volumeMounts:
+                - mountPath: /tmp
+                  name: tmp-volume
           securityContext:
             seccompProfile:
               type: RuntimeDefault
           serviceAccountName: unittest-app-sa
+          volumes:
+            - emptyDir: {}
+              name: tmp-volume
 should render Service:
   1: |
     apiVersion: v1
@@ -59,7 +65,7 @@ should render Service:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.1
+        chart: ssb-chart-4.0.2
         heritage: Helm
         release: unittest-app
       name: unittest-app
@@ -80,7 +86,7 @@ should render ServiceAccount:
       labels:
         app: unittest-app
         billing-project: ssb-unittest
-        chart: ssb-chart-4.0.1
+        chart: ssb-chart-4.0.2
         heritage: Helm
         release: unittest-app
       name: unittest-app-sa

@@ -1,0 +1,26 @@
+suite: test deployment
+templates:
+  - deployment.yaml
+tests:
+
+  - it: should always render tmp volume and volumeMounts
+    set:
+      name: "myapp"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.volumes
+          value:
+            - name: tmp-volume
+              emptyDir: { }
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: myapp-cont
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts
+          value:
+            - name: tmp-volume
+              mountPath: /tmp
+
+
