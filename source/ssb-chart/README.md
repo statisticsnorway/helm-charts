@@ -1,6 +1,6 @@
 # ssb-chart
 
-![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 4.0.2](https://img.shields.io/badge/Version-4.0.2-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Generic chart for SSB applications
 
@@ -1057,7 +1057,7 @@ create: true
 # Two unique ID's are available for use with user/app authentication in todays platform
 #
 # 1. Keycloak unique client ID in the SSB Realm
-#    This is "audience" referenced in the current IstioEndUserAuth config.
+#    This is "audience" referenced in the old IstioEndUserAuth config.
 #    Caller and callee must agree on this authentication through the client config
 #    and the validation.
 #

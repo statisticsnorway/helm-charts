@@ -21,7 +21,7 @@ This is a repository for Helm charts.
 1. Update the Helm chart in the `source/` directory
 1. Add release notes to the helm charts `CHANGELOG.md` file
 1. Increment the version string in the `Charts.yaml` file
-1. Update the `Values` descriptions using the "[helm-docs](https://github.com/norwoodj/helm-docs)" command
+1. Update the `Values` descriptions using the "[helm-docs](https://github.com/norwoodj/helm-docs)" command (` helm-docs -o README.md`)
 1. Run unit tests `helm unittest source/ssb-chart`
 1. Validate the changes to the test snapshots and rerun unit tests with `-u` to update
 1. Run the `./bin/build.sh` script to package the new release
